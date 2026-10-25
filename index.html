@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Music Discovery</title>
-  <meta name="description" content="Ma vie, c'est de partager de la musique. Allume la chaîne, oriente-la, garde ce qui te plaît.">
+  <meta name="description" content="Music Discovery : allume la chaîne, choisis la suite, garde ce qui te plaît.">
   <meta name="theme-color" content="#dcdbd8">
   <script>
     // la teinte est posée tout de suite (évite un flash de la mauvaise couleur) ; sans choix, on suit le mode sombre du téléphone
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=42">
+  <link rel="stylesheet" href="styles.css?v=43">
   <link rel="stylesheet" href="teintes.css?v=14">
 </head>
 <body>
@@ -49,12 +49,11 @@
     <!-- ═════════════ LE CARTON D'ENTRÉE ═════════════ -->
     <section class="ecran ecran-allumage" data-ecran="allumage">
       <div class="allumage-texte">
-        <p class="surtitre">Music Discovery</p>
-        <h1><span class="ligne">Ma vie, c'est</span> <span class="ligne">de partager de la&nbsp;musique</span></h1>
+        <h1>Music Discovery</h1>
       </div>
       <ol class="etapes" aria-label="Comment ça marche">
         <li><b>1</b><span>Allume la chaîne</span></li>
-        <li><b>2</b><span>Oriente la suite</span></li>
+        <li><b>2</b><span>Choisis la suite</span></li>
         <li><b>3</b><span>Garde ce qui te&nbsp;plaît</span></li>
       </ol>
       <div class="panneau-allumage">
@@ -79,6 +78,8 @@
          Une micro-chaîne CD du milieu des années 2000 : le lecteur (écran ou disque,
          la vidéo, les commandes), le tuner pour orienter la suite, deux enceintes. -->
     <section class="ecran ecran-machine" data-ecran="machine" hidden>
+      <!-- une pub YouTube passe avant le morceau : un petit mot, au-dessus de la chaîne -->
+      <div class="avis-pub avis-machine" data-avis hidden></div>
       <div class="hifi">
         <div class="hifi-enceinte hifi-enceinte-g" aria-hidden="true">
           <span class="hp-plaque">AG-08<small>2 voies</small></span>
@@ -208,13 +209,13 @@
         <!-- la pile : trois disques posés sous la chaîne, pour choisir le prochain titre -->
         <section class="tuner pile" id="tuner" aria-labelledby="pile-titre">
           <div class="pile-haut">
-            <h2 class="pile-titre" id="pile-titre">La suite, c'est toi qui la poses</h2>
+            <h2 class="pile-titre" id="pile-titre">Choisis la suite</h2>
             <div class="sources" id="sources" role="group" aria-label="Ce que joue la chaîne" hidden></div>
           </div>
           <div class="pile-disques" id="pile-disques" role="radiogroup" aria-labelledby="pile-titre" aria-live="polite"></div>
           <div class="pile-pied">
-            <p class="pile-aide">Rien choisi ? Celui du milieu passe tout seul.</p>
-            <button class="pile-autres" id="pile-autres" data-action="autres-disques" hidden>Autres disques</button>
+            <button class="pile-flemme" id="pile-flemme" data-action="auto">Flemme de choisir le son d'après&nbsp;? <u>Clique ici</u></button>
+            <button class="pile-autres" id="pile-autres" data-action="autres-disques" hidden><span aria-hidden="true">↻</span> Autres disques</button>
           </div>
         </section>
 
@@ -234,7 +235,6 @@
         </aside>
       </div>
 
-      <div class="avis-pub avis-machine" data-avis hidden></div>
       <p class="machine-source" id="machine-source" hidden></p>
       <section class="livret livret-machine" id="livret-machine" aria-label="Plus d'infos sur le morceau qui passe" hidden></section>
     </section>
@@ -245,6 +245,19 @@
 
   <!-- ═════════════ MA SÉLECTION ═════════════ -->
   <div class="voile" id="voile" data-action="fermer-panneaux" hidden></div>
+
+  <!-- la toute première fois : comment ça marche (la musique démarre en fermant) -->
+  <div class="aide" id="aide" role="dialog" aria-modal="true" aria-labelledby="aide-titre" hidden>
+    <div class="aide-carte">
+      <p class="aide-titre" id="aide-titre">Comment ça marche</p>
+      <ol class="aide-liste">
+        <li><b>Choisis la suite.</b> Sous la chaîne, trois disques : clique celui que tu veux entendre ensuite. Flemme&nbsp;? La radio peut enchaîner toute seule.</li>
+        <li><b>Fais ta sélection.</b> Un morceau te plaît&nbsp;? « J'aime bien » le garde dans ta sélection.</li>
+        <li><b>Écoute-la.</b> Dès deux morceaux gardés, tu peux n'écouter que ta sélection, et continuer à y ajouter des titres.</li>
+      </ol>
+      <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">C'est parti</button>
+    </div>
+  </div>
   <aside class="bac" id="bac" aria-label="Ma sélection" hidden>
     <div class="bac-tete">
       <div>
@@ -297,6 +310,6 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=15"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=43"></script>
+  <script src="app.js?v=44"></script>
 </body>
 </html>

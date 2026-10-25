@@ -88,6 +88,9 @@ const S = {
   tirage: 0,              // « Autres disques » : combien de fois on a reposé la pile
   dejaVus: new Set(),     // les disques déjà proposés pour ce morceau
   axeSuivi: null,         // on a choisi un côté : la pile suivante garde la même échelle
+  auto: memoire.lire('md-auto', false), // « Flemme de choisir » : la radio enchaîne toute seule
+  autoDir: null, autoPas: 0, // le pilote automatique glisse doucement dans un sens, puis change
+  pub: false,             // une pub YouTube semble passer avant le morceau
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
   aime: new Set(memoire.lire('md-aime', [])),
@@ -459,7 +462,7 @@ const AVIS_PUB = `
     <button class="lien-bouton" data-action="encart-extraits">Passer en mode extraits</button>
   </div>`;
 function majAvis() {
-  const montrer = S.lecture === 'yt' && !memoire.lire('md-encart-pub', false);
+  const montrer = S.lecture === 'yt' && S.pub && !memoire.lire('md-encart-pub-v2', false);
   $$('[data-avis]').forEach(a => { if (montrer && !a.innerHTML.trim()) a.innerHTML = AVIS_PUB; a.hidden = !montrer; });
 }
 
@@ -545,6 +548,21 @@ window.onYouTubeIframeAPIReady = () => {
     }
   });
 };
+// une pub avant le morceau : le lecteur tourne, mais le morceau reste à 0 seconde. On prévient (au-dessus de la chaîne)
+let veillePub = null;
+function surveillerPub(m, debut = 0) {
+  clearInterval(veillePub);
+  S.pub = false; majAvis();
+  let immobile = 0, n = 0;
+  veillePub = setInterval(() => {
+    if (S.joue !== m.id || S.lecture !== 'yt' || ++n > 120) { clearInterval(veillePub); return; }
+    let st = -1, t = 0;
+    try { st = lecteur.getPlayerState(); t = lecteur.getCurrentTime() || 0; } catch (e) {}
+    if (t > debut + 0.8) { clearInterval(veillePub); return; }
+    if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING) immobile++;
+    if (immobile >= 5 && !S.pub) { S.pub = true; majAvis(); }
+  }, 1000);
+}
 // une vidéo qui ne démarre jamais (lecture automatique bloquée, vidéo coincée) ne doit pas tout figer
 function surveillerDemarrage(m) {
   clearTimeout(demarrage);
@@ -554,7 +572,8 @@ function surveillerDemarrage(m) {
     let st = -1;
     try { st = lecteur.getPlayerState(); } catch (e) {}
     if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.PAUSED) return;
-    if (st === YT.PlayerState.BUFFERING && patience-- > 0) { demarrage = setTimeout(verif, 6000); return; }
+    // une pub passe : on la laisse finir (jusqu'à deux minutes)
+    if ((st === YT.PlayerState.BUFFERING || S.pub) && patience-- > (S.pub ? -18 : 0)) { demarrage = setTimeout(verif, 6000); return; }
     S.bloque = true;
     echecRadio(m, 'ne démarre pas');
     majEtat();
@@ -579,6 +598,7 @@ function jouerMorceau(m, debut = 0) {
   try { lecteur.loadVideoById(debut ? { videoId: m.yt, startSeconds: debut } : m.yt); } catch (e) {}
   appliquerVolume();
   surveillerDemarrage(m);
+  surveillerPub(m, debut);
   majEtat();
 }
 function jouerExtraitComplet(m, essai = 0) {
@@ -760,8 +780,7 @@ function construireSuite(depuis, n = 6) {
 const AXES = [['calme', 'energique'], ['pose', 'dansant'], ['connu', 'confidentiel']];
 const ETIQUETTES = { calme: 'plus calme', energique: 'plus énergique', pose: 'moins groovy', dansant: 'plus groovy', connu: 'plus mainstream', confidentiel: 'plus confidentiel' };
 const axeDe = dir => AXES.findIndex(a => a.includes(dir));
-function calculerPile(cur) {
-  if (!cur) return [];
+function poolPile(cur) {
   const selection = S.source === 'selection';
   const recents = new Set(S.historique.slice(-40));
   const versionsRecentes = new Set(S.historique.slice(-12).map(id => parId[id] && parId[id].version));
@@ -770,6 +789,27 @@ function calculerPile(cur) {
   if (pool.length < 6) pool = base.filter(m => !S.dejaVus.has(m.id) && !recents.has(m.id));
   if (pool.length < 3) pool = base.filter(m => !S.dejaVus.has(m.id));
   if (pool.length < 3) pool = base;
+  return pool;
+}
+// le pilote automatique : un morceau sur deux fait un pas dans un sens (plus énergique, plus confidentiel…),
+// l'autre reste tout près ; au bout de quatre morceaux, ou au bout de l'échelle, il change de sens
+function prochainAuto(cur) {
+  const pool = poolPile(cur);
+  if (!pool.length) return null;
+  S.autoPas++;
+  if (!S.autoDir || S.autoPas > 4 || !Moteur.possible(cur, S.autoDir, pool, val)) {
+    const avant = S.autoDir;
+    const dirs = Object.keys(Moteur.DIRECTIONS).filter(d => (!avant || axeDe(d) !== axeDe(avant)) && Moteur.possible(cur, d, pool, val));
+    S.autoDir = dirs.length ? hasard(dirs) : null;
+    S.autoPas = 1;
+  }
+  const x = S.autoDir && S.autoPas % 2 === 0 ? Moteur.versDirection(cur, S.autoDir, pool, val, { gout }) : null;
+  return x || parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
+}
+function calculerPile(cur) {
+  if (!cur) return [];
+  const selection = S.source === 'selection';
+  const pool = poolPile(cur);
   if (!pool.length) return [];
   // le milieu : ta sélection garde son ordre, la radio prend le plus proche
   let milieu = null;
@@ -800,6 +840,7 @@ function calculerPile(cur) {
 // la pile du morceau qui passe, et la suite qui part du disque choisi
 function poserPile(cur, { garderAxe = true } = {}) {
   if (!garderAxe) S.axeSuivi = null;
+  if (S.auto && cur) { const x = prochainAuto(cur); S.pile = x ? [{ m: x, dir: null }] : []; S.choix = 0; appliquerChoix(); return; }
   S.pile = calculerPile(cur);
   S.pile.forEach(p => S.dejaVus.add(p.m.id));
   S.choix = S.pile.length === 3 ? 1 : S.pile.length - 1;
@@ -824,6 +865,14 @@ function choisirDisque(i) {
   appliquerChoix();
   clic(900 + i * 300, 0.04, 0.05);
   rendreTuner(); majAfficheur();
+}
+// « Flemme de choisir » : le pilote automatique prend la main, ou te la rend
+function basculerAuto() {
+  S.auto = !S.auto; memoire.ecrire('md-auto', S.auto);
+  S.autoDir = null; S.autoPas = 0; S.dejaVus = new Set(); S.tirage = 0;
+  poserPile(parId[S.joue] || null);
+  clic(S.auto ? 1300 : 700, 0.05, 0.06);
+  rendreTuner({ repose: !S.auto }); majAfficheur();
 }
 // « Autres disques » : on repose la pile, avec d'autres morceaux (et une autre échelle)
 function autresDisques() {
@@ -1009,7 +1058,20 @@ function rendreTuner({ repose = false } = {}) {
   so.hidden = S.gardes.length < 2;
   if (!so.hidden) so.innerHTML = Object.entries(SOURCES).map(([k, x]) => `<button class="source-choix" data-action="source-chaine" data-source="${k}" aria-pressed="${S.source === k}">${x.nom}${k === 'selection' ? ` <b>${S.gardes.length}</b>` : ''}</button>`).join('');
   const el = $('#pile-disques');
-  $('#pile-autres').hidden = !m || S.pile.length < 2;
+  $('#tuner').classList.toggle('en-auto', S.auto);
+  $('#pile-autres').hidden = !m || S.pile.length < 2 || S.auto;
+  $('#pile-flemme').hidden = S.auto;
+  $('#pile-titre').hidden = S.auto && !!m;
+  if (S.auto && m) {
+    const p = S.pile[0];
+    el.innerHTML = `<div class="pilote">
+      <span class="pilote-led" aria-hidden="true"></span>
+      <div class="pilote-textes"><b>Pilote automatique</b><span>La radio enchaîne toute seule, en douceur.${p ? ` Ensuite : <i>${E(p.m.affiche)}</i>, ${E(p.m.artiste)}` : ''}</span></div>
+      <button class="pilote-stop" data-action="auto">Reprendre la main</button>
+    </div>`;
+    majPostIt(m); majGarde();
+    return;
+  }
   if (!m || !S.pile.length) {
     el.innerHTML = `<p class="pile-vide">${m ? 'Plus rien à poser ici : la radio continue toute seule.' : 'Appuie sur lecture : trois disques t\'attendront ici pour choisir la suite.'}</p>`;
     majPostIt(m); majGarde();
@@ -1021,17 +1083,35 @@ function rendreTuner({ repose = false } = {}) {
   majPostIt(m);
   majGarde();
 }
-// un disque de la pile : la vraie pochette si on l'a, sinon un CD gravé, le titre écrit au feutre
+/* sans vraie pochette, on en fabrique une, façon label de disques : une image de la vidéo
+   en bichromie et le titre composé en grand. Trois maquettes (et une couleur par morceau) */
+function pochetteMaison(m) {
+  const h = hache(m.id);
+  const modele = ['bleue', 'blanche', 'bandeau'][h % 3];
+  const titre = String(m.titre).replace(/\s*[([].*?[)\]]\s*/g, ' ').trim() || m.titre;
+  const artiste = Pochettes.artistePrincipal(m.artiste);
+  // la taille du titre : le mot le plus long doit tenir sur une ligne, et le tout sur trois lignes
+  const mots = Math.max(...titre.split(/\s+/).map(w => w.length));
+  const t = Math.max(5, Math.min(15, 84 / mots, 250 / titre.length)).toFixed(2);   // capitales larges
+  const tb = Math.max(5.5, Math.min(12, 118 / mots, 340 / titre.length)).toFixed(2); // texte courant
+  const photo = m.yt ? `<img class="maison-photo" src="https://i.ytimg.com/vi/${E(m.yt)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">` : '';
+  return `<span class="maison maison-${modele}" aria-hidden="true" style="--h:${h % 360};--t:${t};--tb:${tb}">
+    <span class="maison-cadre">${photo}</span>
+    <span class="maison-titre"><span>${E(titre)}</span></span>
+    <span class="maison-artiste">${E(artiste)}${m.annee && artiste.length < 18 ? ` · ${E(m.annee)}` : ''}</span>
+  </span>`;
+}
+// un disque de la pile : la vraie pochette si on l'a, sinon une pochette maison
 function disquePile({ m, dir }, i) {
   const choisi = i === S.choix;
   const mot = dir ? ETIQUETTES[dir] : 'dans la lignée';
-  const pochette = Pochettes.html(m, 'pochette-pile');
-  const officielle = /<img/.test(pochette) && !/est-yt/.test(pochette);
+  const im = Pochettes.image(m);
+  const officielle = im && !im.yt;
   const penche = [-2.4, 1.2, 2.2][i % 3] + ((hache(m.id) % 5) - 2) * 0.4;
   return `<div class="disque-pile${choisi ? ' choisi' : ''}" data-id="${m.id}" data-dir="${dir || ''}" style="--penche:${penche.toFixed(1)}deg;--i:${i}">
     <button class="pile-boite" data-action="choisir-disque" data-i="${i}" role="radio" aria-checked="${choisi}" aria-label="${E(mot)} : ${E(m.affiche)}, ${E(m.artiste)}${choisi ? ' (passe ensuite, rappuie pour l\'écouter maintenant)' : ''}">
       <span class="pile-scotch" aria-hidden="true">${E(mot)}</span>
-      ${officielle ? pochette : `<span class="cd-grave" aria-hidden="true" style="--h:${hache(m.id) % 360}"><span class="cd-grave-disque"></span><span class="cd-grave-ecrit">${E(m.affiche)}</span><span class="cd-grave-artiste">${E(m.artiste)}</span></span>`}
+      ${officielle ? Pochettes.html(m, 'pochette-pile') : pochetteMaison(m)}
       <span class="pile-reflet" aria-hidden="true"></span>
     </button>
     <p class="pile-morceau"><span class="pile-titre-m">${E(m.affiche)}</span><span class="pile-artiste">${E(m.artiste)}</span></p>
@@ -1296,7 +1376,24 @@ function toast(msg, duree = 2800) {
 }
 
 /* ─────────────────────────────── commencer ─────────────────────────────── */
+// la toute première fois : une petite fiche « comment ça marche », la musique part quand on la ferme
 function allumer() {
+  if (!memoire.lire('md-aide-vue', false)) {
+    audioCtx();
+    $('#aide').hidden = false;
+    requestAnimationFrame(() => $('#aide').classList.add('ouverte'));
+    setTimeout(() => $('#aide .gros-bouton').focus(), 60);
+    return;
+  }
+  lancer();
+}
+function fermerAide() {
+  if ($('#aide').hidden) return;
+  memoire.ecrire('md-aide-vue', true);
+  $('#aide').hidden = true; $('#aide').classList.remove('ouverte');
+  if (!demarre()) lancer();
+}
+function lancer() {
   audioCtx();
   clic(220, 0.12, 0.12);
   setTimeout(() => clic(2600, 0.02, 0.04), 140);
@@ -1334,6 +1431,8 @@ const ACTIONS = {
   'pas-aime': () => pasAime(S.joue),
   'choisir-disque': b => choisirDisque(+b.dataset.i),
   'autres-disques': () => autresDisques(),
+  'auto': () => basculerAuto(),
+  'fermer-aide': () => fermerAide(),
   'fidget': b => bidouiller(b),
   'source-chaine': b => choisirSource(b.dataset.source),
   'cosmetique': () => basculerCosmetique(),
@@ -1358,14 +1457,14 @@ const ACTIONS = {
   },
   'fermer-avis-appli': () => { $('#avis-appli').hidden = true; memoire.ecrire('md-avis-appli', true); },
   'ouvrir-bac': () => ouvrirPanneau('bac'),
-  'ouvrir-reglages': () => ouvrirPanneau('reglages'),
+  'ouvrir-reglages': () => { memoire.ecrire('md-reglages-vu', true); $('.bouton-reglages').classList.remove('brille'); ouvrirPanneau('reglages'); },
   'fermer-panneaux': () => fermerPanneaux(),
   'onglet': b => { S.onglet = b.dataset.onglet; rendreBac(); },
   'copier-liste': copierListe,
   'son': b => choisirSon(b.dataset.son),
   'teinte': b => appliquerTeinte(b.dataset.teinte, true),
-  'encart-ok': () => { memoire.ecrire('md-encart-pub', true); majAvis(); },
-  'encart-extraits': () => { memoire.ecrire('md-encart-pub', true); majAvis(); choisirSon('extraits'); },
+  'encart-ok': () => { memoire.ecrire('md-encart-pub-v2', true); majAvis(); },
+  'encart-extraits': () => { memoire.ecrire('md-encart-pub-v2', true); majAvis(); choisirSon('extraits'); },
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-action]');
@@ -1374,14 +1473,14 @@ document.addEventListener('click', e => {
   if (!a) return;
   e.preventDefault();
   // après un clic de souris, le bouton lâche le focus : Espace mettra en pause au lieu de rappuyer dessus
-  if (e.detail > 0 && b.matches('.pile-boite, .pile-maintenant, .pile-autres, .rond, .pilule, .source-choix, .choix-affichage button')) b.blur();
+  if (e.detail > 0 && b.matches('.pile-boite, .pile-maintenant, .pile-autres, .pile-flemme, .pilote-stop, .rond, .pilule, .source-choix, .choix-affichage button')) b.blur();
   // une erreur dans une action ne doit jamais figer le reste du site
   try { a(b); } catch (err) { console.error(err); toast('Oups, quelque chose a coincé. Réessaie.'); }
 });
 /* le clavier : Espace (lecture / pause), ← et → (morceau précédent / suivant),
    J (j'aime bien), X (pas trop comme ça), Échap (refermer) */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
+  if (e.key === 'Escape') { fermerAide(); fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
   if (e.ctrlKey || e.metaKey || e.altKey || S.vue !== 'machine' || !S.joue) return;
   const t = e.target;
   if (t.closest && t.closest('input, textarea, select, [contenteditable="true"], .molette')) return;
@@ -1404,6 +1503,7 @@ S.suite = construireSuite(null);
 document.body.dataset.affichage = S.affichage;
 $$('.choix-affichage [data-val]').forEach(b => b.setAttribute('aria-checked', b.dataset.val === S.affichage));
 poserDisque(S.source);
+if (!memoire.lire('md-reglages-vu', false)) $('.bouton-reglages').classList.add('brille');
 rendreTuner();
 majAfficheur();
 chargerAPI();

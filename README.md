@@ -1,6 +1,6 @@
 # Music Discovery
 
-Ma vie, c'est de partager de la musique. Allume la chaîne, choisis la suite, garde ce qui te plaît.
+Allume la chaîne, choisis la suite, garde ce qui te plaît.
 
 Site en ligne : https://amelienito.github.io/music-discovery/
 
