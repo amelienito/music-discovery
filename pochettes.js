@@ -181,13 +181,6 @@ const Pochettes = (() => {
   /* ─── les extraits ─── */
   // un lien Deezer porte sa date d'expiration (exp=…) : on le considère mort 20 s avant
   const expire = url => { const r = /exp=(\d+)/.exec(url || ''); return !!r && (+r[1]) * 1000 < Date.now() + 20000; };
-  // l'extrait jouable tout de suite (sans réseau), ou null
-  function extrait(m) {
-    const c = cache[m.id];
-    if (!c) return null;
-    if (c.previewDz && !expire(c.previewDz)) return c.previewDz;
-    return c.previewApple || null;
-  }
   // l'extrait, renouvelé si besoin (promesse : un lien, ou null)
   function extraitFrais(m) {
     const suite = () => {
@@ -236,8 +229,6 @@ const Pochettes = (() => {
     return cle ? { cle, nom: NOMS[cle], lien: cle === 'deezer' ? c.lienDeezer : c.lienApple } : null;
   }
   function liens(m) { const c = cache[m.id] || {}; return { deezer: c.lienDeezer || null, apple: c.lienApple || null }; }
-  // la fiche du morceau (album, année, genre, durée), quand on l'a trouvée
-  function meta(m) { return cache[m.id] || null; }
   // 'inconnu' (recherche pas encore faite), 'ok' (extrait dispo) ou 'absent'
   function etat(m) {
     const c = cache[m.id];
@@ -378,40 +369,9 @@ const Pochettes = (() => {
     </div>`;
   }
 
-  // couleur dominante d'une pochette (pour teinter le fond de la page)
-  function couleur(m, cb) {
-    const c = cache[m.id];
-    if (c && c.coul) { cb(c.coul); return; }
-    const im = image(m);
-    if (!im) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = 20;
-        const x = cv.getContext('2d');
-        // les miniatures YouTube ont des bandes noires : on ne lit que le centre
-        if (im.yt) x.drawImage(img, img.width * .25, img.height * .25, img.width * .5, img.height * .5, 0, 0, 20, 20);
-        else x.drawImage(img, 0, 0, 20, 20);
-        const d = x.getImageData(0, 0, 20, 20).data;
-        let r = 0, g = 0, b = 0, p = 0;
-        for (let i = 0; i < d.length; i += 4) {
-          const mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]);
-          const w = 0.15 + (mx - mn) / 255; // les pixels colorés comptent plus
-          r += d[i] * w; g += d[i + 1] * w; b += d[i + 2] * w; p += w;
-        }
-        const coul = [Math.round(r / p), Math.round(g / p), Math.round(b / p)];
-        if (!im.yt && cache[m.id]) { cache[m.id].coul = coul; sauver(); }
-        cb(coul);
-      } catch (e) { /* image non lisible : pas de teinte */ }
-    };
-    img.src = im.src;
-  }
-
   function echapper(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  return { html, image, extrait, extraitFrais, extraitPiste, confidentiel, rafraichir, oublierExtrait, etat, meta, source, liens, album, demander, couleur, echapper, artistePrincipal, normaliser };
+  return { html, image, extraitFrais, extraitPiste, confidentiel, rafraichir, oublierExtrait, etat, source, liens, album, demander, echapper, artistePrincipal, normaliser };
 })();

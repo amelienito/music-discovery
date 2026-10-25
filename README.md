@@ -1,25 +1,34 @@
 # Music Discovery
 
-J'ai fouillé pendant des années. Fais-toi une compil avec ce que j'ai trouvé.
+Ma vie, c'est de partager de la musique. Allume la chaîne, oriente-la, garde ce qui te plaît.
 
 Site en ligne : https://amelienito.github.io/music-discovery/
 
 ---
 
-## Ce que fait la v1.0
+## Ce que fait le site
 
-Trois étapes, comme chez le disquaire : **fouiller les bacs**, **graver sa compil**, **l'écouter sur la chaîne**.
-
-- **Le carton d'entrée** : on règle le volume (la molette se tourne comme une vraie), puis **Commencer**. Pas de compte, pas d'inscription : tout reste dans le navigateur. Ouvert depuis Instagram, TikTok, Messenger…, un bandeau propose d'ouvrir la page dans le vrai navigateur (leur navigateur intégré lit mal YouTube et oublie la compil), avec un bouton « Ouvrir dans Chrome » sur Android et « Copier le lien ».
-- **1. Les bacs** : un bac par ambiance, avec ses pochettes qui dépassent : **Soleil** (soul, funk, chaleur), **Bitume** (rap, la ville la nuit), **Piste** (pour danser), **Brume** (doux et rêveur), **Ailleurs** (étrange et lointain), **Électrique** (guitares et pop vive), **Épopée** (orchestres et jeux vidéo), et **Surprends-moi**. On touche une couleur, la musique démarre. Plus le morceau du jour, une carte à retourner.
-- **La fouille** : le disque qui joue (vidéo, titre, album, **Ajouter à ma compil**) et, à côté, **trois directions** : *Dans la même veine*, un changement d'intensité (*Plus calme*, *Plus énergique*, *Plus dansant*, *Plus posé*, *Plus connu*, *Plus confidentiel*) et *Un pas de côté* vers une ambiance voisine. Chaque proposition dit son style et sa décennie (« Philly soul, années 70 ») : on peut choisir sans écouter. Sur téléphone, les directions passent en lignes, la direction d'abord, avec un petit bouton pour écouter 30 secondes. Si on ne choisit pas, la première démarre à la fin du morceau. De temps en temps, une carte mystère ou un coup de cœur.
-- **2. La compil** : les morceaux ajoutés s'écrivent au feutre sur la jaquette d'un boîtier de CD. À partir de 3 titres, **Graver la compil** : le CD-R tourne, les titres s'inscrivent un à un, rangés dans l'ordre qui s'enchaîne le mieux. Puis **La mettre dans la chaîne**.
-- **3. La chaîne** : une micro-chaîne CD des années 2000. Le tiroir s'ouvre, le disque s'y pose, on le voit tourner derrière le hublot fumé. Écran à cristaux liquides (piste, temps, titre qui défile, morceau suivant) avec un petit égaliseur qui bat au tempo du morceau ; enceintes dont la membrane bat aussi ; gros bouton de volume à anneau lumineux ; touche d'éjection. Dessous, **le rack** : la compil gravée, un disque par ambiance, et Surprends-moi. Chaque disque est rangé pour s'enchaîner d'un morceau proche à l'autre. Alu brossé et écran bleu le jour, laque noire et écran ambré la nuit, à l'encre en Papier.
-- **Les recommandations** : chaque morceau a une fiche dans `data.js` (ambiance, style, année, tempo, voix, étiquettes). `moteur.js` compare les fiches : deux morceaux qui partagent leurs étiquettes, leur époque et leur tempo se suivent ; un changement d'intensité reste dans le même monde ; un pas de côté passe par le morceau le plus proche de l'ambiance voisine.
-- **Le livret** (replié, sous la page) : l'album, sa fiche Wikipédia, la liste des titres (30 secondes d'un toucher), l'artiste, et les liens pour écouter en entier (YouTube Music, Deezer, Apple Music, Qobuz, Bandcamp).
-- **Clavier** : 1, 2 ou 3 pour choisir la suite, G pour ajouter à la compil, Espace pour la pause.
+- **Le carton d'entrée** : on règle le volume (la molette se tourne comme une vraie), puis **Commencer**. Pas de compte : tes choix restent dans ton navigateur. Ouvert depuis Instagram, TikTok, Messenger…, un bandeau propose d'ouvrir la page dans le vrai navigateur.
+- **La chaîne** : une micro-chaîne CD des années 2000, entre deux enceintes.
+  - **Le lecteur** : l'écran à cristaux liquides (ou, au choix, le disque qui tourne derrière son hublot, avec la pochette imprimée dessus), la vidéo, les commandes, **♥ J'aime bien** (le morceau part dans ta sélection et la suite va dans ce sens) et **Pas trop comme ça** (on passe au suivant et on s'éloigne de ce genre-là), le volume.
+  - **Le tuner, juste dessous : « Oriente la suite »**. La bande des époques (Tout, avant 60, 60, 70, 80, 90-2000, 2010, 2020), trois réglages par deux (**Plus calme / Plus énergique**, **Moins groovy / Plus groovy**, **Plus mainstream / Plus confidentiel**), et l'afficheur **Ensuite** : le prochain titre, la direction en cours (avec son × pour arrêter) et **Écouter maintenant**. Une direction tient six morceaux ; rappuyer va plus loin ; au bout de l'échelle, le bouton affiche « max ». À partir de deux coups de cœur, le tuner propose aussi d'écouter **Ma sélection** (où les directions marchent aussi).
+  - **Ton mot** sur le morceau arrive en post-it, collé sur l'enceinte de droite (on peut le décoller).
+  - **Cosmétique** (en haut de la chaîne) : des petits réglages inutiles, couleur de l'écran, égaliseur, vitesse du disque, rétroéclairage, lumières et grilles des enceintes, loudness, bip des touches. Toucher l'écran change aussi sa couleur ; les haut-parleurs répondent quand on tape dessus.
+- **Quand on descend** lire « Plus d'infos », la vidéo suit dans un coin (YouTube veut qu'elle reste visible) ; « Revenir à la chaîne » remonte.
+- **Plus d'infos** : le genre et l'époque, quelques mots sur le morceau, l'album (titres à écouter 30 secondes), l'artiste (Wikipédia en français, sinon Genius), et où écouter en entier (YouTube Music, Deezer, Apple Music, Qobuz, Bandcamp).
+- **Ma sélection** (en haut, à partir de deux morceaux) : tes morceaux en boîtiers de CD, l'historique de tout ce qui est passé, l'écoute dans la chaîne, et de quoi repartir avec une playlist.
+- **Clavier** : Espace (lecture / pause), ← et → (morceau précédent / suivant), J (j'aime bien), X (pas trop comme ça), Échap (refermer).
 - **Une chaîne qui ne se bloque pas** : un morceau qui refuse de se lire est remplacé par son extrait ou sauté ; après trois ratés d'affilée, elle s'arrête et dit pourquoi.
 - **Réglages** : morceaux complets via YouTube, ou extraits de 30 secondes sans pub ; teinte du site (Salon, Nuit, Papier).
+
+## Les recommandations
+
+Chaque morceau a une fiche dans `data.js` (ambiance, style, année, tempo, voix, étiquettes, énergie, groove, notoriété). `moteur.js` compare les fiches :
+
+- **Sans direction**, chaque morceau mène au plus proche qu'on n'a pas entendu récemment ; ce que tu aimes attire, ce que tu n'aimes pas repousse.
+- **Avec une direction**, le premier pas va au moins d'un cran dans le sens demandé, par le morceau le plus proche ; ensuite la suite tient le niveau atteint, remonte d'un cran un morceau sur trois quand ça se fait en douceur, et ne redescend jamais de plus d'un cran. Elle préfère un pas modeste dans le même univers à un grand saut vers l'autre bout de la banque.
+- La notoriété se mesure au nombre de fans de l'artiste sur Deezer (sinon la note `etrange` de la fiche).
+- Avec une petite banque, certains morceaux ont peu de voisins : plus la banque grandit, plus les enchaînements sont naturels.
 
 ## La table de tri
 
@@ -49,9 +58,9 @@ Trois étapes, comme chez le disquaire : **fouiller les bacs**, **graver sa comp
 | Fichier | À quoi il sert | Tu y touches ? |
 |---|---|---|
 | `data.js` | Ta banque de morceaux et tes textes | **Oui, c'est le tien** |
-| `moteur.js` | Les sept ambiances (noms, couleurs) et la façon de passer d'un morceau à l'autre | Pour renommer ou recolorer une ambiance |
+| `moteur.js` | Les ambiances et la façon de passer d'un morceau à l'autre (directions comprises) | Rarement |
 | `teintes.css` | Les couleurs et polices de chaque teinte | Si tu veux créer une teinte |
-| `styles.css` | La forme des objets (façade, chaîne, pochettes) | Rarement |
+| `styles.css` | La forme des objets (chaîne, tuner, livret, panneaux) | Rarement |
 | `app.js` | Le fonctionnement | Non |
 | `pochettes.js` | Va chercher pochettes, extraits, et la fiche de l'album (date, label, titres) | Non |
 | `infos.js` | Va chercher les fiches Wikipédia de l'artiste et de l'album | Non |
@@ -71,11 +80,10 @@ Dans `data.js`, copie un bloc, colle-le avant le `];` final, remplis :
   energie: 2, etrange: 4, danse: 1 },
 ```
 
-- La **fiche** (ambiance, style, année, tempo, voix, étiquettes) range le morceau dans son bac et décide de ses voisins. Le plus simple : colle tes « oui » de la table de tri à Claude, il écrit les fiches.
+- La **fiche** (ambiance, style, année, tempo, voix, étiquettes, énergie, groove, notoriété) décide de ses voisins dans la radio. Le plus simple : colle tes « oui » de la table de tri à Claude, il écrit les fiches.
 
 - La **pochette** et l'**extrait** se trouvent tout seuls (pas besoin de les fournir).
 - La **note** est facultative. Un morceau sans texte, c'est très bien aussi.
-- `liens: ["Judy", "Quiet Storm"]` force le morceau proposé « Dans la même veine ».
 
 ## Vérifier que tous les morceaux se lisent
 

@@ -1,24 +1,23 @@
 /* ════════════════════════════════════════════════════════════════════
-   MOTEUR — les ambiances, et la façon de passer d'un morceau à l'autre
+   MOTEUR — la façon de passer d'un morceau à l'autre
    Chaque morceau a une fiche dans data.js (ambiance, style, année, tempo,
-   voix, étiquettes). Le moteur compare deux fiches et dit à quel point
-   les deux morceaux vont bien ensemble : c'est ce qui fait que
-   « dans la même veine » reste dans la même veine, et que la radio
-   enchaîne sans à-coups.
+   voix, étiquettes, énergie, groove, notoriété). Le moteur compare deux
+   fiches et dit à quel point les deux morceaux vont bien ensemble : c'est
+   ce qui fait que la radio enchaîne sans à-coups, et qu'« Oriente la
+   suite » va dans le sens demandé sans sauter n'importe où.
    ════════════════════════════════════════════════════════════════════ */
 
 const Moteur = (() => {
-  // les sept ambiances : ce sont les bacs de Découvrir et les disques de la chaîne
+  // les sept ambiances, et celles qui leur sont voisines
   const AMBIANCES = {
-    soleil:     { nom: 'Soleil',     sous: 'Soul, funk, chaleur',          couleur: '#f0a03a', sombre: '#7a4310', encre: '#2b1500', voisins: ['piste', 'bitume', 'brume'] },
-    bitume:     { nom: 'Bitume',     sous: 'Rap, la ville la nuit',        couleur: '#2c3aa0', sombre: '#141a52', encre: '#eef0ff', voisins: ['soleil', 'piste', 'ailleurs'] },
-    piste:      { nom: 'Piste',      sous: 'Pour danser',                  couleur: '#e23d8b', sombre: '#6e1240', encre: '#fff0f6', voisins: ['soleil', 'bitume', 'ailleurs', 'electrique'] },
-    brume:      { nom: 'Brume',      sous: 'Doux et rêveur',               couleur: '#a8c6d6', sombre: '#3e5a69', encre: '#14242c', voisins: ['soleil', 'ailleurs', 'epopee'] },
-    ailleurs:   { nom: 'Ailleurs',   sous: 'Étrange et lointain',          couleur: '#2f9e6a', sombre: '#0f4a2f', encre: '#effff6', voisins: ['brume', 'piste', 'electrique', 'bitume'] },
-    electrique: { nom: 'Électrique', sous: 'Guitares et pop vive',         couleur: '#e2462e', sombre: '#6b170b', encre: '#fff2ee', voisins: ['piste', 'ailleurs', 'epopee'] },
-    epopee:     { nom: 'Épopée',     sous: 'Orchestres et jeux vidéo',     couleur: '#6a49c9', sombre: '#2a1a5e', encre: '#f3efff', voisins: ['brume', 'electrique'] },
+    soleil:     { nom: 'Soleil',     voisins: ['piste', 'bitume', 'brume'] },
+    bitume:     { nom: 'Bitume',     voisins: ['soleil', 'piste', 'ailleurs'] },
+    piste:      { nom: 'Piste',      voisins: ['soleil', 'bitume', 'ailleurs', 'electrique'] },
+    brume:      { nom: 'Brume',      voisins: ['soleil', 'ailleurs', 'epopee'] },
+    ailleurs:   { nom: 'Ailleurs',   voisins: ['brume', 'piste', 'electrique', 'bitume'] },
+    electrique: { nom: 'Électrique', voisins: ['piste', 'ailleurs', 'epopee'] },
+    epopee:     { nom: 'Épopée',     voisins: ['brume', 'electrique'] },
   };
-  const ORDRE = ['soleil', 'bitume', 'piste', 'brume', 'ailleurs', 'electrique', 'epopee'];
 
   // des étiquettes de la même famille se ressemblent un peu, même si ce ne sont pas les mêmes
   const FAMILLES = [
@@ -80,7 +79,7 @@ const Moteur = (() => {
     return { 'chant-rap': 0.45, 'chant-instru': 0.35, 'instru-rap': 0.6 }[p] || 0.4;
   }
   const num = (v, d) => (typeof v === 'number' && isFinite(v) ? v : d);
-  // plus c'est petit, mieux les deux morceaux vont ensemble
+  // plus c'est petit, mieux les deux morceaux vont ensemble (2 : très proches ; au-delà de 5 : un vrai saut)
   function distance(a, b, { sans = null } = {}) {
     let d = 4 * (1 - ressemblance(a, b));
     d += ecartAmbiance(a, b);
@@ -101,103 +100,85 @@ const Moteur = (() => {
     for (let i = 0; i < l.length; i++) { r -= poids[i]; if (r <= 0) return l[i]; }
     return l[0];
   }
-  function lesPlusProches(ref, pool, opts) {
-    return pool.filter(x => x !== ref).map(x => [x, distance(ref, x, opts)]).sort((p, q) => p[1] - q[1]).map(p => p[0]);
-  }
+  const classer = notes => notes.filter(Boolean).sort((a, b) => a[1] - b[1]).map(p => p[0]);
 
-  /* les directions de Découvrir
-     val(m, cle) donne l'énergie, la danse ou le côté confidentiel d'un morceau */
+  /* les six directions d'« Oriente la suite ».
+     val(m, cle) donne l'énergie, le groove ou le côté confidentiel d'un morceau (0 à 10) ;
+     gout(x), facultatif, ajoute tes goûts (ce que tu aimes attire, ce que tu n'aimes pas repousse) */
   const DIRECTIONS = {
-    veine:        { etiquette: 'Dans la même veine', court: 'Même veine' },
-    energique:    { etiquette: 'Plus énergique', court: 'Plus énergique', cle: 'energie', sens: 1 },
-    calme:        { etiquette: 'Plus calme', court: 'Plus calme', cle: 'energie', sens: -1 },
-    dansant:      { etiquette: 'Plus dansant', court: 'Plus dansant', cle: 'danse', sens: 1 },
-    pose:         { etiquette: 'Plus posé', court: 'Plus posé', cle: 'danse', sens: -1 },
-    connu:        { etiquette: 'Plus connu', court: 'Plus connu', cle: 'etrange', sens: -1 },
-    confidentiel: { etiquette: 'Plus confidentiel', court: 'Plus confidentiel', cle: 'etrange', sens: 1 },
-    cote:         { etiquette: 'Un pas de côté', court: 'Pas de côté' },
+    calme:        { nom: 'Plus calme',        cle: 'energie', sens: -1, pas: 1.5 },
+    energique:    { nom: 'Plus énergique',    cle: 'energie', sens: 1,  pas: 1.5 },
+    // « plus groovy » depuis un morceau de piano doit vraiment faire bouger, pas juste un peu moins immobile
+    pose:         { nom: 'Moins groovy',      cle: 'danse',   sens: -1, pas: 2, plafond: 5 },
+    dansant:      { nom: 'Plus groovy',       cle: 'danse',   sens: 1,  pas: 2, plancher: 4 },
+    connu:        { nom: 'Plus mainstream',   cle: 'etrange', sens: -1, pas: 1.5 },
+    confidentiel: { nom: 'Plus confidentiel', cle: 'etrange', sens: 1,  pas: 1.5 },
   };
-  /* Chaque direction a un pas minimum et, pour la danse, un seuil absolu :
-     « plus dansant » depuis un morceau de piano doit vraiment faire danser,
-     pas juste un peu moins immobile. Si rien de cohérent n'existe (trop loin
-     du morceau en cours), la direction est indisponible plutôt que farfelue. */
-  const REGLES = {
-    energique:    { cle: 'energie', sens: 1, pas: 1.5 },
-    calme:        { cle: 'energie', sens: -1, pas: 1.5 },
-    dansant:      { cle: 'danse', sens: 1, pas: 2, plancher: 4 },
-    pose:         { cle: 'danse', sens: -1, pas: 2, plafond: 5 },
-    connu:        { cle: 'etrange', sens: -1, pas: 1.5 },
-    confidentiel: { cle: 'etrange', sens: 1, pas: 1.5 },
-  };
-  const QUALITE = 6.5; // au-delà, le morceau proposé n'a plus rien à voir avec celui en cours
-  /* le premier pas : un cran au-dessus, pas un saut au bout de l'échelle.
-     energique : +1 à +3 (force 1), +2 à +4 (force 2)… ; si rien, on accepte plus loin */
-  function candidatsDirection(ref, dir, pool, val, force = 1, large = false) {
-    const R = REGLES[dir];
-    const ecart = x => (val(x, R.cle) - val(ref, R.cle)) * R.sens;
-    const mini = Math.max(1, R.pas * force - 0.5), maxi = large ? 99 : R.pas * force + 1.5;
-    const ok = x => ecart(x) >= mini - 0.01 && ecart(x) <= maxi + 0.01
-      && (R.plancher === undefined || val(x, R.cle) >= R.plancher)
-      && (R.plafond === undefined || val(x, R.cle) <= R.plafond)
-      && (x.ambiance === ref.ambiance || voisines(ref.ambiance, x.ambiance));
+  const ecartDe = (R, ref, x, val) => (val(x, R.cle) - val(ref, R.cle)) * R.sens;
+
+  /* Le premier pas : au moins un cran dans le sens demandé (deux crans si on a rappuyé),
+     par le morceau le plus proche de celui qui passe. Un pas trop grand, ou qui sort du
+     monde du morceau, coûte plus cher : on n'y va que s'il n'y a rien de mieux. */
+  function versDirection(ref, dir, pool, val, { force = 1, gout = null } = {}) {
+    const R = DIRECTIONS[dir];
+    if (!R || !ref || !pool.length) return null;
     const sans = R.cle === 'etrange' ? null : R.cle;
     const cible = R.pas * force;
-    return pool.filter(ok).map(x => [x, distance(ref, x, { sans }) + 0.6 * Math.abs(ecart(x) - cible)])
-      .filter(p => p[1] <= QUALITE).sort((a, b) => a[1] - b[1]).map(p => p[0]);
+    return parmiLesMeilleurs(classer(pool.map(x => {
+      const e = ecartDe(R, ref, x, val);
+      if (x === ref || e < 1) return null;
+      let note = distance(ref, x, { sans }) + 0.6 * Math.abs(e - cible) + 0.5 * Math.max(0, e - cible - 1.5);
+      if (R.plancher !== undefined && val(x, R.cle) < R.plancher) note += 1.5;
+      if (R.plafond !== undefined && val(x, R.cle) > R.plafond) note += 1.5;
+      if (gout) note += gout(x);
+      return [x, note];
+    })));
   }
-  function versDirection(ref, dir, pool, val, { force = 1 } = {}) {
-    if (!ref || !pool.length) return null;
-    if (dir === 'veine') return parmiLesMeilleurs(lesPlusProches(ref, pool), 2);
-    if (dir === 'cote') {
-      // une ambiance voisine, mais par le morceau qui lui ressemble le plus : un pont, pas un saut
-      const voisins = pool.filter(x => x.ambiance !== ref.ambiance && voisines(ref.ambiance, x.ambiance));
-      const c = voisins.length ? voisins : pool.filter(x => x.ambiance !== ref.ambiance);
-      return parmiLesMeilleurs(lesPlusProches(ref, c), 2);
-    }
-    if (!REGLES[dir]) return null;
-    // on essaie le pas demandé, puis un pas plus petit si l'on est déjà tout au bout
-    for (let f = force; f >= 1; f--) {
-      const c = candidatsDirection(ref, dir, pool, val, f);
-      if (c.length) return parmiLesMeilleurs(c, 2);
-    }
-    const loin = candidatsDirection(ref, dir, pool, val, 1, true);
-    return loin.length ? parmiLesMeilleurs(loin, 2) : null;
-  }
-  // peut-on aller dans cette direction depuis ce morceau, sans tomber sur n'importe quoi ?
+  // y a-t-il au moins un morceau plus loin dans ce sens ? (sinon, on est tout au bout de l'échelle)
   function possible(ref, dir, pool, val) {
-    if (!REGLES[dir]) return pool.length > 0;
-    return candidatsDirection(ref, dir, pool, val, 1, true).length > 0;
+    const R = DIRECTIONS[dir];
+    if (!R || !ref) return pool.length > 0;
+    return pool.some(x => x !== ref && ecartDe(R, ref, x, val) >= 1);
   }
-  /* la pente : une direction qui tient sur plusieurs morceaux, par paliers.
-     Le premier morceau monte d'un cran ; ensuite on reste au même niveau (ou un peu plus),
-     et un morceau sur trois remonte d'un cran. Jamais en arrière, jamais de saut au bout de
-     l'échelle : on parcourt plus de morceaux en chemin au lieu de foncer vers les extrêmes. */
-  function suivantPente(ref, dir, pool, val, { premier = false, force = 1, etape = 0 } = {}) {
-    const R = REGLES[dir];
-    if (!R) return null;
-    if (premier) { const x = versDirection(ref, dir, pool, val, { force }); if (x) return x; }
-    const ecart = x => (val(x, R.cle) - val(ref, R.cle)) * R.sens;
-    const proche = x => x.ambiance === ref.ambiance || voisines(ref.ambiance, x.ambiance);
+  /* La suite d'une direction : elle tient le niveau atteint (le « sol »), remonte d'un cran
+     un morceau sur trois quand ça se fait en douceur, et ne redescend jamais de plus d'un cran.
+     Au lieu de foncer vers les extrêmes (et de sauter d'un univers à l'autre pour y arriver),
+     elle choisit le morceau le plus proche qui respecte le sens. */
+  function suivantPente(ref, dir, pool, val, { premier = false, force = 1, etape = 0, sol = null, gout = null } = {}) {
+    const R = DIRECTIONS[dir];
+    if (!R || !ref) return null;
+    if (premier) { const x = versDirection(ref, dir, pool, val, { force, gout }); if (x) return x; }
+    const niveau = sol === null ? val(ref, R.cle) : sol;
     const monte = etape % 3 === 2;
-    const essais = monte
-      ? [[1, R.pas + 1], [0, R.pas + 1], [0, 99]]   // un cran de plus, sinon au moins pareil
-      : [[0, 1], [0, R.pas + 1], [0, 99]];           // pareil (ou à peine plus)
-    for (const [mini, maxi] of essais) {
-      const c = pool.filter(x => proche(x) && ecart(x) >= mini && ecart(x) <= maxi)
-        .map(x => [x, distance(ref, x)]).sort((a, b) => a[1] - b[1]).map(p => p[0]);
-      if (c.length) return parmiLesMeilleurs(c, 2);
-    }
-    // tout au bout de l'échelle dans ces ambiances : on va chercher ailleurs, mais toujours sans redescendre
-    const ailleurs = pool.filter(x => ecart(x) >= 0).map(x => [x, distance(ref, x)]).sort((a, b) => a[1] - b[1]).map(p => p[0]);
-    return ailleurs.length ? parmiLesMeilleurs(ailleurs, 2) : null;
+    return parmiLesMeilleurs(classer(pool.map(x => {
+      if (x === ref) return null;
+      const e = ecartDe(R, ref, x, val);
+      const f = (val(x, R.cle) - niveau) * R.sens;
+      if (f < -1 || e < -1.5) return null;
+      let note = distance(ref, x);
+      if (e < 0) note += 1.1 * -e;
+      if (f < 0) note += 1.8 * -f;
+      if (monte) note += e >= 1 ? -1 : 0.5;
+      if (e > R.pas + 1.5) note += 0.5 * (e - R.pas - 1.5);
+      if (gout) note += gout(x);
+      return [x, note];
+    })));
   }
+  // le sol monte avec la direction (à un cran près), il ne redescend jamais
+  function nouveauSol(dir, sol, m, val) {
+    const R = DIRECTIONS[dir];
+    if (!R) return sol;
+    const v = val(m, R.cle);
+    if (sol === null || sol === undefined) return v;
+    return R.sens > 0 ? Math.max(sol, v - 1) : Math.min(sol, v + 1);
+  }
+
   /* l'ordre d'un disque : chaque morceau mène au plus proche, puis on
      décroise les enchaînements maladroits (comme un DJ qui prépare son set) */
-  function longueur(o) { let s = 0; for (let i = 1; i < o.length; i++) s += distance(o[i - 1], o[i]); return s; }
   function sequencer(liste, { depart = null, tours = 8 } = {}) {
     const reste = [...liste];
     if (reste.length < 3) return reste;
-    let premier = depart && reste.includes(depart) ? depart : reste[Math.floor(Math.random() * reste.length)];
+    const premier = depart && reste.includes(depart) ? depart : reste[Math.floor(Math.random() * reste.length)];
     const o = [premier];
     reste.splice(reste.indexOf(premier), 1);
     while (reste.length) {
@@ -224,12 +205,6 @@ const Moteur = (() => {
     return o;
   }
 
-  // le morceau le plus « central » d'un ensemble : un bon point de départ pour un bac
-  function representatifs(liste, n = 4) {
-    return liste.map(x => [x, liste.reduce((s, y) => s + (x === y ? 0 : distance(x, y)), 0)])
-      .sort((p, q) => p[1] - q[1]).slice(0, n).map(p => p[0]);
-  }
-
-  return { AMBIANCES, ORDRE, DIRECTIONS, REGLES, distance, ressemblance, versDirection, possible, suivantPente, sequencer, representatifs, longueur, lesPlusProches };
+  return { AMBIANCES, DIRECTIONS, distance, ressemblance, versDirection, possible, suivantPente, nouveauSol, sequencer, parmiLesMeilleurs };
 })();
 if (typeof module !== 'undefined') module.exports = Moteur;

@@ -1,7 +1,8 @@
 /* ════════════════════════════════════════════════════════════════════
-   MUSIC DISCOVERY — v1.0
+   MUSIC DISCOVERY
    Toute la logique du site. Tu n'as normalement pas besoin d'y toucher :
-   la musique se gère dans data.js, les couleurs dans teintes.css.
+   la musique se gère dans data.js, les couleurs dans teintes.css, et la
+   façon d'enchaîner les morceaux dans moteur.js.
    ════════════════════════════════════════════════════════════════════ */
 
 (() => {
@@ -13,12 +14,10 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const E  = Pochettes.echapper;
 const N  = Pochettes.normaliser;
 const hasard = arr => arr[Math.floor(Math.random() * arr.length)];
-const melanger = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const borner = (v, a, b) => Math.max(a, Math.min(b, v));
 const deux = n => String(Math.max(0, Math.floor(n))).padStart(2, '0');
 const minutes = s => `${Math.floor(s / 60)}:${deux(s % 60)}`;
 const reduitMouvement = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const tactile = matchMedia('(hover: none)').matches;
 const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (IOS) document.documentElement.classList.add('ios');
 const doux = reduitMouvement ? 'auto' : 'smooth';
@@ -56,15 +55,12 @@ const BANQUE = (typeof MORCEAUX !== 'undefined' ? MORCEAUX : []).map((m, i) => {
     yt: idYouTube(m.lien),
     energie, etrange: num(m.etrange, 5), danse: num(m.danse, 5),
     note: (m.note || '').trim(),
-    liens: m.liens || [],
     // les morceaux qui cognent sont joués un peu moins fort, pour ne pas surprendre
     facteur: borner(num(m.volume, energie >= 9 ? 0.66 : energie >= 8 ? 0.78 : energie >= 7 ? 0.88 : 1), 0.1, 1),
   };
 });
 const parId = Object.fromEntries(BANQUE.map(m => [m.id, m]));
-const parTitre = t => BANQUE.find(m => m.titre.toLowerCase() === String(t).toLowerCase());
-// Découvrir compare les fiches des morceaux (moteur.js : style, année, tempo, voix, ambiance).
-// « connu / confidentiel » se mesure d'après le nombre de fans de l'artiste sur Deezer,
+// « mainstream / confidentiel » se mesure d'après le nombre de fans de l'artiste sur Deezer,
 // et, tant qu'on ne sait pas, d'après la note « etrange » de data.js
 const conf = m => { if (m.connu) return 1; const c = m.id ? Pochettes.confidentiel(m) : null; return c === null ? m.etrange : c; };
 const val = (m, cle) => cle === 'etrange' ? conf(m) : m[cle];
@@ -79,21 +75,17 @@ const S = {
   erreur: false,          // rien n'a pu être lu
   bloque: false,          // la lecture ne démarre pas toute seule
   aJoue: false,           // le morceau en cours a-t-il déjà démarré ?
-  mode: 'radio',
   // la chaîne
   source: (s => ['radio', 'selection'].includes(s) ? s : 'radio')(memoire.lire('md-source', 'radio')),
-  suite: [], historique: memoire.lire('md-historique', []).filter(id => parId[id]), echecs: 0,
-  epure: false,
+  suite: [],              // les six prochains morceaux
+  historique: memoire.lire('md-historique', []).filter(id => parId[id]),
+  echecs: 0,              // morceaux qui ne démarrent pas, d'affilée
   affichage: memoire.lire('md-affichage-v2', 'ecran'), // l'écran LCD, ou le disque qui tourne
-  tiroirOuvert: false, repriseTiroir: false, posteFerme: false,
-  pente: null,            // une direction qui tient : { dir, force, neuf, vise, joues }
-  cote: false,            // « un pas de côté », pour le prochain morceau seulement
-  devine: memoire.lire('md-devine-v2', true),     // de temps en temps, deviner l'époque du morceau
+  pente: null,            // une direction qui tient : { dir, force, neuf, vise, joues, sol }
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
-  score: memoire.lire('md-score', { bons: 0, total: 0 }),
-  epoque: memoire.lire('md-epoque', 'toutes'),
+  epoque: memoire.lire('md-epoque', 'toutes'),  // la molette d'époque
+  epoqueFinie: false,     // tous les morceaux de l'époque sont passés
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
-  demo: false,
   aime: new Set(memoire.lire('md-aime', [])),
   aimePas: new Set(memoire.lire('md-aime-pas', [])),
   // le reste
@@ -103,14 +95,13 @@ const S = {
   injouables: new Set(memoire.lire('md-injouables', [])),
   son: memoire.lire('md-son', 'complet'),
   onglet: 'gardes',
-  posteReduit: false,     // poste replié : la vidéo YouTube est alors en pause (jamais de lecture cachée)
   livrets: { machine: false },
 };
 // les anciens identifiants finissaient par « -numéro » : on les retrouve
 const retrouver = ids => [...new Set(ids.map(id => parId[id] ? id : parId[String(id).replace(/-\d+$/, '')] ? String(id).replace(/-\d+$/, '') : null).filter(Boolean))];
 S.croises = retrouver(S.croises); memoire.ecrire('md-croises', S.croises);
 S.gardes  = retrouver(S.gardes);  memoire.ecrire('md-gardes', S.gardes);
-if (S.source === 'selection' && !S.gardes.length) S.source = 'radio';
+if (S.source === 'selection' && S.gardes.length < 2) S.source = 'radio';
 
 let apiEnPanne = false;
 const jouable = m => S.son === 'complet' && !apiEnPanne && !!m.yt && !S.injouables.has(m.yt);
@@ -146,7 +137,7 @@ function aller(vue) {
     document.body.dataset.vue = vue;
     window.scrollTo(0, 0);
     arreterExtrait();
-    majPoste();
+    majVideo();
   };
   // un fondu entre deux écrans, là où le navigateur sait le faire
   if (change && document.startViewTransition && !reduitMouvement && document.body.classList.contains('allume')) {
@@ -267,7 +258,7 @@ function basculerGarde(id) {
     S.gardes.unshift(id);
     S.aimePas.delete(id);
     const n = S.gardes.length;
-    toast(n === 1 ? 'Noté ♥ La suite va dans ce sens.' : n === 2 ? 'Deux coups de cœur : ta sélection apparaît en haut, et tu peux l\'écouter dans « Oriente la suite ».' : `Noté ♥ Dans ta sélection (${n}).`, n === 2 ? 5000 : 2400);
+    toast(n === 1 ? 'Noté ♥ La suite va dans ce sens.' : n === 2 ? 'Deux coups de cœur : « Ma sélection » apparaît en haut, et tu peux l\'écouter depuis le tuner.' : `Noté ♥ Dans ta sélection (${n}).`, n === 2 ? 5000 : 2400);
     clic(900, 0.08, 0.06);
     const b = $('.bouton-trouvailles'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
   }
@@ -275,29 +266,19 @@ function basculerGarde(id) {
   memoire.ecrire('md-gardes', S.gardes);
   memoire.ecrire('md-aime', [...S.aime]); memoire.ecrire('md-aime-pas', [...S.aimePas]);
   majGarde();
-  if (S.source === 'selection' && !S.gardes.length) { choisirSource('radio'); return; }
-  if (S.joue) rafraichirSuite(); else rendrePupitre();
+  if (S.source === 'selection' && S.gardes.length < 2) { choisirSource('radio'); return; }
+  if (S.joue) rafraichirSuite(); else rendreTuner();
   if (!$('#bac').hidden) rendreBac();
 }
-// tous les boutons Garder de la page se mettent à jour d'un coup
+// le cœur de la chaîne et le compteur de « Ma sélection »
 function majGarde() {
   document.body.classList.toggle('sans-selection', S.gardes.length < 2);
   $('#compteur-bac').textContent = S.gardes.length;
-  $$('[data-garder]').forEach(b => {
-    const g = estGarde(b.dataset.garder);
-    b.classList.toggle('est-garde', g);
-    b.setAttribute('aria-pressed', g);
-    const t = $('.avis-garder-texte', b); if (t) t.textContent = g ? 'Dans ma sélection' : 'Ajouter à ma sélection';
-  });
-  const pg = $('#poste-garder');
-  const gj = S.joue && estGarde(S.joue);
-  pg.classList.toggle('est-garde', !!gj); pg.setAttribute('aria-pressed', !!gj);
-  pg.setAttribute('aria-label', gj ? 'Retirer de ma sélection' : 'Ajouter à ma sélection');
   const rg = $('#radio-garder');
-  const gr = S.joue && estGarde(S.joue);
-  if (rg) { rg.classList.toggle('est-garde', !!gr); rg.setAttribute('aria-pressed', !!gr); $('.avis-aime-texte', rg).textContent = gr ? (S.gardes.length >= 2 ? 'Dans ma sélection' : 'Aimé') : 'J\'aime bien'; }
-  $$('.avis-aime').forEach(a => { a.classList.toggle('actif', !!gr); a.setAttribute('aria-pressed', !!gr); const t = $('.avis-aime-texte', a); if (t) t.textContent = gr ? 'Dans ma sélection' : 'Ça, j\'aime bien'; });
-  majSource();
+  const gr = !!S.joue && estGarde(S.joue);
+  rg.classList.toggle('est-garde', gr);
+  rg.setAttribute('aria-pressed', gr);
+  $('.avis-aime-texte', rg).textContent = gr ? (S.gardes.length >= 2 ? 'Dans ma sélection' : 'Aimé') : 'J\'aime bien';
 }
 
 // « Philly soul, années 70 » : de quoi choisir sans avoir à écouter
@@ -313,19 +294,6 @@ function indice(m) {
   return t || (m.energie <= 3 ? 'Tout en douceur' : m.energie >= 7 ? 'Ça cogne' : 'Ça avance');
 }
 
-
-function dateDuJour() {
-  const d = new Date();
-  return `${d.getFullYear()}-${deux(d.getMonth() + 1)}-${deux(d.getDate())}`;
-}
-function morceauDuJour() {
-  const j = dateDuJour();
-  const force = BANQUE.find(m => m.jour === j);
-  if (force) return force;
-  const pool = BANQUE.filter(m => m.yt);
-  const h = [...j].reduce((s, c) => (s * 31 + c.charCodeAt(0)) >>> 0, 7);
-  return pool[h % pool.length];
-}
 /* ─────────────────────────────── LE LIVRET ───────────────────────────────
    Comme le livret d'un CD : l'album, l'artiste, et où écouter le morceau
    en entier. Replié par défaut, pour que la page reste légère. */
@@ -380,7 +348,7 @@ function rendreLivret(ou, m, { force = false } = {}) {
     ${ouvert ? `
     <button class="livret-fermer" data-action="fermer-livret" aria-label="Fermer les infos">×</button>
     <p class="livret-genre">${E(indice(m))}</p>
-    <p class="livret-chronique maintenant-chronique" data-chronique="${m.id}"></p>
+    <p class="livret-chronique" data-chronique="${m.id}"></p>
     <div class="livret-pages">
       <section class="livret-page" aria-label="L'album">
         <div class="livret-album" data-album-pour="${m.id}"><p class="livret-attente">On feuillette l'album…</p></div>
@@ -489,33 +457,11 @@ function majAvis() {
   $$('[data-avis]').forEach(a => { if (montrer && !a.innerHTML.trim()) a.innerHTML = AVIS_PUB; a.hidden = !montrer; });
 }
 
-/* ─────────────────────────────── pré-écoutes (survol, ou « Écouter 30 s ») ─────────────────────────────── */
+/* ─────────────────────────────── pré-écoutes (30 secondes d'un titre de l'album, dans le livret) ─────────────────────────────── */
 const audioExtrait = $('#extrait');
 const audioLecture = new Audio(); // sert au mode extraits, et quand un morceau refuse YouTube
 audioLecture.setAttribute('playsinline', '');
-let extraitPour = null, fondu = null;
-function lancerExtrait(id, el) {
-  const m = parId[id];
-  if (!m) return;
-  arreterExtrait();
-  extraitPour = id;
-  appliquerVolume();
-  if (el) el.classList.add('ecoute');
-  const bouton = el && el.querySelector('.option-ecoute, .extrait-bouton');
-  if (bouton) bouton.classList.add('en-cours');
-  Pochettes.extraitFrais(m).then(url => {
-    if (extraitPour !== id) return;
-    if (!url) { arreterExtrait(); return; }
-    audioExtrait.dataset.id = id;
-    audioExtrait.dataset.essai = '0';
-    audioExtrait.src = url;
-    audioExtrait.volume = 0;
-    audioExtrait.play().catch(() => {});
-    clearInterval(fondu);
-    const cibleVol = borner(S.volume / 100 * m.facteur, 0, 1);
-    fondu = setInterval(() => { audioExtrait.volume = Math.min(cibleVol, audioExtrait.volume + cibleVol / 10); if (audioExtrait.volume >= cibleVol) clearInterval(fondu); }, 50);
-  });
-}
+let extraitPour = null;
 function lancerExtraitPiste(p, cle, li) {
   arreterExtrait();
   extraitPour = cle;
@@ -524,37 +470,26 @@ function lancerExtraitPiste(p, cle, li) {
   Pochettes.extraitPiste(p).then(url => {
     if (extraitPour !== cle) return;
     if (!url) { arreterExtrait(); toast('Pas d\'extrait pour ce titre.'); return; }
-    audioExtrait.dataset.id = '';
     audioExtrait.src = url;
     audioExtrait.volume = borner(S.volume / 100, 0, 1);
     audioExtrait.play().catch(() => arreterExtrait());
   });
 }
 function arreterExtrait() {
-  clearInterval(fondu);
   if (!audioExtrait.paused) audioExtrait.pause();
   const avait = extraitPour;
   extraitPour = null;
-  $$('.extrait-bouton.en-cours, .option-ecoute.en-cours').forEach(b => b.classList.remove('en-cours'));
   $$('.ecoute').forEach(b => b.classList.remove('ecoute'));
   if (avait) appliquerVolume();
 }
 audioExtrait.addEventListener('ended', arreterExtrait);
-// un extrait qui ne se lit pas (lien périmé) : on le renouvelle une fois, sinon on l'oublie
-audioExtrait.addEventListener('error', () => {
-  const id = audioExtrait.dataset.id, m = parId[id];
-  if (!m || extraitPour !== id) return;
-  if (audioExtrait.dataset.essai !== '1') {
-    audioExtrait.dataset.essai = '1';
-    Pochettes.rafraichir(m).then(url => { if (extraitPour === id && url) { audioExtrait.src = url; audioExtrait.play().catch(() => {}); } });
-    return;
-  }
-  Pochettes.oublierExtrait(m, audioExtrait.src);
-  arreterExtrait();
-});
+audioExtrait.addEventListener('error', () => { if (extraitPour) { arreterExtrait(); toast('Pas d\'extrait pour ce titre.'); } });
 document.addEventListener('pochette-prete', e => {
   const id = e.detail;
   if (S.joue === id && S.vue === 'machine') majAfficheur();
+  // la pochette du prochain titre arrive dans « Ensuite » (sans refaire toute la ligne)
+  const p = S.suite[0] === id && $('.ensuite-morceau .pochette');
+  if (p) p.outerHTML = Pochettes.html(parId[id], 'pochette-ensuite');
 });
 
 /* ─────────────────────────────── LE LECTEUR ─────────────────────────────── */
@@ -633,9 +568,8 @@ function jouerMorceau(m, debut = 0) {
   if (!jouable(m)) { jouerExtraitComplet(m); return; }
   S.lecture = 'yt';
   S.enLecture = false;
-  S.posteReduit = false;
   $('#ecran-video').hidden = false;
-  majPoste();
+  majVideo();
   if (!lecteurPret) { enAttente = m; chargerAPI(); majEtat(); return; }
   try { lecteur.loadVideoById(debut ? { videoId: m.yt, startSeconds: debut } : m.yt); } catch (e) {}
   appliquerVolume();
@@ -646,7 +580,7 @@ function jouerExtraitComplet(m, essai = 0) {
   if (lecteur && lecteurPret) { try { lecteur.stopVideo(); } catch (e) {} }
   clearTimeout(demarrage);
   S.lecture = 'extrait'; S.erreur = false; S.enLecture = false;
-  majPoste(); majEtat();
+  majVideo(); majEtat();
   Pochettes.extraitFrais(m).then(url => {
     if (S.joue !== m.id || S.lecture !== 'extrait') return;
     if (!url) return extraitIntrouvable(m);
@@ -668,7 +602,7 @@ function jouerExtraitComplet(m, essai = 0) {
 }
 function extraitIntrouvable(m) {
   S.lecture = null; S.enLecture = false; S.erreur = true;
-  majPoste(); majEtat();
+  majVideo(); majEtat();
   echecRadio(m, S.son === 'extraits' ? 'n\'a pas d\'extrait' : 'ne s\'écoute que sur YouTube Music');
 }
 // un extrait dont le lien est périmé : on en redemande un, une fois ; sinon on passe
@@ -689,7 +623,6 @@ audioLecture.addEventListener('play', () => { if (S.lecture === 'extrait') { S.e
 function basculerLecture() {
   if (!S.joue) return;
   if (S.lecture === 'extrait') { if (audioLecture.paused) audioLecture.play().catch(() => {}); else audioLecture.pause(); return; }
-  if (S.lecture === 'yt' && S.posteReduit) { S.posteReduit = false; majPoste(); }
   if (S.lecture === 'yt' && lecteurPret) {
     const st = lecteur.getPlayerState();
     if (st === YT.PlayerState.PLAYING) lecteur.pauseVideo(); else lecteur.playVideo();
@@ -706,10 +639,9 @@ setInterval(() => {
 }, 1500);
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
-  $('#poste-icone').classList.toggle('pause', S.enLecture);
   $('#radio-icone').classList.toggle('pause', S.enLecture);
   majAvis();
-  majPoste();
+  majVideo();
   if (S.vue === 'machine') majAfficheur();
 }
 function tempsActuel() {
@@ -720,10 +652,11 @@ function tempsActuel() {
   return [0, 0];
 }
 
-/* ─────────────────────────────── le poste et l'écran vidéo ─────────────────────────────── */
+/* ─────────────────────────────── l'écran vidéo ─────────────────────────────── */
 /* Règles du lecteur YouTube, respectées ici : la vidéo est toujours visible
    pendant qu'elle joue (jamais de lecture cachée), dans un cadre d'au moins
-   200 × 200 pixels, sans rien posé par-dessus. */
+   200 × 200 pixels, sans rien posé par-dessus. Une seule vidéo, qui se pose
+   sur la chaîne, ou dans un coin de l'écran quand on descend lire la suite. */
 let chaineVue = true;
 if ('IntersectionObserver' in window) {
   new IntersectionObserver(es => {
@@ -731,51 +664,26 @@ if ('IntersectionObserver' in window) {
     const v = e.isIntersecting && e.intersectionRect.height >= Math.min(190, e.boundingClientRect.height * 0.85);
     if (v === chaineVue) return;
     chaineVue = v;
-    majPoste();
+    majVideo();
   }, { threshold: [0, 0.25, 0.5, 0.75, 0.85, 0.95, 1], rootMargin: `-${($('.facade-haut') || {}).offsetHeight || 64}px 0px 0px 0px` }).observe($('[data-emplacement="machine"]'));
 }
-function majPoste() {
-  const p = $('#poste');
-  const yt = S.lecture === 'yt';
-  const visible = false; // plus de petit lecteur : il cachait « Plus d'infos »
+function majVideo() {
   const coin = S.vue === 'machine' && !!S.joue && S.lecture === 'yt' && !chaineVue;
   $('#coin-video').hidden = !coin;
   document.body.classList.toggle('video-coin', coin);
-  p.hidden = !visible;
-  p.classList.toggle('avec-video', visible && yt && !S.posteReduit);
-  p.classList.toggle('reduit', visible && yt && S.posteReduit);
-  document.body.classList.toggle('avec-poste', visible);
-  if (S.joue) {
-    const m = parId[S.joue];
-    $('#poste-titre').textContent = m.affiche;
-    $('#poste-artiste').textContent = S.lecture === 'extrait' ? `${m.artiste}, extrait 30 s` : m.artiste;
-    const slot = $('[data-emplacement="poste"]');
-    if (slot.dataset.id !== m.id) { slot.innerHTML = Pochettes.html(m, 'pochette-fond'); slot.dataset.id = m.id; }
-  }
-  const r = $('#poste-reduire');
-  r.hidden = !yt;
-  r.classList.toggle('deplier', S.posteReduit);
-  r.setAttribute('aria-label', S.posteReduit ? 'Afficher la vidéo' : 'Réduire le lecteur (met en pause)');
-  r.title = S.posteReduit ? 'Afficher la vidéo' : 'Réduire (met en pause)';
+  document.body.classList.toggle('video-machine', S.lecture === 'yt' && S.vue === 'machine');
   majGarde();
   placerEcranVideo();
-  requestAnimationFrame(() => document.body.style.setProperty('--poste-h', visible ? `${p.offsetHeight}px` : '0px'));
 }
 let suiviRAF = null;
 function emplacementCible() {
-  if (!S.joue || S.lecture !== 'yt') return null;
-  if (S.vue === 'machine' && chaineVue) return $('[data-emplacement="machine"]');
-  // on descend : la vidéo suit dans un coin (YouTube veut qu'elle reste visible), la musique continue
-  if (S.vue === 'machine') return $('[data-emplacement="coin"]');
-  if (!$('#poste').hidden && !S.posteReduit) return $('[data-emplacement="poste"]');
-  return null;
+  if (!S.joue || S.lecture !== 'yt' || S.vue !== 'machine') return null;
+  return $(chaineVue ? '[data-emplacement="machine"]' : '[data-emplacement="coin"]');
 }
 function placerEcranVideo() {
   const ev = $('#ecran-video');
   const slot = emplacementCible();
   cancelAnimationFrame(suiviRAF);
-  const ou = slot ? slot.dataset.emplacement : '';
-  document.body.classList.toggle('video-machine', S.lecture === 'yt' && S.vue === 'machine');
   if (!slot) {
     ev.classList.add('cache');
     // garde-fou : une vidéo qui n'est pas à l'écran ne doit pas jouer
@@ -791,7 +699,7 @@ function placerEcranVideo() {
   };
   suivre();
 }
-addEventListener('resize', majPoste);
+addEventListener('resize', majVideo);
 
 // le temps qui passe : la chaîne, et la barre des extraits sur la platine
 setInterval(() => {
@@ -800,18 +708,17 @@ setInterval(() => {
   $('#lcd-temps').textContent = $('#etq-temps').textContent = `${deux(t / 60)}:${deux(t % 60)}`;
 }, 500);
 
-/* ─────────────────────────────── LA CHAÎNE ET LE PUPITRE ───────────────────────────────
-   Un seul lieu : la chaîne diffuse, et dessous on l'oriente pendant qu'elle
-   tourne. « Ça j'aime bien » attire la suite vers ce morceau, « Pas trop
-   comme ça » l'en éloigne (et passe au suivant), les directions changent le
-   prochain titre. Le moteur (moteur.js) compare les fiches de data.js pour
-   que chaque morceau mène au plus proche. */
+/* ─────────────────────────────── LA CHAÎNE ET LE TUNER ───────────────────────────────
+   La chaîne diffuse ; juste dessous, le tuner l'oriente pendant qu'elle tourne.
+   « J'aime bien » attire la suite vers ce morceau, « Pas trop comme ça » l'en éloigne
+   (et passe au suivant), les directions et l'époque choisissent le prochain titre.
+   Le moteur (moteur.js) compare les fiches de data.js pour que chaque morceau mène
+   au plus proche. */
 const SOURCES = {
-  radio:     { nom: 'La radio', sous: 'Toute la sélection, d\'un morceau proche à l\'autre' },
-  selection: { nom: 'Ma sélection', sous: 'Ce que tu as gardé' },
+  radio:     { nom: 'La radio' },
+  selection: { nom: 'Ma sélection' },
 };
-const CAPS = ['calme', 'energique', 'dansant', 'pose', 'connu', 'confidentiel', 'cote'];
-const nomCap = d => d === 'connu' ? 'Plus mainstream' : d === 'pose' ? 'Moins groovy' : d === 'dansant' ? 'Plus groovy' : (Moteur.DIRECTIONS[d] || {}).etiquette || '';
+const nomCap = d => (Moteur.DIRECTIONS[d] || {}).nom || '';
 /* la molette d'époque, façon Radioooooo : on règle la décennie, la radio pioche dedans */
 const EPOQUES = [
   { k: 'toutes', nom: 'Toutes les époques', court: 'Tout', de: -Infinity, a: Infinity },
@@ -839,9 +746,8 @@ function choisirEpoque(k) {
   if (avant === k) return;
   const cur = parId[S.joue];
   if (cur) S.suite = construireSuite(cur);
-  rendrePupitre(); majAfficheur();
-  const p = parId[S.suite[0]];
-  toast(k === 'toutes' ? 'Toutes les époques : la radio pioche partout.' : `${epoqueDe(k).nom}${p ? ` : ensuite, ${p.affiche}, ${p.annee}` : ''}.`, 3200);
+  rendreTuner(); majAfficheur();
+  signalerEnsuite();
 }
 // le petit souffle de la radio qu'on règle
 function gresillement() {
@@ -856,29 +762,32 @@ function gresillement() {
   } catch (e) {}
 }
 function poolSource() {
-  let p;
-  if (S.source === 'selection') p = S.gardes.map(id => parId[id]).filter(Boolean);
-  else p = BANQUE;
+  const p = S.source === 'selection' ? S.gardes.map(id => parId[id]).filter(Boolean) : BANQUE;
   const ok = p.filter(ecoutable);
   return ok.length >= 3 ? ok : p;
 }
 // ce que tu aimes attire, ce que tu n'aimes pas repousse
-function score(cur, x) {
-  let d = Moteur.distance(cur, x);
+function gout(x) {
+  let d = 0;
   S.aime.forEach(id => { const a = parId[id]; if (a && a !== x) d -= 0.7 * Math.exp(-Moteur.distance(a, x) / 2.6); });
   S.aimePas.forEach(id => { const a = parId[id]; if (a) d += 2.4 * Math.exp(-Moteur.distance(a, x) / 2.2); });
   return d;
 }
+const score = (cur, x) => Moteur.distance(cur, x) + gout(x);
 function parmiDeux(l) { return !l.length ? null : l.length === 1 || Math.random() < 0.72 ? l[0] : l[1]; }
+/* la suite : les six prochains morceaux, calculés depuis celui qui passe.
+   Sans direction, chaque morceau mène au plus proche (ce que tu aimes attire) ;
+   avec une direction, le moteur avance dans ce sens sans sauter d'un univers à l'autre.
+   Ta sélection sans direction passe dans l'ordre qui s'enchaîne le mieux. */
 function construireSuite(depuis, n = 6) {
-  const recents = new Set(S.historique.slice(-40));
-  const base = poolSource().filter(m => (!depuis || m.id !== depuis.id) && !S.aimePas.has(m.id));
-  if (S.source === 'selection') {
-    // ta sélection, rangée pour s'enchaîner, en repartant après le morceau en cours
+  const selection = S.source === 'selection';
+  if (selection && !S.pente) {
     const ordre = Moteur.sequencer(poolSource(), { depart: depuis && S.gardes.includes(depuis.id) ? depuis : null }).map(m => m.id);
     const i = depuis ? ordre.indexOf(depuis.id) : -1;
     return [...ordre.slice(i + 1), ...ordre.slice(0, Math.max(0, i))].slice(0, n);
   }
+  const recents = new Set(S.historique.slice(-40));
+  const base = poolSource().filter(m => (!depuis || m.id !== depuis.id) && (selection || !S.aimePas.has(m.id)));
   const baseE = filtreEpoque(base);
   let pool = baseE.filter(m => !recents.has(m.id));
   // fait le tour de l'époque : on le dira, et la molette repasse sur « Tout »
@@ -888,10 +797,14 @@ function construireSuite(depuis, n = 6) {
   const suite = [];
   let cur = depuis || hasard(pool);
   if (!depuis && cur) { suite.push(cur.id); pool = pool.filter(m => m !== cur); }
+  let sol = S.pente ? S.pente.sol : null;
   while (suite.length < n && pool.length) {
     let x = null;
-    if (cur && S.pente) x = Moteur.suivantPente(cur, S.pente.dir, pool, val, { premier: !suite.length && S.pente.neuf, force: S.pente.force, etape: S.pente.joues + suite.length });
-    else if (cur && S.cote && !suite.length) x = Moteur.versDirection(cur, 'cote', pool, val);
+    if (cur && S.pente) {
+      const premier = !suite.length && S.pente.neuf;
+      x = Moteur.suivantPente(cur, S.pente.dir, pool, val, { premier, force: S.pente.force, etape: S.pente.joues + suite.length, sol: premier ? null : sol, gout });
+      if (x) sol = Moteur.nouveauSol(S.pente.dir, premier ? null : sol, x, val);
+    }
     if (!x) x = parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
     if (!x) break;
     suite.push(x.id);
@@ -912,15 +825,14 @@ function finTourEpoque() {
 function rafraichirSuite() {
   S.suite = construireSuite(parId[S.joue] || null);
   finTourEpoque();
-  rendrePupitre();
+  rendreTuner();
   majAfficheur();
 }
 
-/* le disque dans le tiroir : la radio (holographique), le fond du bac (noir), ma sélection (CD-R) */
+/* le disque dans le tiroir : la radio (holographique), ma sélection (CD-R) */
 function disqueHTML(k, extra = '') {
   if (k === 'selection') return `<span class="disque disque-compil ${extra}"><span class="disque-main">Ma sélection</span></span>`;
-  if (k === 'radio') return `<span class="disque disque-hasard ${extra}"><span class="disque-nom">La radio<small>Music Discovery</small></span></span>`;
-  return `<span class="disque disque-vide ${extra}"></span>`;
+  return `<span class="disque disque-hasard ${extra}"><span class="disque-nom">La radio<small>Music Discovery</small></span></span>`;
 }
 /* le disque imprimé : la pochette du morceau qui passe, en picture disc */
 function majDisque() {
@@ -933,7 +845,7 @@ function majDisque() {
   if (img) d.style.setProperty('--pochette', `url("${img.src.replace(/"/g, '%22')}")`);
   else d.style.removeProperty('--pochette');
 }
-// une spirale, pour la vitesse « hypno »
+// une spirale, pour la vitesse « hypno », et l'anneau stroboscopique du disque
 (function () {
   let p = 'M50 50';
   for (let a = 0; a < Math.PI * 2 * 7; a += 0.12) { const r = 2 + a * 1.08; p += `L${(50 + r * Math.cos(a)).toFixed(1)} ${(50 + r * Math.sin(a)).toFixed(1)}`; }
@@ -954,6 +866,7 @@ function poserDisque(k) {
   d.replaceWith(nv);
   majDisque();
 }
+// changer de disque : le tiroir s'ouvre, le disque se pose, le tiroir se referme
 function chargerTiroir(k) {
   tiroirMin.forEach(clearTimeout); tiroirMin = [];
   const t = $('#tiroir');
@@ -966,61 +879,41 @@ function chargerTiroir(k) {
   tiroirMin.push(setTimeout(() => { t.classList.remove('pose'); document.body.classList.remove('lecture-disque'); majAfficheur(); }, 1150));
   majAfficheur();
 }
-// la touche d'éjection change de disque : la radio, ou ta sélection
-function ejecter() {
-  const t = $('#tiroir');
-  tiroirMin.forEach(clearTimeout); tiroirMin = [];
-  S.tiroirOuvert = !S.tiroirOuvert;
-  t.classList.toggle('ouvert', S.tiroirOuvert);
-  clic(S.tiroirOuvert ? 300 : 320, 0.16, 0.05);
-  if (S.tiroirOuvert && S.enLecture) { S.repriseTiroir = true; basculerLecture(); }
-  else if (!S.tiroirOuvert && S.repriseTiroir) { S.repriseTiroir = false; basculerLecture(); }
-  majAfficheur();
-}
 function choisirSource(k) {
   if (!SOURCES[k]) return;
-  if (k === 'selection' && !S.gardes.length) { toast('Ta sélection est vide : appuie sur « ♥ J\'aime bien » quand un morceau te plaît.', 4200); return; }
-  if (k === S.source && S.joue) { majSource(); return; }
+  if (k === 'selection' && S.gardes.length < 2) { toast('Garde au moins deux morceaux (♥ J\'aime bien) pour écouter ta sélection.', 4200); return; }
+  if (k === S.source && S.joue) return;
   // on note où on en était, pour y revenir pile au même endroit
   if (S.joue) { const [t] = tempsActuel(); S.reprise[S.source] = { id: S.joue, t: S.lecture === 'yt' && t > 5 ? Math.floor(t) : 0 }; memoire.ecrire('md-reprise', S.reprise); }
   S.source = k;
   memoire.ecrire('md-source', k);
-  S.pente = null; S.cote = false;
+  S.pente = null;
   const r = S.reprise[k];
   const ok = r && parId[r.id] && r.id !== S.joue && (k === 'radio' || S.gardes.includes(r.id));
   chargerTiroir(k);
-  majSource();
   if (ok) jouerRadio(r.id, { debut: r.t });
   else { const premier = construireSuite(null, 1)[0]; if (premier) jouerRadio(premier); }
-}
-function majSource() {
-  $$('#sources [data-source]').forEach(b => b.setAttribute('aria-pressed', b.dataset.source === S.source));
-  const n = $('#n-source'); if (n) n.textContent = S.gardes.length;
 }
 
 /* jouer : le morceau passe, la suite se recalcule depuis lui */
 function jouerRadio(id, { debut = 0 } = {}) {
   const m = parId[id];
   if (!m) return;
-  if (S.tiroirOuvert) { S.tiroirOuvert = false; S.repriseTiroir = false; $('#tiroir').classList.remove('ouvert'); }
   S.livrets.machine = false;
-  S.posteFerme = false;
-  S.mode = 'radio';
   croiser(m.id);
   if (S.historique[S.historique.length - 1] !== m.id) S.historique.push(m.id);
   memoire.ecrire('md-historique', S.historique.slice(-60));
   jouerMorceau(m, debut);
   // la direction : le premier pas est fait quand le morceau visé passe ; elle tient ensuite six morceaux
   if (S.pente) {
-    if (S.pente.neuf && S.pente.vise === m.id) S.pente.neuf = false;
-    else if (!S.pente.neuf) S.pente.joues++;
-    if (S.pente.joues >= 6) { toast(`${nomCap(S.pente.dir)} : on laisse filer la radio, maintenant.`); S.pente = null; }
+    if (S.pente.neuf && S.pente.vise === m.id) { S.pente.neuf = false; S.pente.sol = Moteur.nouveauSol(S.pente.dir, null, m, val); }
+    else if (!S.pente.neuf) { S.pente.joues++; S.pente.sol = Moteur.nouveauSol(S.pente.dir, S.pente.sol, m, val); }
+    if (S.pente.joues >= 6) { toast(`${nomCap(S.pente.dir)} : c'était le sixième. La radio reprend son fil.`, 3200); S.pente = null; }
   }
-  S.cote = false;
   S.suite = construireSuite(m);
   finTourEpoque();
   if (S.pente && S.pente.neuf) S.pente.vise = S.suite[0];
-  rendrePupitre();
+  rendreTuner();
   majMachine();
 }
 function radioSuivant() {
@@ -1039,7 +932,6 @@ function radioPrecedent() {
 }
 function radioLecture() {
   S.echecs = 0;
-  if (S.tiroirOuvert) { S.repriseTiroir = false; ejecter(); }
   if (S.joue && S.lecture) basculerLecture();
   else jouerRadio(S.joue || construireSuite(null, 1)[0]);
   clic(600, 0.06, 0.07);
@@ -1079,28 +971,31 @@ function pasAime(id) {
   S.suite = construireSuite(parId[id]);
   radioSuivant();
 }
-/* orienter : une direction tient sur plusieurs morceaux (sans jamais revenir en arrière).
-   Appuyer encore dessus va plus loin ; « Laisser filer » rend la main à la radio. */
+/* orienter : une direction tient sur six morceaux (sans jamais vraiment revenir en arrière).
+   Appuyer encore dessus va plus loin ; le × de la ligne « Ensuite » rend la main à la radio. */
 function orienter(dir) {
   if (!S.joue) return;
   const cur = parId[S.joue];
-  let msg = '';
-  if (dir === 'libre') { S.pente = null; S.cote = false; msg = 'La radio reprend son fil.'; }
-  else if (dir === 'cote') { S.cote = true; msg = 'Un pas de côté'; }
-  else if (S.pente && S.pente.dir === dir) {
+  if (dir === 'libre') {
+    S.pente = null;
+    rafraichirSuite();
+    signalerEnsuite();
+    clic(1200, 0.03, 0.05);
+    return;
+  }
+  if (!Moteur.DIRECTIONS[dir]) return;
+  if (S.pente && S.pente.dir === dir) {
+    if (S.pente.force >= 3) toast(`${nomCap(dir)}, déjà à fond : la suite va aussi loin que possible.`);
     S.pente.force = Math.min(3, S.pente.force + 1); S.pente.neuf = true; S.pente.joues = 0;
-    msg = `Encore ${nomCap(dir).toLowerCase()}`;
-  } else S.pente = { dir, force: 1, neuf: true, vise: null, joues: 0 }, msg = nomCap(dir);
+  } else S.pente = { dir, force: 1, neuf: true, vise: null, joues: 0, sol: null };
   // tout au bout de l'échelle : on le dit, et on reste au même niveau plutôt que de refuser
-  const bout = dir !== 'libre' && dir !== 'cote' && !Moteur.possible(cur, dir, filtreEpoque(poolSource().filter(x => x.id !== cur.id)), val);
+  const bout = !Moteur.possible(cur, dir, filtreEpoque(poolSource().filter(x => x.id !== cur.id)), val);
   S.suite = construireSuite(cur);
-  if (S.pente && S.pente.neuf) S.pente.vise = S.suite[0];
-  rendrePupitre();
+  S.pente.vise = S.suite[0] || null;
+  rendreTuner();
   majAfficheur();
-  const p = parId[S.suite[0]];
-  if (bout) toast(`On est déjà tout au bout de ce côté-là : la suite reste à ce niveau.`, 3600);
-  else if (p && dir !== 'libre') toast(`${msg} : ensuite, ${indice(p).charAt(0).toLowerCase() + indice(p).slice(1)}.`);
-  else if (msg) toast(msg);
+  signalerEnsuite();
+  if (bout) toast('On est déjà tout au bout de ce côté-là : la suite reste à ce niveau.', 3600);
   clic(1500, 0.03, 0.06);
 }
 /* les petits réglages inutiles : couleur de l'écran, égaliseur, vitesse, loudness */
@@ -1131,60 +1026,68 @@ function bidouiller(b) {
   clic(...(sons[cle] || [1500, 0.03, 0.05]));
   if (cle === 'vitesse' && !S.enLecture) toast('Lance un morceau pour voir le disque tourner.');
 }
-/* le pupitre : le morceau qui passe, sa mini-chronique, l'avis, la suite */
-/* « Oriente la suite » : trois réglettes. Le point plein, c'est le morceau qui passe ;
-   le rond, le suivant. On pousse d'un côté ou de l'autre, la suite suit. */
+/* le tuner : ta sélection ou la radio, l'époque, les trois réglages, et ce qui vient ensuite */
 const AXES = [
-  ['Énergie', 'calme', 'energique', 'energie'],
-  ['Groovy', 'pose', 'dansant', 'danse'],
-  ['Notoriété', 'connu', 'confidentiel', 'etrange'],
+  ['Énergie', 'calme', 'energique'],
+  ['Groovy', 'pose', 'dansant'],
+  ['Notoriété', 'connu', 'confidentiel'],
 ];
-const POUCE = '<svg class="pouce" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.7a2 2 0 0 0-2 1.7l-1.4 9A2 2 0 0 0 4.3 15H10Zm7-13h2.7A2.3 2.3 0 0 1 22 4.3v6.4a2.3 2.3 0 0 1-2.3 2.3H17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const position = (m, cle) => m ? Math.max(0, Math.min(10, +val(m, cle) || 0)) * 10 : 50;
-function rendrePupitre() {
+function rendreTuner() {
   const m = parId[S.joue];
-  const p = parId[S.suite[0]];
   const pool = filtreEpoque(poolSource().filter(x => !m || x.id !== m.id));
   // la radio ou ta sélection : seulement quand ta sélection a au moins deux morceaux
   const so = $('#sources');
   so.hidden = S.gardes.length < 2;
-  so.innerHTML = `<span class="sources-nom">Écouter</span>
-    <button class="source-choix" data-action="source-chaine" data-source="radio" aria-pressed="${S.source === 'radio'}">La radio</button>
-    <button class="source-choix" data-action="source-chaine" data-source="selection" aria-pressed="${S.source === 'selection'}">Ma sélection <b>${S.gardes.length}</b></button>`;
-  const bout = (d, cote) => {
-    const actif = S.pente && S.pente.dir === d;
-    const dispo = !m || actif || Moteur.possible(m, d, pool, val);
-    const nom = nomCap(d) + (actif && S.pente.force > 1 ? ` ×${S.pente.force}` : '');
-    return `<button class="rail-bout rail-${cote}${dispo ? '' : ' a-bout'}" data-action="cap" data-dir="${d}" aria-pressed="${!!actif}"${m ? '' : ' disabled'}>${cote === 'g' ? '<span aria-hidden="true">←</span> ' : ''}${E(nom)}${cote === 'd' ? ' <span aria-hidden="true">→</span>' : ''}</button>`;
+  if (!so.hidden) so.innerHTML = Object.entries(SOURCES).map(([k, x]) => `<button class="source-choix" data-action="source-chaine" data-source="${k}" aria-pressed="${S.source === k}">${x.nom}${k === 'selection' ? ` <b>${S.gardes.length}</b>` : ''}</button>`).join('');
+  // les trois réglages, par deux : le bouton choisi se remplit ; au bout de l'échelle, il se grise un peu
+  const bouton = (d, cote) => {
+    const actif = !!S.pente && S.pente.dir === d;
+    const bout = !!m && !actif && !Moteur.possible(m, d, pool, val);
+    const titre = bout ? 'Rien de plus loin dans ce sens par ici : la suite resterait à ce niveau' : actif ? 'Rappuie pour aller encore plus loin' : '';
+    const max = bout ? ' <small class="rail-max">max</small>' : '';
+    return `<button class="rail-bout rail-${cote}${bout ? ' a-bout' : ''}" data-action="cap" data-dir="${d}" aria-pressed="${actif}"${titre ? ` title="${titre}"` : ''}${m ? '' : ' disabled'}>${cote === 'g' ? '<span class="fleche" aria-hidden="true">←</span>' : ''}<span>${E(nomCap(d))}${max}</span>${cote === 'd' ? '<span class="fleche" aria-hidden="true">→</span>' : ''}</button>`;
   };
-  $('#rails').innerHTML = AXES.map(([nom, g, d]) => `<div class="reglage">
+  $('#rails').innerHTML = AXES.map(([nom, g, d]) => `<div class="reglage" role="group" aria-label="${nom}">
       <span class="reglage-nom">${nom}</span>
-      <div class="reglage-paire">${bout(g, 'g')}${bout(d, 'd')}</div>
-    </div>`).join('') + `<div class="reglage">
-      <span class="reglage-nom">Ce morceau</span>
-      <button class="rail-bout rail-passer" data-action="pas-aime"${m ? '' : ' disabled'} title="On passe au suivant, et on s'éloigne de ce genre-là">${POUCE} Pas trop comme ça</button>
-    </div>`;
+      <div class="reglage-paire">${bouton(g, 'g')}${bouton(d, 'd')}</div>
+    </div>`).join('');
+  // l'époque : une bande de radio, pour la radio seulement
   const ca = $('#cadran');
   ca.hidden = S.source === 'selection';
   if (!ca.hidden) {
     const radio = poolSource().filter(x => !S.aimePas.has(x.id));
     const i = Math.max(0, EPOQUES.findIndex(e => e.k === S.epoque));
     const nb = k => radio.filter(x => dansEpoque(x, k)).length;
-    ca.innerHTML = `<div class="cadran-tete"><span class="reglage-nom">Époque</span><span class="cadran-etat">${S.epoque === 'toutes' ? 'Toutes les époques' : `${E(epoqueDe(S.epoque).nom)} · ${nb(S.epoque)} morceau${nb(S.epoque) > 1 ? 'x' : ''}`}</span></div>
+    ca.innerHTML = `<span class="reglage-nom">Époque</span>
       <div class="cadran-bande" role="radiogroup" aria-label="Époque" style="--pos:${i};--n:${EPOQUES.length}">
         <span class="cadran-aiguille" aria-hidden="true"></span>
-        ${EPOQUES.map(e => `<button class="cadran-choix" role="radio" data-action="epoque" data-epoque="${e.k}" aria-checked="${e.k === S.epoque}" aria-label="${E(e.nom)}" title="${E(e.nom)}${e.k === 'toutes' ? '' : ` · ${nb(e.k)}`}">${E(e.court)}</button>`).join('')}
+        ${EPOQUES.map(e => `<button class="cadran-choix" role="radio" data-action="epoque" data-epoque="${e.k}" aria-checked="${e.k === S.epoque}" aria-label="${E(e.nom)}" title="${E(e.nom)}${e.k === 'toutes' ? '' : ` · ${nb(e.k)} morceau${nb(e.k) > 1 ? 'x' : ''}`}">${E(e.court)}</button>`).join('')}
       </div>`;
   }
-  $('#autres').innerHTML = '';
-  const pe = $('#pente');
-  pe.hidden = !S.pente;
-  if (S.pente) pe.innerHTML = `En ce moment : <b>${E(nomCap(S.pente.dir))}${S.pente.force > 1 ? ` ×${S.pente.force}` : ''}</b>, encore ${Math.max(1, 6 - S.pente.joues)} morceau${6 - S.pente.joues > 1 ? 'x' : ''}. Rappuie pour aller plus loin. <button class="lien-bouton" data-action="cap" data-dir="libre">Laisser filer</button>`;
-  $('#ensuite').innerHTML = p ? `<span class="ensuite-mot">Ensuite</span><button class="ensuite-titre" data-action="jouer-id" data-id="${p.id}" title="L'écouter tout de suite">${E(p.affiche)} <em>${E(p.artiste)}</em></button>` : '';
+  rendreEnsuite(parId[S.suite[0]]);
   majPostIt(m);
   majGarde();
 }
-// ton mot sur le morceau : un post-it collé sur la chaîne, qui arrive avec le morceau
+// « Ensuite » : le prochain titre, la direction en cours (avec son × pour arrêter), et de quoi y passer tout de suite
+function rendreEnsuite(p) {
+  const el = $('#ensuite');
+  if (!p) { el.innerHTML = ''; return; }
+  const reste = S.pente ? Math.max(1, 6 - S.pente.joues) : 0;
+  const cap = S.pente ? `<span class="ensuite-cap" title="Encore ${reste} morceau${reste > 1 ? 'x' : ''} dans ce sens">${E(nomCap(S.pente.dir))}${S.pente.force > 1 ? ` ×${S.pente.force}` : ''}<button class="ensuite-cap-x" data-action="cap" data-dir="libre" aria-label="Arrêter : la radio reprend son fil" title="Arrêter : la radio reprend son fil">×</button></span>` : '';
+  el.innerHTML = `<span class="ensuite-mot">Ensuite</span>
+    <button class="ensuite-morceau" data-action="jouer-id" data-id="${p.id}" title="L'écouter tout de suite">
+      ${Pochettes.html(p, 'pochette-ensuite')}
+      <span class="ensuite-textes"><span class="ensuite-titre">${E(p.affiche)}</span><span class="ensuite-artiste">${E(p.artiste)}<span class="ensuite-indice"> · ${E(indice(p))}</span></span></span>
+    </button>
+    ${cap}
+    <button class="ensuite-passer" data-action="radio-suivant" title="Passer au suivant (→)"><span class="ensuite-passer-texte">Écouter maintenant</span><span class="icone icone-suiv" aria-hidden="true"></span></button>`;
+}
+// la ligne « Ensuite » s'allume quand un réglage change le prochain titre
+function signalerEnsuite() {
+  const el = $('#ensuite');
+  el.classList.remove('change'); void el.offsetWidth; el.classList.add('change');
+}
+// ton mot sur le morceau : un post-it collé sur l'enceinte de droite (sous la chaîne sur petit écran)
 function majPostIt(m) {
   const el = $('#post-it');
   const note = m && m.note ? m.note.trim() : '';
@@ -1199,19 +1102,10 @@ function majPostIt(m) {
   el.style.setProperty('--penche', `${(hache(m.id) % 7) - 3.5}deg`);
   el.classList.remove('colle'); void el.offsetWidth; el.classList.add('colle');
 }
-// sur téléphone, le post-it se range dans « Oriente la suite », sous les réglettes, pour garder la vidéo à l'écran
-function rangerPostIt() {
-  const el = $('#post-it');
-  const mobile = innerWidth < 641;
-  if (mobile && el.parentElement.id !== 'pupitre') $('#pupitre').insertBefore(el, $('#pente'));
-  else if (!mobile && el.parentElement.id === 'pupitre') $('.hifi').appendChild(el);
-}
-addEventListener('resize', rangerPostIt);
 function placerPostIt() {
-  rangerPostIt();
   const el = $('#post-it'), sp = $('.hifi-enceinte-d'), h = $('.hifi');
-  if (!el || el.hidden || !sp || !h) return;
-  if (innerWidth < 1240 || !sp.offsetWidth || el.parentElement !== h) { el.style.top = el.style.right = ''; return; }
+  if (el.hidden) return;
+  if (innerWidth < 1240 || !sp.offsetWidth) { el.style.top = el.style.right = ''; return; }
   const a = sp.getBoundingClientRect(), b = h.getBoundingClientRect();
   el.style.top = `${Math.round(a.top - b.top + a.height * 0.17)}px`;
   el.style.right = `${Math.round(b.right - a.right + (a.width - el.offsetWidth) / 2)}px`;
@@ -1229,7 +1123,6 @@ function remplirChronique(m) {
     p.classList.add('pret');
   }));
 }
-// « Juste la musique » : la chaîne seule, rien d'autre
 // le bouton « Cosmétique » : il déplie tous les petits réglages, et les replie
 function basculerCosmetique(force) {
   const ouvre = typeof force === 'boolean' ? force : !document.body.classList.contains('cosmetique');
@@ -1244,18 +1137,8 @@ function choisirAffichage(v) {
   $$('.choix-affichage [data-val]').forEach(b => b.setAttribute('aria-checked', b.dataset.val === S.affichage));
   clic(S.affichage === 'ecran' ? 1700 : 600, 0.04, 0.05);
 }
-function basculerEpure(force) {
-  S.epure = typeof force === 'boolean' ? force : !S.epure;
-  memoire.ecrire('md-epure-v2', S.epure);
-  document.body.classList.toggle('epure', S.epure);
-  const b = $('#bouton-epure');
-  b.setAttribute('aria-pressed', S.epure);
-  b.textContent = S.epure ? 'Tout afficher' : 'Juste la musique';
-  clic(1300, 0.03, 0.05);
-  majPoste();
-}
 function entrerMachine() {
-  rendrePupitre();
+  rendreTuner();
   if (!$('#tiroir').classList.contains('ouvert')) poserDisque(S.source);
   aller('machine');
   majMachine();
@@ -1279,11 +1162,11 @@ function texteLCD(el, texte) {
   requestAnimationFrame(() => { if (el.scrollWidth > boite.clientWidth + 2) boite.classList.remove('fixe'); });
 }
 function majEtiquette(m, active) {
-  $('#etq-piste').textContent = m ? `PISTE ${deux(S.historique.length)} · ${S.source === 'selection' ? 'MA SÉLECTION' : S.epoque === 'toutes' ? 'LA RADIO' : 'LA RADIO · ' + epoqueDe(S.epoque).nom.toUpperCase()}` : 'PISTE --';
-  $('#etq-titre').textContent = S.tiroirOuvert ? 'Tiroir ouvert' : m ? m.affiche : 'Appuie sur lecture';
-  $('#etq-artiste').textContent = S.tiroirOuvert ? 'Appuie sur ⏏ ou sur lecture pour le refermer' : m ? m.artiste : '';
+  $('#etq-piste').textContent = m ? `PISTE ${deux(S.historique.length)} · ${S.source === 'selection' ? 'MA SÉLECTION' : S.epoque === 'toutes' ? 'LA RADIO' : epoqueDe(S.epoque).nom.toUpperCase()}` : 'PISTE --';
+  $('#etq-titre').textContent = m ? m.affiche : 'Appuie sur lecture';
+  $('#etq-artiste').textContent = m ? m.artiste : '';
   const e = parId[S.suite[0]];
-  $('#etq-ensuite').textContent = e && !S.tiroirOuvert ? `Ensuite : ${e.affiche}` : '';
+  $('#etq-ensuite').textContent = e ? `Ensuite : ${e.affiche}` : '';
   if (!active) $('#etq-temps').textContent = '--:--';
 }
 function majAfficheur() {
@@ -1292,11 +1175,10 @@ function majAfficheur() {
   const lecture = document.body.classList.contains('lecture-disque');
   $('#lcd-disque').textContent = SOURCES[S.source].nom.toUpperCase();
   $('#lcd-piste').textContent = m ? deux(S.historique.length) : '--';
-  if (S.demo) { lancerSpectre(); return; }
   const texte = lecture ? 'READING' : m ? `${m.affiche} · ${m.artiste}${active && S.lecture === 'extrait' ? ' (extrait)' : ''}` : 'APPUIE SUR LECTURE';
   texteLCD($('#lcd-texte'), texte);
   majEtiquette(m, active);
-  $('#lcd-etat').textContent = S.tiroirOuvert ? 'OPEN' : lecture ? 'READ' : !active ? 'STOP' : S.bloque ? 'APPUIE SUR ▶' : S.enLecture ? '▶ PLAY' : S.aJoue ? 'II PAUSE' : 'LOAD';
+  $('#lcd-etat').textContent = lecture ? 'READ' : !active ? 'STOP' : S.bloque ? 'APPUIE SUR ▶' : S.enLecture ? '▶ PLAY' : S.aJoue ? 'II PAUSE' : 'LOAD';
   const ensuite = parId[S.suite[0]];
   $('#lcd-ensuite').textContent = ensuite && !lecture ? `ENSUITE ${ensuite.affiche}` : '';
   if (!active) $('#lcd-temps').textContent = '--:--';
@@ -1320,11 +1202,11 @@ const pics = new Array(BARRES).fill(0);
 let spectreRAF = null, spectreDernier = 0;
 function lancerSpectre() {
   if (spectreRAF || reduitMouvement) return;
-  if (S.vue !== 'machine' || (!S.enLecture && !S.demo)) return;
+  if (S.vue !== 'machine' || !S.enLecture) return;
   spectreRAF = requestAnimationFrame(animerSpectre);
 }
 function animerSpectre(t) {
-  if (S.vue !== 'machine' || (!S.enLecture && !S.demo)) {
+  if (S.vue !== 'machine' || !S.enLecture) {
     spectreRAF = null;
     barres.forEach((b, i) => { b.style.setProperty('--h', '0.06'); pics[i] = 0; b.style.setProperty('--pic', 0); });
     majVU(0, 0);
@@ -1333,15 +1215,6 @@ function animerSpectre(t) {
   spectreRAF = requestAnimationFrame(animerSpectre);
   if (t - spectreDernier < 55) return;
   spectreDernier = t;
-  if (S.demo) { // la démo des magasins hi-fi : une vague qui balaie l'écran
-    barres.forEach((b, i) => {
-      const h = 0.5 + 0.48 * Math.sin(t / 160 - i * 0.55) * Math.cos(t / 900 + i * 0.12);
-      pics[i] = Math.max(h, pics[i] - 0.03);
-      b.style.setProperty('--h', h.toFixed(2)); b.style.setProperty('--pic', ((pics[i] - h) * 52).toFixed(1));
-    });
-    majVU(...niveaux());
-    return;
-  }
   const m = parId[S.joue] || {};
   const bpm = m.bpm || 100, e = Math.min(1, num(m.energie, 5) / 10 + (S.fidget.loudness ? 0.18 : 0));
   const temps = (t / 60000) * (bpm > 150 ? bpm / 2 : bpm);
@@ -1390,12 +1263,11 @@ function rendreBac() {
   const ids = S.onglet === 'gardes' ? S.gardes : S.croises;
   $('#bac-liste').innerHTML = !ids.length
     ? `<li class="bac-vide">${S.onglet === 'gardes'
-        ? 'Rien dans ta sélection pour l\'instant. Quand un morceau te plaît, appuie sur « Ajouter à ma sélection ».'
+        ? 'Rien dans ta sélection pour l\'instant. Quand un morceau te plaît, appuie sur « ♥ J\'aime bien ».'
         : 'Tout ce qui passe dans la chaîne s\'inscrit ici.'}</li>`
     : S.onglet === 'gardes' ? ids.map(id => {
         const m = parId[id];
-        const h = [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
-        const incl = ((h % 9) - 4) * 0.9;
+        const incl = ((hache(id) % 9) - 4) * 0.9;
         return `<li class="boitier" style="--incl:${incl}deg">
           <button class="boitier-morceau" data-action="ouvrir" data-id="${m.id}" title="Écouter ${E(m.affiche)}">
             <span class="boitier-cd"><span class="boitier-disque" aria-hidden="true"></span><span class="boitier-etui"><span class="boitier-dos" aria-hidden="true"></span>${Pochettes.html(m, 'pochette-mini')}<span class="boitier-reflet" aria-hidden="true"></span></span></span>
@@ -1507,26 +1379,15 @@ const ACTIONS = {
   'ouvrir': b => { fermerPanneaux(); clic(1300); jouerRadio(b.dataset.id); },
   'jouer-id': b => { clic(1300); jouerRadio(b.dataset.id); },
   'garder': b => basculerGarde(b.dataset.id),
-  'garder-joue': () => basculerGarde(S.joue),
   'aime': () => aimer(S.joue),
   'pas-aime': () => pasAime(S.joue),
   'cap': b => orienter(b.dataset.dir),
   'epoque': b => choisirEpoque(b.dataset.epoque),
   'fidget': b => bidouiller(b),
-  'trappe': b => { const p = $('#trappe-panneau'); const ouvre = p.hidden; p.hidden = !ouvre; b.setAttribute('aria-expanded', ouvre); $('#trappe').classList.toggle('ouverte', ouvre); clic(ouvre ? 520 : 380, 0.08, 0.06); },
   'source-chaine': b => choisirSource(b.dataset.source),
-  'lecture': () => basculerLecture(),
-  'suivant': () => radioSuivant(),
-  'retour-morceau': () => { entrerMachine(); window.scrollTo({ top: 0, behavior: doux }); },
-  'epure': () => basculerEpure(),
+  'retour-morceau': () => window.scrollTo({ top: 0, behavior: doux }),
   'cosmetique': () => basculerCosmetique(),
   'affichage': b => choisirAffichage(b.dataset.val),
-  'fermer-poste': () => {
-    S.posteFerme = true;
-    if (S.enLecture) basculerLecture();
-    clic(900, 0.03, 0.05);
-    majPoste();
-  },
   'fermer-livret': () => { const m = parId[S.joue]; S.livrets.machine = false; if (m) rendreLivret('machine', m, { force: true }); clic(1000, 0.04, 0.05); },
   'livret': b => {
     const m = parId[S.joue];
@@ -1540,8 +1401,6 @@ const ACTIONS = {
   'radio-suivant': radioSuivant,
   'radio-precedent': radioPrecedent,
   'radio-stop': radioStop,
-  'radio-raconte': () => { const m = parId[S.joue]; if (m) ouvrirLivret('machine', m); },
-  'ejecter': ejecter,
   'ecouter-selection': () => { fermerPanneaux(); choisirSource('selection'); window.scrollTo({ top: 0, behavior: doux }); },
   'copier-lien': async () => {
     try { await navigator.clipboard.writeText(location.href); toast('Lien copié : colle-le dans ton navigateur.'); }
@@ -1557,12 +1416,6 @@ const ACTIONS = {
   'teinte': b => appliquerTeinte(b.dataset.teinte, true),
   'encart-ok': () => { memoire.ecrire('md-encart-pub', true); majAvis(); },
   'encart-extraits': () => { memoire.ecrire('md-encart-pub', true); majAvis(); choisirSon('extraits'); },
-  'reduire-poste': () => {
-    S.posteReduit = !S.posteReduit;
-    if (S.posteReduit && S.lecture === 'yt' && lecteurPret) { try { lecteur.pauseVideo(); } catch (e) {} }
-    clic(1200, 0.03, 0.05);
-    majPoste();
-  },
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-action]');
@@ -1570,18 +1423,25 @@ document.addEventListener('click', e => {
   const a = ACTIONS[b.dataset.action];
   if (!a) return;
   e.preventDefault();
+  // après un clic de souris, le bouton lâche le focus : Espace mettra en pause au lieu de rappuyer dessus
+  if (e.detail > 0 && b.matches('.rail-bout, .rond, .pilule, .ensuite-passer, .ensuite-morceau, .cadran-choix, .source-choix, .choix-affichage button')) b.blur();
   // une erreur dans une action ne doit jamais figer le reste du site
   try { a(b); } catch (err) { console.error(err); toast('Oups, quelque chose a coincé. Réessaie.'); }
 });
+/* le clavier : Espace (lecture / pause), ← et → (morceau précédent / suivant),
+   J (j'aime bien), X (pas trop comme ça), Échap (refermer) */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') fermerPanneaux();
-  const libre = e.target === document.body || (e.target.matches && e.target.matches('.cap, .avis-bouton, .file-titre'));
-  if (!libre || e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.key === ' ' && S.joue) { e.preventDefault(); basculerLecture(); return; }
-  if (!S.joue) return;
-  if ('gGjJ'.includes(e.key)) { e.preventDefault(); aimer(S.joue); }
-  else if (e.key === 'x' || e.key === 'X') { e.preventDefault(); pasAime(S.joue); }
-  else if (e.key === 'ArrowRight') { e.preventDefault(); radioSuivant(); }
+  if (e.key === 'Escape') { fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || S.vue !== 'machine' || !S.joue) return;
+  const t = e.target;
+  if (t.closest && t.closest('input, textarea, select, [contenteditable="true"], .molette, .cadran-bande')) return;
+  const surBouton = t.closest && t.closest('button, a');
+  const touche = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  if (touche === ' ') { if (surBouton) return; e.preventDefault(); basculerLecture(); }
+  else if (touche === 'ArrowRight') { e.preventDefault(); radioSuivant(); }
+  else if (touche === 'ArrowLeft') { e.preventDefault(); radioPrecedent(); }
+  else if (touche === 'j' || touche === 'g') aimer(S.joue);
+  else if (touche === 'x') pasAime(S.joue);
 });
 
 /* ─────────────────────────────── démarrage ─────────────────────────────── */
@@ -1594,7 +1454,7 @@ S.suite = construireSuite(null);
 document.body.dataset.affichage = S.affichage;
 $$('.choix-affichage [data-val]').forEach(b => b.setAttribute('aria-checked', b.dataset.val === S.affichage));
 poserDisque(S.source);
-rendrePupitre();
+rendreTuner();
 majAfficheur();
 chargerAPI();
 // pochettes, extraits et fiches de toute la sélection, préparés dès l'arrivée (puis gardés en cache)
@@ -1627,7 +1487,7 @@ if (S.gardes.length || S.croises.length) {
   }
 })();
 
-/* ─────────────────────────────── petites bidouilles sur le poste (rien d'utile, tout est fait pour tripoter) ─────────────────────────────── */
+/* ─────────────────────────────── petites bidouilles sur la chaîne (rien d'utile, tout est fait pour tripoter) ─────────────────────────────── */
 (() => {
   const compte = {};
   const fois = k => (compte[k] = (compte[k] || 0) + 1);
@@ -1659,7 +1519,7 @@ if (S.gardes.length || S.croises.length) {
   let pris = null;
   const pos = (n, v) => pi.style.setProperty(n, v + 'px');
   pi.addEventListener('pointerdown', e => {
-    if (pi.parentElement.id === 'pupitre' || e.button) return;
+    if (innerWidth < 1240 || e.button) return; // sur petit écran, le post-it est rangé sous la chaîne : on ne le décolle pas
     pris = { x: e.clientX, y: e.clientY, dx: parseFloat(pi.style.getPropertyValue('--dx')) || 0, dy: parseFloat(pi.style.getPropertyValue('--dy')) || 0 };
     pi.setPointerCapture(e.pointerId); pi.classList.add('souleve'); pi.classList.remove('colle');
   });

@@ -20,29 +20,23 @@
      album    l'album d'origine (aide à trouver la bonne pochette)
      note     TON texte. Trois mots, un pavé, ou rien du tout.
               Rien du tout, c'est très bien aussi : le morceau parle seul.
-     liens    titres d'autres morceaux de la banque vers lesquels
-              celui-ci doit mener. Ex : liens: ["Pearls", "Judy"]
      volume   de 0.1 à 1, si un morceau est enregistré trop fort.
               (Les morceaux très énergiques sont déjà baissés tout seuls.)
-     jour     une date "2026-12-25" pour en faire le morceau du jour ce jour-là.
-              Sans ça, le morceau du jour est tiré au sort, le même pour tous.
      connu    true pour un morceau connu de tous même si ses interprètes
-              ne le sont pas (Mozart, Zelda…) : il ira côté « connu ».
-     coeur    true pour un coup de cœur : il passe en priorité quand le site
-              propose « Celui-là, je l'avais mis de côté pour toi ».
-              (La table de tri le coche pour toi.)
+              ne le sont pas (Mozart, Zelda…) : il ira côté « mainstream ».
+     coeur    true pour un coup de cœur (la table de tri le coche pour toi).
      long     true pour un morceau de 20 minutes et plus (simple repère).
      bandcamp le lien Bandcamp du morceau, s'il y est. Il apparaît dans
               « Écouter en entier sur » (sans pub, et l'artiste touche plus).
               Ex : bandcamp: "https://artiste.bandcamp.com/track/morceau"
 
-   La fiche du morceau : c'est elle qui fait que « dans la même veine »
-   reste dans la même veine, et que la chaîne enchaîne sans à-coups.
-     ambiance le bac et le disque où il range : "soleil" (soul, funk, chaleur),
+   La fiche du morceau : c'est elle qui fait que la chaîne enchaîne sans
+   à-coups, et qu'« Oriente la suite » va dans le bon sens.
+     ambiance son univers : "soleil" (soul, funk, chaleur),
               "bitume" (rap, la ville la nuit), "piste" (pour danser),
               "brume" (doux et rêveur), "ailleurs" (étrange et lointain),
               "electrique" (guitares et pop vive), "epopee" (orchestres,
-              jeux vidéo). Les couleurs et les noms sont dans moteur.js.
+              jeux vidéo). Les univers voisins sont dans moteur.js.
      style    deux ou trois mots montrés aux visiteurs : "Philly soul"
      annee    l'année de sortie (ou de composition)
      bpm      le tempo, à peu près
@@ -52,8 +46,9 @@
    Tu n'as pas à les remplir toi-même : quand tu colles tes « oui » de la
    table de tri, Claude écrit la fiche de chaque nouveau morceau.
 
-   Les réglages (de 0 à 10) servent au moteur de découverte.
-   Ils ne sont jamais montrés aux visiteurs. Ajuste-les à l'instinct :
+   Les réglages (de 0 à 10) servent à « Oriente la suite » (énergie,
+   groove, notoriété). Ils ne sont jamais montrés aux visiteurs.
+   Ajuste-les à l'instinct :
      energie  0 immobile · 2 calme · 4 posé · 6 ça avance · 8 intense
               · 10 extrême (thrash, metal, speedcore)
      danse    0 impossible (classique, ambient) · 2 on écoute · 4 on hoche
@@ -61,6 +56,8 @@
               (un metal très énergique peut avoir une danse basse : on
               secoue la tête, on ne danse pas)
      etrange  1 évident pour tout le monde · 5 inhabituel · 9 d'où ça sort ?
+              (une fois sur le site, c'est le nombre de fans de l'artiste
+              sur Deezer qui décide, quand on le connaît)
 
    ⚠ Les valeurs actuelles sont une première estimation faite par Claude.
      Corrige-les comme tu le sens, c'est ta sélection, pas la sienne.

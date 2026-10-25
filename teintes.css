@@ -11,29 +11,6 @@
 /* ─── SALON (par défaut) : d'après la pochette « For A Good Time… » d'Odeal.
    Mur gris clair de studio, velours bleu Klein, noyer, aluminium, plexi fumé, cuir cognac. ─── */
 :root, [data-teinte="salon"] {
-  --etiquette: #f7f3ea;
-  --sur-etiquette: #1c1c21;
-  --facade-cd: linear-gradient(180deg, #f6f5f2, #e2e0dc 62%, #d3d1cc), repeating-linear-gradient(90deg, rgba(255,255,255,.3) 0 1px, transparent 1px 3px);
-  --encre-cd: #25252a;
-  --sur-encre-cd: #f6f5f2;
-  --touche-cd: linear-gradient(180deg, #fdfcfa, #dddbd6);
-  --fente-cd: #1a1a1e;
-  --vfd: #8fe6ff;
-  --vfd-fond: #0c1317;
-  --vfd-halo: rgba(143, 230, 255, .45);
-
-  --noyer: linear-gradient(90deg, #5e3519, #8e5a31 18%, #7a4826 36%, #9d6838 58%, #7f4c28 78%, #63391c);
-  --noyer-grain: repeating-linear-gradient(88deg, rgba(0,0,0,.07) 0 2px, transparent 2px 7px, rgba(255,255,255,.05) 7px 8px, transparent 8px 13px);
-  --cone: #1b1b1e;
-  --cone-centre: #34343a;
-  --cone-bord: #2a2a2e;
-  --plexi: radial-gradient(120% 90% at 30% 10%, rgba(120,80,45,.55), rgba(40,24,14,.82));
-  --disque: conic-gradient(from 20deg, #1b3cc4, #5d7bff, #1b3cc4 30%, #9fb2ff 42%, #1b3cc4 55%, #3a58e8 75%, #1b3cc4);
-
-  --dos-carte: radial-gradient(130% 100% at 28% 18%, #3a57e6, #1b3cc4 48%, #0e2384);
-  --sur-dos: #ffffff;
-  --force-teinte: .26;
-
   --fond: #dcdbd8;
   --fond-2: #e9e8e5;
   --fond-3: #f3f2ef;
@@ -43,19 +20,11 @@
   --encre-3: rgba(28, 28, 33, .2);
   --trait: rgba(28, 28, 33, .12);
 
-  --verre: #1b3cc4;
   --verre-fond: #cfcecb;
-  --verre-trait: rgba(27, 60, 196, .3);
   --verre-eteint: #bdbcb8;
-  --verre-halo: rgba(27, 60, 196, .3);
   --aiguille: #1b3cc4;
   --sur-aiguille: #ffffff;
 
-  --metal: #e8e7e3;
-  --metal-sombre: #8f8e8a;
-  --socle: linear-gradient(160deg, #f3f2ef, #dddbd7);
-  --plateau: radial-gradient(circle, #c9c8c4 0 60%, #8f8e8a 61% 63%, #c9c8c4 64%);
-  --rainure: #c4c3bf;
   --capuchon-haut: #f6f5f2;
   --capuchon-bas: #b5b3ae;
 
@@ -64,7 +33,6 @@
   --relief-enfonce: inset 0 3px 10px rgba(0,0,0,.18);
   --relief-plein: 0 10px 24px rgba(27,30,60,.22);
   --ombre-pochette: 0 6px 16px rgba(45,32,20,.22);
-  --ombre-pochette-forte: 0 30px 60px -14px rgba(45,32,20,.45), 0 8px 18px rgba(45,32,20,.16);
 
   --display: "Unbounded", system-ui, sans-serif;
   --display-poids: 600;
@@ -74,7 +42,6 @@
   --rayon-objet: 18px;
   --rayon-pochette: 2px;
   --rayon-ecran: 8px;
-  --rayon-verre: 8px;
 
   /* la chaîne : alu brossé, écran bleu glacier */
   --hifi-corps: linear-gradient(180deg, rgba(255,255,255,.6), transparent 16%), repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 1px, rgba(0,0,0,.022) 1px 2px), linear-gradient(180deg, #eceded, #d3d5d7 48%, #c5c7ca 52%, #dfe1e3);
@@ -92,36 +59,11 @@
   --lcd-fond: radial-gradient(120% 140% at 50% 0%, #0d2235, #06111c 70%);
   --lcd-encre: #8fdcff;
   --lcd-halo: rgba(110, 200, 255, .55);
-  --etagere: linear-gradient(180deg, #f1f0ed, #e4e2de);
-  --etagere-bord: rgba(120, 100, 80, .12);
 }
 
 /* ─── NUIT : le même salon, lampe allumée. Mur sombre, noyer, velours bleu,
    afficheur ambré. C'est le mode sombre du site. ─── */
 [data-teinte="nuit"] {
-  --etiquette: #ebe5d6;
-  --sur-etiquette: #17161b;
-  --facade-cd: linear-gradient(180deg, #2c2b32, #201f25 62%, #19181d), repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px);
-  --encre-cd: #ebe9e4;
-  --sur-encre-cd: #17161b;
-  --touche-cd: linear-gradient(180deg, #37363e, #27262d);
-  --fente-cd: #08080a;
-  --vfd: #ffb862;
-  --vfd-fond: #0c0906;
-  --vfd-halo: rgba(255, 170, 80, .5);
-
-  --noyer: linear-gradient(90deg, #3f2311, #6b4222 18%, #5a3519 36%, #77502c 58%, #5d371b 78%, #432614);
-  --noyer-grain: repeating-linear-gradient(88deg, rgba(0,0,0,.12) 0 2px, transparent 2px 7px, rgba(255,255,255,.04) 7px 8px, transparent 8px 13px);
-  --cone: #111113;
-  --cone-centre: #2a2a30;
-  --cone-bord: #1d1d21;
-  --plexi: radial-gradient(120% 90% at 30% 10%, rgba(130,85,45,.5), rgba(20,12,8,.9));
-  --disque: conic-gradient(from 20deg, #2440d8, #6a86ff, #2440d8 30%, #a9b9ff 42%, #2440d8 55%, #4864f0 75%, #2440d8);
-
-  --dos-carte: radial-gradient(130% 100% at 28% 18%, #3a57e6, #1b3cc4 48%, #0e2384);
-  --sur-dos: #ffffff;
-  --force-teinte: .3;
-
   --fond: #141318;
   --fond-2: #1d1c22;
   --fond-3: #27262d;
@@ -131,19 +73,11 @@
   --encre-3: rgba(236, 235, 230, .2);
   --trait: rgba(236, 235, 230, .1);
 
-  --verre: #5470ff;
   --verre-fond: #0d0d11;
-  --verre-trait: rgba(84, 112, 255, .35);
   --verre-eteint: #2b2a33;
-  --verre-halo: rgba(84, 112, 255, .35);
   --aiguille: #5470ff;
   --sur-aiguille: #0b0d22;
 
-  --metal: #d9d7d2;
-  --metal-sombre: #7d7b77;
-  --socle: linear-gradient(160deg, #26252c, #1b1a20);
-  --plateau: radial-gradient(circle, #3a3940 0 60%, #7d7b77 61% 63%, #3a3940 64%);
-  --rainure: #0a0a0d;
   --capuchon-haut: #e4e2dd;
   --capuchon-bas: #8c8a85;
 
@@ -152,7 +86,6 @@
   --relief-enfonce: inset 0 3px 10px rgba(0,0,0,.6);
   --relief-plein: 0 10px 24px rgba(0,0,0,.45);
   --ombre-pochette: 0 6px 16px rgba(0,0,0,.5);
-  --ombre-pochette-forte: 0 30px 60px -12px rgba(0,0,0,.75), 0 8px 18px rgba(0,0,0,.4);
 
   --display: "Unbounded", system-ui, sans-serif;
   --display-poids: 600;
@@ -162,7 +95,6 @@
   --rayon-objet: 18px;
   --rayon-pochette: 2px;
   --rayon-ecran: 8px;
-  --rayon-verre: 8px;
 
   /* la chaîne : laque noire, écran ambré */
   --hifi-corps: linear-gradient(180deg, rgba(255,255,255,.08), transparent 16%), linear-gradient(180deg, #2a2b30, #17181b 60%, #101114);
@@ -180,32 +112,10 @@
   --lcd-fond: radial-gradient(120% 140% at 50% 0%, #1a0f05, #0a0603 70%);
   --lcd-encre: #ffb35c;
   --lcd-halo: rgba(255, 160, 70, .55);
-  --etagere: linear-gradient(180deg, #232228, #1a191e);
-  --etagere-bord: rgba(0,0,0,.35);
 }
 
 /* ─── PAPIER : une archive privée, papier vert-de-gris, encre bleue, tampon magenta ─── */
 [data-teinte="papier"] {
-  --etiquette: #d01e6a;
-  --sur-etiquette: #f6f7f1;
-  --noyer: #1d2a4d;
-  --noyer-grain: none;
-  --cone: #2c3c66; --cone-centre: #eef1e8; --cone-bord: #1d2a4d;
-  --plexi: #1d2a4d;
-  --disque: repeating-radial-gradient(circle, #eef1e8 0 3px, #d3dacb 3px 5px);
-  --facade-cd: #eef1e8;
-  --encre-cd: #1d2a4d;
-  --sur-encre-cd: #eef1e8;
-  --touche-cd: #f6f7f1;
-  --fente-cd: #1d2a4d;
-  --vfd: #f6f7f1;
-  --vfd-fond: #1d2a4d;
-  --vfd-halo: transparent;
-
-  --dos-carte: #1d2a4d;
-  --sur-dos: #eef1e8;
-  --force-teinte: .28;
-
   --fond: #dfe4d7;
   --fond-2: #eef1e8;
   --fond-3: #d3dacb;
@@ -215,19 +125,11 @@
   --encre-3: rgba(29, 42, 77, .25);
   --trait: rgba(29, 42, 77, .14);
 
-  --verre: #1d2a4d;
   --verre-fond: #f6f7f1;
-  --verre-trait: rgba(29, 42, 77, .3);
   --verre-eteint: rgba(29, 42, 77, .15);
-  --verre-halo: transparent;
   --aiguille: #d01e6a;
   --sur-aiguille: #f6f7f1;
 
-  --metal: #1d2a4d;
-  --metal-sombre: #5a6680;
-  --socle: #eef1e8;
-  --plateau: radial-gradient(circle, #c9d0bf 0 60%, #1d2a4d 61% 62%, #c9d0bf 63%);
-  --rainure: #c3cbb8;
   --capuchon-haut: #1d2a4d;
   --capuchon-bas: #2c3c66;
 
@@ -236,18 +138,15 @@
   --relief-enfonce: 0 0 0 2px var(--aiguille);
   --relief-plein: none;
   --ombre-pochette: 0 0 0 1px rgba(29,42,77,.2);
-  --ombre-pochette-forte: 8px 8px 0 rgba(29,42,77,.16), 0 0 0 1px rgba(29,42,77,.2);
 
   --display: "Newsreader", Georgia, serif;
   --display-poids: 400;
   --display-interlettre: -0.025em;
   --texte: "Familjen Grotesk", system-ui, sans-serif;
-  --note: "Newsreader", Georgia, serif;
 
   --rayon-objet: 2px;
   --rayon-pochette: 0px;
   --rayon-ecran: 0px;
-  --rayon-verre: 0px;
 
   /* la chaîne : à plat, à l'encre */
   --hifi-corps: #eef1e8;
@@ -265,6 +164,4 @@
   --lcd-fond: #1d2a4d;
   --lcd-encre: #f6f7f1;
   --lcd-halo: transparent;
-  --etagere: #e3e8dc;
-  --etagere-bord: rgba(29,42,77,.12);
 }

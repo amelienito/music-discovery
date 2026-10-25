@@ -1,6 +1,9 @@
 /* ════════════════════════════════════════════════════════════════════
-   MUSIC DISCOVERY — la structure et les objets (v1.0)
+   MUSIC DISCOVERY — la structure et les objets
    Les couleurs et polices viennent de teintes.css (une teinte = un skin).
+   Plan : base · façade · carton d'entrée · boutons · pochettes · disques ·
+   la chaîne (enceintes, lecteur, tuner, post-it, cosmétique) · vidéo ·
+   livret · panneaux · messages · tablette · téléphone · mouvements.
    ════════════════════════════════════════════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -26,53 +29,31 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, p { margin: 0; }
 :focus-visible { outline: 2px solid var(--aiguille); outline-offset: 3px; border-radius: 6px; }
-
-h1, h2, .envie-titre, .platine-titre, .suite-titre, .gros-bouton, .jour-titre, .marque {
+h1, h2, .gros-bouton, .marque {
   font-family: var(--display);
   font-weight: var(--display-poids);
   font-stretch: var(--display-etirement, 100%);
   letter-spacing: var(--display-interlettre, -0.02em);
   line-height: 1.05;
 }
+/* des lignes équilibrées, pas de mot tout seul en fin de paragraphe */
+h1, h2, h3, .avis-titre { text-wrap: balance; }
+p, li, .livret-texte { text-wrap: pretty; }
 
 /* ─────────────────────────────── LA FAÇADE (barre du haut) ─────────────────────────────── */
 .facade-haut {
   position: fixed; top: 0; left: 0; right: 0; z-index: 40;
   height: 76px;
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 0 20px;
   padding-top: env(safe-area-inset-top);
   background: var(--fond);
   border-bottom: 1px solid var(--trait);
   transition: background-color .5s ease;
 }
-body[data-vue="allumage"] .selecteur,
 body[data-vue="allumage"] .facade-droite { visibility: hidden; }
-.marque { justify-self: start; font-size: 13px; line-height: 1.05; letter-spacing: 0; text-align: left; }
-
-/* le sélecteur de source : un vrai interrupteur à deux positions */
-.selecteur {
-  position: relative; display: grid; grid-template-columns: 1fr 1fr;
-  padding: 4px; border-radius: 999px;
-  background: var(--verre-fond);
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.35), 0 0 0 1px var(--trait);
-}
-.selecteur-pos {
-  position: relative; z-index: 1;
-  min-width: 118px; height: 40px; padding: 0 18px; border-radius: 999px;
-  font-weight: 600; font-size: 15px; color: var(--encre-2);
-  transition: color .25s;
-}
-.selecteur-pos[aria-selected="true"] { color: var(--fond); }
-.selecteur-curseur {
-  position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
-  border-radius: 999px; background: var(--encre);
-  box-shadow: 0 2px 8px rgba(0,0,0,.3);
-  transition: transform .35s cubic-bezier(.3,1.4,.5,1);
-}
-body[data-source="ecouter"] .selecteur-curseur { transform: translateX(100%); }
-
-.facade-droite { justify-self: end; display: flex; align-items: center; gap: 14px; }
+.marque { font-size: 13px; line-height: 1.05; letter-spacing: 0; text-align: left; }
+.facade-droite { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .bouton-facade {
   height: 42px; padding: 0 16px; border-radius: 999px; white-space: nowrap;
   background: var(--fond-2); box-shadow: var(--relief);
@@ -81,11 +62,21 @@ body[data-source="ecouter"] .selecteur-curseur { transform: translateX(100%); }
 }
 .bouton-facade:active { transform: translateY(1px); }
 .bouton-trouvailles { padding-right: 10px; }
+/* « Ma sélection » n'apparaît qu'à partir de deux morceaux */
+body.sans-selection .bouton-trouvailles { display: none; }
 /* l'icône des réglages reprend les couleurs de la teinte active */
 .icone-teinte { width: 18px; height: 18px; border-radius: 50%; flex: none; background: conic-gradient(var(--aiguille) 0 34%, var(--encre) 0 67%, var(--fond-3) 0); box-shadow: inset 0 0 0 1px var(--trait), 0 0 0 1px rgba(0,0,0,.08); }
-.bouton-rotatif-petit { grid-auto-flow: column; align-items: center; gap: 8px; }
-.bouton-rotatif-petit .molette { width: 34px; height: 34px; }
 .seulement-mobile-inline { display: none; }
+/* le petit CD-R du bouton « Ma sélection » */
+.mini-cdr { width: 18px; height: 18px; border-radius: 50%; flex: none; background: radial-gradient(circle, var(--fond-2) 0 16%, rgba(0,0,0,.25) 17% 20%, transparent 21%), conic-gradient(#e9ecef, #c4cad1, #f7f8f9, #c8ced5, #e9ecef); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.bouton-trouvailles.pulse .mini-cdr { animation: tourne .8s cubic-bezier(.3,.6,.3,1); }
+.compteur {
+  min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
+  display: inline-grid; place-items: center;
+  background: var(--encre); color: var(--fond); font-size: 13px;
+}
+.bouton-trouvailles.pulse .compteur { animation: pulse .5s cubic-bezier(.3,1.8,.5,1); }
+@keyframes pulse { 50% { transform: scale(1.45); } }
 
 /* les pastilles de teinte : visibles en façade, et en grand dans Réglages */
 .teintes { display: flex; gap: 4px; align-items: center; }
@@ -99,15 +90,8 @@ body[data-source="ecouter"] .selecteur-curseur { transform: translateX(100%); }
 .teintes-grandes .pastille span { width: 42px; height: 42px; }
 .teintes-grandes .pastille em { position: static; width: auto; height: auto; clip: auto; font-style: normal; font-size: 13px; font-weight: 600; }
 .teintes-grandes .pastille[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--aiguille); background: var(--fond-2); }
-.compteur {
-  min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
-  display: inline-grid; place-items: center;
-  background: var(--encre); color: var(--fond); font-size: 13px;
-}
-.bouton-trouvailles.pulse .compteur { animation: pulse .5s cubic-bezier(.3,1.8,.5,1); }
-@keyframes pulse { 50% { transform: scale(1.45); } }
 
-/* ─────────────────────────────── LES MOLETTES (volume, teinte) ─────────────────────────────── */
+/* ─────────────────────────────── LA MOLETTE DE VOLUME (carton d'entrée) ─────────────────────────────── */
 .bouton-rotatif { display: grid; justify-items: center; gap: 4px; }
 .bouton-rotatif-nom { font-size: 12px; color: var(--encre-2); white-space: nowrap; }
 .molette {
@@ -120,42 +104,41 @@ body[data-source="ecouter"] .selecteur-curseur { transform: translateX(100%); }
   cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
 }
 .molette.saisie { cursor: grabbing; }
-.bouton-rotatif-grand .molette { cursor: pointer; }
-.molette-repere {
-  position: absolute; inset: 0; transform: rotate(var(--rot));
-  transition: transform .12s ease-out;
-}
+.molette-repere { position: absolute; inset: 0; transform: rotate(var(--rot)); transition: transform .12s ease-out; }
 .molette-repere::before {
   content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 30%;
   margin-left: -1.5px; border-radius: 2px; background: var(--aiguille);
 }
-.molette-crantee .molette-repere { transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
 /* l'arc qui montre le niveau du volume */
 .molette-arc { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); transform: rotate(135deg); pointer-events: none; }
 .molette-arc circle { fill: none; stroke: var(--aiguille); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 45 100; transition: stroke-dasharray .1s; }
-.bouton-rotatif-grand .molette { width: 112px; height: 112px; }
+.bouton-rotatif-grand .molette { width: 112px; height: 112px; cursor: pointer; }
 .bouton-rotatif-grand .molette-repere::before { top: 10px; width: 4px; margin-left: -2px; height: 24%; }
 .bouton-rotatif-grand .bouton-rotatif-nom { font-size: 15px; font-weight: 600; color: var(--encre); margin-top: 8px; }
-.bouton-rotatif-mini .molette { width: 36px; height: 36px; }
-/* sur iPhone, le volume ne se pilote pas depuis une page web : on cache ces molettes */
+/* sur iPhone, le volume ne se pilote pas depuis une page web : on cache la molette */
 .ios [data-molette="volume"] { display: none !important; }
 
 #scene { padding-top: 76px; min-height: 100vh; }
 .ecran { min-height: calc(100vh - 76px); padding: clamp(20px, 4vw, 56px); padding-bottom: 120px; }
-body.avec-poste .ecran { padding-bottom: calc(var(--poste-h, 90px) + 48px); }
 
-/* ─────────────────────────────── ALLUMAGE ─────────────────────────────── */
+/* ─────────────────────────────── LE CARTON D'ENTRÉE ─────────────────────────────── */
 .ecran-allumage { display: grid; place-content: center; justify-items: center; gap: 34px; text-align: center; }
 .allumage-texte h1 { font-size: clamp(2rem, 4.5vw, 4.4rem); max-width: none; margin: 0 auto; text-wrap: balance; }
 .allumage-texte h1 .ligne { display: inline-block; text-wrap: balance; }
-.allumage-sous { margin-top: 18px; font-size: clamp(1.05rem, 1.6vw, 1.3rem); color: var(--encre-2); }
+.allumage-texte .surtitre { margin-bottom: 18px; font-size: 13.65px; }
+.surtitre { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--encre-2); }
+.etapes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
+.etapes li { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+.etapes b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fond-2); box-shadow: var(--relief); font-size: 13px; }
+.etapes li + li::before { content: ""; width: 26px; height: 1px; margin-right: 14px; background: var(--encre-3); }
 .panneau-allumage {
   display: flex; align-items: center; gap: clamp(28px, 6vw, 64px);
   padding: 26px 36px; border-radius: var(--rayon-objet);
   background: var(--fond-2); box-shadow: var(--relief);
 }
-.allumage-conseil { font-size: 14px; color: var(--encre-2); max-width: 36ch; }
+.allumage-conseil { font-size: 14px; color: var(--encre-2); max-width: 52ch; }
 .allumage-retour { font-size: 15px; color: var(--aiguille); font-weight: 600; }
+.allumage-libre { font-size: 13px; color: var(--encre-2); max-width: 44ch; }
 .interrupteur {
   width: 132px; height: 132px; border-radius: 50%;
   background: var(--fond-3);
@@ -184,80 +167,6 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
 }
 .lien-bouton:hover { color: var(--encre); }
 
-
-/* le petit CD-R du bouton « Ma compil » */
-.mini-cdr { width: 18px; height: 18px; border-radius: 50%; flex: none; background: radial-gradient(circle, var(--fond-2) 0 16%, rgba(0,0,0,.25) 17% 20%, transparent 21%), conic-gradient(#e9ecef, #c4cad1, #f7f8f9, #c8ced5, #e9ecef); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
-.bouton-trouvailles.pulse .mini-cdr { animation: tourne .8s cubic-bezier(.3,.6,.3,1); }
-
-/* les petits repères d'étape : 1 fouiller, 2 graver, 3 écouter */
-.surtitre { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--encre-2); }
-.etape-puce { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--encre); color: var(--fond); font-size: 12px; letter-spacing: 0; }
-.etapes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
-.etapes li { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
-.etapes b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fond-2); box-shadow: var(--relief); font-size: 13px; }
-.etapes li + li::before { content: ""; width: 26px; height: 1px; margin-right: 14px; background: var(--encre-3); }
-.allumage-texte .surtitre { margin-bottom: 18px; font-size: 13.65px; }
-.allumage-libre { font-size: 13px; color: var(--encre-2); }
-
-/* ─────────────────────────────── DÉCOUVRIR : les bacs ───────────────────────────────
-   Un bac par ambiance, comme chez le disquaire : l'intercalaire de couleur
-   devant, les pochettes qui dépassent derrière. */
-.ecran-accueil {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
-  grid-template-areas: "tete jour" "bacs jour";
-  gap: clamp(22px, 3vw, 40px) clamp(32px, 5vw, 80px); align-items: start; align-content: center;
-  max-width: 1320px; margin: 0 auto;
-}
-.bacs-tete { grid-area: tete; display: grid; gap: 14px; justify-items: start; }
-.envie-titre { font-size: clamp(2.3rem, 5.6vw, 5rem); line-height: .98; max-width: 13ch; }
-.envie-aide { color: var(--encre-2); max-width: 46ch; font-size: clamp(15px, 1.3vw, 17px); }
-.bacs { grid-area: bacs; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 22px); }
-.bac-couleur {
-  --amb: #888; --amb-sombre: #333; --amb-encre: #fff;
-  position: relative; display: block; aspect-ratio: 4 / 5; text-align: left; isolation: isolate;
-  border-radius: 16px; background: var(--fond-2); box-shadow: var(--relief);
-  animation: sortie .6s calc(var(--i, 0) * 45ms) cubic-bezier(.2,.9,.3,1.1) both;
-  transition: transform .3s cubic-bezier(.2,.9,.3,1.3), box-shadow .3s;
-}
-.bac-couleur::before { /* le fond du bac, un peu creusé */
-  content: ""; position: absolute; inset: 7px; z-index: -1; border-radius: 11px;
-  background: linear-gradient(180deg, rgba(0,0,0,.08), transparent 60%); box-shadow: inset 0 2px 8px rgba(0,0,0,.12);
-}
-.bac-pochettes { position: absolute; left: 12%; right: 12%; top: 9%; height: 54%; }
-.bac-pochettes .pochette { position: absolute; left: 50%; top: 0; width: 72%; margin-left: -36%; box-shadow: 0 10px 22px rgba(0,0,0,.28); transition: transform .45s cubic-bezier(.2,.9,.3,1.25); }
-.bac-pochettes .pochette:nth-child(1) { transform: translateX(-22%) rotate(-9deg); }
-.bac-pochettes .pochette:nth-child(2) { transform: translateY(-4%) rotate(2deg); z-index: 1; }
-.bac-pochettes .pochette:nth-child(3) { transform: translateX(22%) rotate(10deg); }
-.bac-couleur:hover { transform: translateY(-4px); box-shadow: var(--relief-fort); }
-.bac-couleur:hover .bac-pochettes .pochette:nth-child(1) { transform: translate(-30%, -12%) rotate(-13deg); }
-.bac-couleur:hover .bac-pochettes .pochette:nth-child(2) { transform: translateY(-18%) rotate(0deg); }
-.bac-couleur:hover .bac-pochettes .pochette:nth-child(3) { transform: translate(30%, -10%) rotate(14deg); }
-.bac-couleur:active { transform: translateY(1px) scale(.99); }
-.bac-intercalaire {
-  position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 50%;
-  display: grid; align-content: end; gap: 2px; padding: clamp(12px, 1.4vw, 18px);
-  border-radius: 12px 12px 16px 16px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--amb) 92%, #fff) 0%, var(--amb) 40%, color-mix(in srgb, var(--amb) 82%, #000) 100%);
-  color: var(--amb-encre);
-  box-shadow: 0 -10px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35);
-}
-.bac-intercalaire::before { /* l'onglet de l'intercalaire */
-  content: ""; position: absolute; left: 14px; top: -16px; width: 46%; height: 20px; border-radius: 9px 9px 0 0;
-  background: color-mix(in srgb, var(--amb) 92%, #fff);
-}
-.bac-nom { font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.15rem, 1.9vw, 1.6rem); line-height: 1.02; }
-.bac-sous { font-size: clamp(12px, 1.05vw, 14px); opacity: .85; line-height: 1.25; }
-.bac-nombre { margin-top: 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
-.bac-hasard { --amb: #d9d6cf; --amb-encre: #1c1c21; }
-.bac-hasard .bac-intercalaire { background: conic-gradient(from 210deg at 70% 120%, #f6c1d6, #c7d7ff, #c8f5df, #fff1b8, #f6c1d6); }
-.bac-hasard .bac-intercalaire::before { background: #e7dff0; }
-.bac-hasard .bac-pochettes .pochette { filter: saturate(.9); }
-
-.accueil-jour { grid-area: jour; display: grid; justify-items: start; gap: 10px; align-self: center; }
-.jour-titre { font-size: clamp(1.15rem, 1.7vw, 1.45rem); }
-.accueil-jour .carte-jour { width: min(100%, 300px); }
-.jour-pied { font-size: 14px; color: var(--encre-2); max-width: 32ch; }
-
 /* ─────────────────────────────── POCHETTES ─────────────────────────────── */
 .pochette {
   position: relative; overflow: hidden; width: 100%;
@@ -273,176 +182,12 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
   color: hsl(var(--h) 55% 72%);
 }
 .pochette-mini .pochette-repli, .pochette-livret .pochette-repli { font-size: 1.5rem; }
+.pochette-ensuite .pochette-repli { font-size: 1.1rem; }
 .pochette img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 .pochette img.est-yt { transform: scale(1.36); }
 .pochette img.se-revele { animation: revele .6s ease both; }
 @keyframes revele { from { opacity: 0; } }
-.pochette-fond { position: absolute; inset: 0; height: 100%; aspect-ratio: auto; box-shadow: none; border-radius: inherit; }
-.pochette-fond::before { display: none; }
-
-.titre-morceau { font-weight: 600; font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.2; overflow-wrap: anywhere; }
-.artiste-morceau { color: var(--encre-2); font-size: clamp(.92rem, 1.2vw, 1.02rem); overflow-wrap: anywhere; }
 @keyframes sortie { from { opacity: 0; transform: translateY(34px); } }
-
-/* les cartes qu'on retourne (morceau du jour, carte mystère) */
-.carte-retournable { position: relative; display: block; width: 100%; aspect-ratio: 1 / 1; perspective: 1400px; }
-@supports not (aspect-ratio: 1 / 1) { .carte-retournable::before { content: ""; display: block; padding-top: 100%; } }
-.carte-face {
-  position: absolute; inset: 0; display: block;
-  -webkit-backface-visibility: hidden; backface-visibility: hidden;
-  transition: transform .75s cubic-bezier(.3,.9,.3,1);
-  border-radius: var(--rayon-pochette);
-}
-.carte-recto { transform: rotateY(180deg); }
-.carte-recto .pochette { height: 100%; }
-.carte-retournable.retournee .carte-dos { transform: rotateY(-180deg); }
-.carte-retournable.retournee .carte-recto { transform: rotateY(0deg); }
-.carte-dos {
-  overflow: hidden; display: grid; place-items: center; padding: 12%;
-  background: var(--dos-carte); color: var(--sur-dos);
-  box-shadow: var(--ombre-pochette-forte);
-}
-.carte-dos-motif {
-  position: absolute; inset: 0; opacity: .35;
-  background: repeating-radial-gradient(circle at 50% 50%, transparent 0 9px, var(--sur-dos) 9px 10px);
-}
-.carte-dos-texte { position: relative; font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); font-size: clamp(1rem, 1.8vw, 1.4rem); line-height: 1.2; text-align: center; }
-.carte-retournable:not(.retournee):hover .carte-dos { transform: rotateY(-12deg); }
-
-/* ─────────────────────────────── LA FOUILLE ─────────────────────────────── */
-.ecran-fouille {
-  background-image: radial-gradient(70% 55% at 18% 16%, rgba(var(--couleur-disque, 0, 0, 0), var(--force-teinte, .3)), transparent 72%);
-  transition: background-image .6s;
-}
-.fouille {
-  display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
-  grid-template-areas: "platine suite" "platine compil" "platine livret";
-  gap: clamp(30px, 4vw, 60px) clamp(28px, 4.4vw, 76px); align-items: start;
-  max-width: 1320px; margin: 0 auto;
-}
-.fouille.sans-platine { grid-template-columns: minmax(0, 1fr); grid-template-areas: "suite" "compil" "livret"; max-width: 940px; }
-
-/* le disque qui joue */
-.platine {
-  grid-area: platine; display: grid; gap: 16px; min-width: 0; align-self: start;
-  padding: clamp(12px, 1.6vw, 18px); border-radius: var(--rayon-objet);
-  background: var(--fond-2); box-shadow: var(--relief-fort);
-  animation: sortie .6s cubic-bezier(.2,.9,.3,1.1) both;
-}
-@media (min-width: 961px) { .platine { position: -webkit-sticky; position: sticky; top: 96px; } }
-/* le livret vit dans la colonne de droite : la platine, collée à gauche, ne le recouvre jamais */
-@media (min-width: 961px) { .fouille:not(.sans-platine) .livret-pages { grid-template-columns: minmax(0, 1fr); } .fouille:not(.sans-platine) .livret-pages::before { display: none; } .fouille:not(.sans-platine) .livret-page + .livret-page { border-top: 1px solid var(--trait); } }
-.platine .platine-texte { padding: 0 4px 4px; }
-.platine-ecran { position: relative; width: 100%; }
-.emplacement-fouille { min-height: 200px; }
-body:not(.video-fouille) .emplacement-fouille { display: none; }
-.platine-pochette { width: min(100%, 400px); }
-body.video-fouille .platine-pochette { display: none; }
-.pochette-platine { box-shadow: var(--ombre-pochette-forte); }
-.platine-texte { display: grid; gap: 6px; justify-items: start; min-width: 0; }
-.platine-titre { font-size: clamp(1.7rem, 3vw, 2.8rem); overflow-wrap: anywhere; }
-.platine-artiste { font-size: clamp(1.05rem, 1.6vw, 1.3rem); font-weight: 500; }
-.platine-album { margin-top: 2px; font-size: 15px; color: var(--encre-2); text-align: left; text-decoration: underline; text-decoration-color: var(--encre-3); text-decoration-thickness: 1px; text-underline-offset: 4px; }
-.platine-album:hover { color: var(--encre); text-decoration-color: currentColor; }
-.platine-note { margin-top: 6px; font-family: var(--note, var(--texte)); font-size: clamp(1.05rem, 1.5vw, 1.25rem); line-height: 1.5; max-width: 38em; }
-.platine-note::before { content: "« "; color: var(--aiguille); }
-.platine-note::after { content: " »"; color: var(--aiguille); }
-.platine-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 8px; }
-.platine-lecture {
-  min-height: 52px; padding: 0 22px 0 20px; border-radius: 999px;
-  display: inline-flex; align-items: center; gap: 12px;
-  background: var(--encre); color: var(--fond); font-weight: 600; box-shadow: var(--relief-plein);
-  transition: transform .12s;
-}
-.platine-lecture:active { transform: translateY(2px); }
-.platine-progression { width: min(100%, 400px); height: 4px; margin-top: 4px; border-radius: 2px; background: var(--trait); overflow: hidden; }
-.platine-progression span { display: block; height: 100%; width: 0; background: var(--aiguille); transition: width .5s linear; }
-.platine-info { font-size: 14px; color: var(--encre-2); max-width: 52ch; }
-.platine-info a { color: var(--encre); }
-.platine-info .lien-bouton { font-size: 14px; }
-
-
-/* les directions pour la suite : sur ordinateur, trois pochettes avec l'étiquette du disquaire ;
-   sur téléphone, trois lignes où la direction passe en premier (pas besoin d'écouter pour choisir) */
-.suite { grid-area: suite; min-width: 0; display: grid; gap: 10px; align-content: start; }
-.suite-titre { font-size: clamp(1.45rem, 2.4vw, 2.1rem); }
-.suite-sous { font-size: 15px; color: var(--encre-2); min-height: 1.5em; }
-.suite-sous .lien-bouton { font-size: 15px; margin-left: 4px; }
-.fouille.sans-platine .suite-titre, .fouille.sans-platine .suite-sous { text-align: center; }
-.suite-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.8vw, 26px); margin-top: 14px; }
-.option {
-  --amb: var(--aiguille); --amb-encre: var(--sur-aiguille);
-  position: relative; display: grid; align-content: start; min-width: 0;
-  animation: sortie .6s cubic-bezier(.2,.9,.3,1.15) both;
-}
-.option:nth-child(2) { animation-delay: .07s; } .option:nth-child(3) { animation-delay: .14s; }
-.option-choix { display: grid; gap: 12px; align-content: start; width: 100%; text-align: left; }
-.option-pochette {
-  position: relative; display: block; width: 100%;
-  transform: rotate(var(--penche, 0deg));
-  transition: transform .4s cubic-bezier(.2,.9,.3,1.25);
-}
-.option-pochette .pochette { box-shadow: var(--ombre-pochette-forte); }
-.option:hover .option-pochette, .option.ecoute .option-pochette, .option.compte .option-pochette { transform: rotate(0deg) translateY(-5px); }
-.option.ecoute .pochette, .option.compte .pochette { box-shadow: var(--ombre-pochette-forte), 0 0 0 3px var(--amb); }
-.option-textes { display: grid; gap: 2px; min-width: 0; }
-.option-dir { display: none; }
-.option-style { display: flex; align-items: baseline; gap: 7px; font-size: 13px; font-weight: 600; color: var(--encre-2); line-height: 1.3; }
-.puce-amb { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--amb); box-shadow: 0 0 0 2px color-mix(in srgb, var(--amb) 25%, transparent); transform: translateY(-1px); }
-.option-titre { font-weight: 600; font-size: clamp(.98rem, 1.25vw, 1.1rem); line-height: 1.2; overflow-wrap: anywhere; margin-top: 2px; }
-.option-artiste { color: var(--encre-2); font-size: 14px; overflow-wrap: anywhere; line-height: 1.3; }
-.option-ecoute {
-  justify-self: start; margin-top: 6px; display: inline-flex; align-items: center; gap: 8px;
-  min-height: 34px; padding: 0 12px 0 10px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--encre-2);
-  box-shadow: inset 0 0 0 1px var(--trait);
-}
-.option-ecoute:hover { color: var(--encre); box-shadow: inset 0 0 0 1px var(--encre-3); }
-.option-ecoute.en-cours { color: var(--encre); box-shadow: inset 0 0 0 1.5px var(--amb); }
-.option-ecoute.en-cours .extrait-icone { animation: egaliseur .5s ease-in-out infinite alternate; }
-.option-ecoute[data-etat="inconnu"], .option-ecoute[data-etat="absent"] { opacity: .45; pointer-events: none; }
-
-/* l'étiquette du disquaire, collée sur la pochette : la direction, dans la couleur de l'ambiance */
-.sticker {
-  position: absolute; z-index: 2; left: -8px; top: 12px; max-width: calc(100% - 4px);
-  padding: 6px 10px; border-radius: 2px;
-  background: var(--etiquette); color: var(--sur-etiquette);
-  font-family: var(--texte); font-weight: 600; font-size: 13px; line-height: 1.15; text-align: left;
-  transform: rotate(-4deg);
-  box-shadow: inset 4px 0 0 var(--amb), 0 1px 0 rgba(0,0,0,.08), 0 6px 14px rgba(0,0,0,.2);
-}
-.option:nth-child(2) .sticker { transform: rotate(3deg); }
-.option:nth-child(3) .sticker { transform: rotate(-2deg); }
-.sticker-coup { background: var(--aiguille); color: var(--sur-aiguille); box-shadow: 0 6px 14px rgba(0,0,0,.2); }
-/* le compte à rebours de l'enchaînement, sous la première pochette */
-.option-barre { position: absolute; left: 0; right: 0; bottom: -9px; height: 4px; border-radius: 2px; background: var(--amb); transform: scaleX(0); transform-origin: left; opacity: 0; }
-.option.compte .option-barre, .coup.compte .option-barre { opacity: 1; animation: remplir 5s linear forwards; }
-@keyframes remplir { to { transform: scaleX(1); } }
-/* la carte mystère : on ne voit que son indice, elle se retourne avant de se lancer */
-.option.mystere .option-pochette.carte-retournable { aspect-ratio: 1 / 1; }
-.option.mystere .carte-dos { background: radial-gradient(130% 100% at 28% 18%, color-mix(in srgb, var(--amb) 80%, #fff), var(--amb) 50%, color-mix(in srgb, var(--amb) 60%, #000)); color: var(--amb-encre); }
-.option.mystere .carte-dos-motif { background: repeating-radial-gradient(circle at 50% 50%, transparent 0 9px, currentColor 9px 10px); }
-
-/* le coup de cœur, tout seul */
-.coup { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 34px); align-items: center; animation: sortie .6s cubic-bezier(.2,.9,.3,1.1) both; }
-.coup .option-pochette { transform: rotate(-2deg); }
-.coup:hover .option-pochette, .coup.ecoute .option-pochette { transform: rotate(0deg) translateY(-4px); }
-.coup.ecoute .pochette { box-shadow: var(--ombre-pochette-forte), 0 0 0 3px var(--aiguille); }
-.coup-texte { display: grid; gap: 4px; justify-items: start; min-width: 0; }
-.coup-actions { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 14px; }
-.suite-coup { grid-template-columns: minmax(0, 1fr); }
-.suite-pied { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; margin-top: 12px; }
-.fouille.sans-platine .suite-pied { justify-content: center; }
-.raccourcis { font-size: 13px; color: var(--encre-2); }
-
-/* les pré-écoutes */
-.extrait-bouton { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--encre-2); min-height: 34px; text-align: left; }
-.extrait-icone { flex: none; width: 18px; height: 12px; background:
-  linear-gradient(currentColor, currentColor) 0 60%/3px 40% no-repeat,
-  linear-gradient(currentColor, currentColor) 50% 100%/3px 100% no-repeat,
-  linear-gradient(currentColor, currentColor) 100% 80%/3px 60% no-repeat; }
-.extrait-bouton.en-cours { color: var(--aiguille); }
-.extrait-bouton.en-cours .extrait-icone { animation: egaliseur .5s ease-in-out infinite alternate; }
-@keyframes egaliseur { to { background-size: 3px 90%, 3px 30%, 3px 100%; } }
 
 /* ─────────────────────────────── LES DISQUES ───────────────────────────────
    Un CD imprimé : le trou, l'anneau de plastique transparent, l'étiquette
@@ -468,12 +213,12 @@ body.video-fouille .platine-pochette { display: none; }
   font-family: var(--display); font-weight: 600; letter-spacing: -0.03em; font-size: 14px; font-size: 12cqw; line-height: 1; color: var(--amb-encre);
 }
 .disque-nom small { display: block; margin-top: .45em; font-family: var(--texte); font-weight: 600; letter-spacing: .14em; font-size: .3em; text-transform: uppercase; opacity: .7; }
-.disque-hasard .disque-nom { font-size: 11px; font-size: 9.5cqw; top: 19%; }
-.disque-amb { background:
+/* la radio : un disque holographique */
+.disque-hasard { --amb-encre: #1c1c21; background:
   radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.55) 8.6% 15.5%, rgba(255,255,255,.7) 15.7% 16.4%, transparent 16.6%),
-  radial-gradient(circle, transparent 0 16.5%, rgba(255,255,255,.18) 16.6% 17.4%, transparent 17.6% 46%, rgba(0,0,0,.08) 46.2% 46.8%, transparent 47%),
-  radial-gradient(120% 120% at 30% 20%, color-mix(in srgb, var(--amb) 80%, #fff), var(--amb) 45%, color-mix(in srgb, var(--amb) 70%, #000)); }
-/* la compil : un CD-R argenté, écrit au feutre */
+  conic-gradient(from 30deg, #ffd0e4, #c9d5ff, #c4f6df, #fff2b5, #ffd0e4, #d8c9ff, #c4f1ff, #ffe0c4, #ffd0e4); }
+.disque-hasard .disque-nom { font-size: 11px; font-size: 9.5cqw; top: 19%; }
+/* ma sélection : un CD-R argenté, écrit au feutre */
 .disque-compil { --amb-encre: #1a2c8a; background:
   radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.55) 8.6% 15.5%, rgba(255,255,255,.7) 15.7% 16.4%, transparent 16.6%),
   repeating-radial-gradient(circle, rgba(255,255,255,.12) 0 1px, rgba(0,0,0,.03) 1px 2px),
@@ -482,87 +227,493 @@ body.video-fouille .platine-pochette { display: none; }
   position: absolute; left: 50%; top: 14%; transform: translateX(-50%) rotate(-8deg); white-space: nowrap;
   font-family: "Caveat", "Bradley Hand", cursive; font-weight: 700; font-size: 16px; font-size: 15cqw; line-height: 1; color: var(--amb-encre);
 }
-.disque-main small { display: block; text-align: center; font-size: .55em; font-weight: 500; opacity: .85; }
-/* surprends-moi : un disque holographique */
-.disque-hasard { --amb-encre: #1c1c21; background:
-  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.55) 8.6% 15.5%, rgba(255,255,255,.7) 15.7% 16.4%, transparent 16.6%),
-  conic-gradient(from 30deg, #ffd0e4, #c9d5ff, #c4f6df, #fff2b5, #ffd0e4, #d8c9ff, #c4f1ff, #ffe0c4, #ffd0e4); }
-.disque-vide { background: radial-gradient(circle, transparent 0 7%, rgba(0,0,0,.15) 7.4% 98%); box-shadow: inset 0 0 0 2px rgba(0,0,0,.08); }
 @keyframes tourne { to { transform: rotate(360deg); } }
+/* le picture disc : la pochette du morceau imprimée sur le disque, des sillons, un anneau
+   stroboscopique sur la tranche. Le reflet irisé ne tourne pas avec le disque : il reste
+   sous la lumière pendant que l'image file dessous, et c'est ça qui hypnotise. */
+.disque-image { background:
+  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.6) 8.6% 15.5%, rgba(255,255,255,.75) 15.7% 16.4%, transparent 16.6%),
+  radial-gradient(circle, transparent 0 16.5%, rgba(0,0,0,.35) 16.6% 17.3%, transparent 17.6%),
+  var(--pochette) center / cover no-repeat, #222; }
+.disque-image.disque-yt { background:
+  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.6) 8.6% 15.5%, rgba(255,255,255,.75) 15.7% 16.4%, transparent 16.6%),
+  radial-gradient(circle, transparent 0 16.5%, rgba(0,0,0,.35) 16.6% 17.3%, transparent 17.6%),
+  var(--pochette) center / auto 134% no-repeat, #222; }
+.disque-image > * { display: none; }
+.disque-image::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background:
+    var(--strobe) center / 100% 100% no-repeat,
+    radial-gradient(circle, transparent 0 94.5%, rgba(10,10,12,.82) 95% 100%),
+    radial-gradient(circle, transparent 0 17.6%, rgba(255,255,255,.18) 17.8% 18.3%, transparent 18.6% 61%, rgba(0,0,0,.22) 61.2% 61.7%, transparent 62%),
+    repeating-radial-gradient(circle, rgba(255,255,255,.06) 0 1px, rgba(0,0,0,.08) 1px 2.6px);
+}
+.plateau-reflet {
+  position: absolute; width: 96%; aspect-ratio: 1 / 1; border-radius: 50%; pointer-events: none;
+  background:
+    conic-gradient(from 0deg, transparent 0 6%, rgba(255,120,200,.55) 10%, rgba(120,200,255,.6) 14%, rgba(160,255,190,.5) 18%, transparent 24% 52%, rgba(255,230,140,.45) 57%, rgba(200,140,255,.5) 61%, transparent 67%),
+    radial-gradient(90% 60% at 30% 22%, rgba(255,255,255,.35), transparent 60%);
+  mix-blend-mode: screen; opacity: .55;
+  -webkit-mask: radial-gradient(circle, transparent 0 16.6%, #000 17%); mask: radial-gradient(circle, transparent 0 16.6%, #000 17%);
+  animation: balayage 14s linear infinite; animation-play-state: paused;
+}
+body.cd-tourne .plateau-reflet { animation-play-state: running; }
+@keyframes balayage { to { transform: rotate(-360deg); } }
 
-/* ─────────────────────────────── LA COMPIL (étape 2) ───────────────────────────────
-   Le boîtier ouvert : la jaquette où s'écrivent les titres, le CD-R à côté. */
-.compil {
-  grid-area: compil; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(16px, 2vw, 26px); align-items: center;
-  padding: clamp(14px, 1.6vw, 20px); border-radius: var(--rayon-objet);
-  background: var(--fond-2); box-shadow: var(--relief), 0 0 0 1px var(--trait);
+/* ═══════════════════════════════ LA CHAÎNE ═══════════════════════════════
+   Une micro-chaîne CD du milieu des années 2000 : deux enceintes, et entre elles
+   le lecteur (écran ou disque, la vidéo, les commandes) posé sur le tuner qui
+   oriente la suite. Alu brossé le jour, laque noire la nuit, encre en Papier. */
+.ecran-machine { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(26px, 3.5vw, 44px); padding-top: clamp(14px, 2.2vw, 30px); }
+.hifi {
+  position: relative; isolation: isolate;
+  display: grid; grid-template-columns: minmax(96px, 180px) minmax(0, 980px) minmax(96px, 180px);
+  grid-template-areas: "g corps d" "g tuner d";
+  column-gap: clamp(12px, 2vw, 26px); row-gap: 12px; align-items: end;
+  width: 100%; max-width: 1420px;
 }
-.fouille.sans-platine .compil { display: none; }
-.compil-boitier {
-  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .82fr); align-items: center; gap: 0;
-  padding: 8px; border-radius: 6px;
-  background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 40%, rgba(255,255,255,.3)), rgba(30,30,40,.06);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.6), 0 12px 26px -10px rgba(0,0,0,.35);
-}
-.compil-papier {
-  position: relative; align-self: stretch; padding: 10px 10px 10px 14px; border-radius: 2px;
-  background: repeating-linear-gradient(180deg, transparent 0 21px, rgba(40,70,160,.18) 21px 22px), #fbfaf6;
-  color: #1a2c8a; box-shadow: 0 1px 3px rgba(0,0,0,.15);
-}
-.compil-papier::before { content: ""; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: rgba(208,30,80,.3); }
-.compil-liste { list-style: none; margin: 0; padding: 0; counter-reset: c; font-family: "Caveat", "Bradley Hand", cursive; font-size: 17px; line-height: 22px; }
-.compil-liste li { counter-increment: c; display: flex; gap: 6px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.compil-liste li::before { content: counter(c) "."; flex: none; width: 1.3em; text-align: right; opacity: .7; }
-.compil-liste li span { overflow: hidden; text-overflow: ellipsis; }
-.compil-liste li em { font-style: normal; opacity: .6; overflow: hidden; text-overflow: ellipsis; }
-.compil-liste li.vide::after { content: ""; flex: 1; }
-.compil-liste li.nouveau { animation: ecrire .7s ease-out both; }
-@keyframes ecrire { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.compil-plateau { position: relative; display: grid; place-items: center; padding: 8%; }
-.compil-plateau::before { content: ""; position: absolute; inset: 4%; border-radius: 50%; background: repeating-conic-gradient(rgba(0,0,0,.05) 0 6deg, transparent 6deg 12deg); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
-.compil-plateau .disque { --d: 140px; width: 100%; }
-.compil.ajout .compil-plateau .disque { animation: tourne .9s cubic-bezier(.3,.6,.3,1); }
-.compil-texte { display: grid; gap: 8px; justify-items: start; min-width: 0; }
-.compil-compte { font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.25rem, 2vw, 1.7rem); line-height: 1.05; }
-.compil-jauge { width: 100%; max-width: 260px; height: 6px; border-radius: 3px; background: var(--trait); overflow: hidden; }
-.compil-jauge span { display: block; height: 100%; width: calc(var(--p, 0) * 100%); border-radius: inherit; background: var(--aiguille); transition: width .5s cubic-bezier(.2,.9,.3,1); }
-.compil-aide { font-size: 14px; color: var(--encre-2); max-width: 34ch; }
-.compil-texte .gros-bouton { margin-top: 4px; }
-.gros-bouton:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.hifi::after { content: ""; position: absolute; z-index: -1; left: 3%; right: 3%; bottom: -24px; height: 42px; background: radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.22), transparent 72%); }
 
-/* ─────────────────────────────── LA GRAVURE ─────────────────────────────── */
-.gravure {
-  position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 20px;
-  background: color-mix(in srgb, var(--fond) 82%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
-  animation: apparition .35s ease both;
+/* ─── les enceintes : vis apparentes, tweeter dans un pavillon, membrane à nervures,
+       anneau lumineux, vumètre à diodes, évent bass-reflex, grille amovible ─── */
+.hifi-enceinte {
+  position: relative; display: grid; grid-template-rows: auto auto auto auto 1fr; justify-items: center; gap: 7%;
+  aspect-ratio: 1 / 2.75; padding: 18% 12% 14%; border-radius: 16px 16px 12px 12px; overflow: hidden;
+  background:
+    radial-gradient(circle at 14px 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 14px) 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
+    radial-gradient(circle at 14px calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
+    var(--hifi-corps);
+  box-shadow: var(--hifi-ombre);
 }
-@keyframes apparition { from { opacity: 0; } }
-.gravure-boite {
-  --avance: 0;
-  display: grid; grid-template-columns: minmax(180px, 300px) minmax(0, 380px); gap: clamp(24px, 4vw, 56px); align-items: center;
-  width: min(820px, 100%); padding: clamp(22px, 4vw, 44px); border-radius: calc(var(--rayon-objet) + 6px);
-  background: var(--fond-2); box-shadow: var(--relief-fort), 0 0 0 1px var(--trait);
+.hifi-enceinte-g { grid-area: g; }
+.hifi-enceinte-d { grid-area: d; }
+.hp-plaque { justify-self: center; font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .12em; color: var(--hifi-encre); opacity: .55; text-align: center; line-height: 1; }
+.hp-plaque small { display: block; font-family: var(--texte); font-weight: 600; font-size: 8px; letter-spacing: .2em; text-transform: uppercase; margin-top: 3px; }
+.hp-tweeter { position: relative; width: 52%; aspect-ratio: 1 / 1; border-radius: 26%; background: radial-gradient(circle, #1a1b1e 0 30%, #2c2e33 46%, #3d4046 62%, #2a2c30 70%); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.6); cursor: pointer; }
+.hp-tweeter i { position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fbfbfb 0 12%, #a7adb4 30%, #33363c 70%); }
+.hp-boomer {
+  position: relative; width: 96%; aspect-ratio: 1 / 1; border-radius: 50%; cursor: pointer;
+  background: radial-gradient(circle, transparent 0 66%, #121315 66.5% 71%, var(--hifi-anneau) 72% 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5);
 }
-.gravure-disque { position: relative; display: grid; place-items: center; }
-.gravure-disque .disque { --d: 280px; width: 86%; }
-.gravure.en-cours .gravure-disque .disque { animation: tourne .7s linear infinite; }
-.gravure.finie .gravure-disque .disque { animation: tourne 2.4s cubic-bezier(.1,.6,.3,1) 1; }
-.gravure-anneau { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--aiguille) calc(var(--avance) * 360deg), var(--trait) 0); -webkit-mask: radial-gradient(circle closest-side, transparent 0 93%, #000 93.5% 98.5%, transparent 99%); mask: radial-gradient(circle closest-side, transparent 0 93%, #000 93.5% 98.5%, transparent 99%); }
-.gravure-texte { display: grid; gap: 10px; justify-items: start; min-width: 0; }
-.gravure-texte h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
-.gravure-etat { color: var(--encre-2); font-variant-numeric: tabular-nums; min-height: 1.5em; }
-.gravure-liste { list-style: none; margin: 4px 0 0; padding: 0; counter-reset: g; display: grid; gap: 2px; width: 100%; max-height: 40vh; overflow: auto; font-family: "Caveat", "Bradley Hand", cursive; font-size: 20px; line-height: 1.25; color: var(--encre); }
-.gravure-liste li { counter-increment: g; display: flex; gap: 8px; min-width: 0; opacity: .14; transition: opacity .25s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gravure-liste li::before { content: counter(g) "."; flex: none; width: 1.4em; text-align: right; opacity: .6; }
-.gravure-liste li em { font-style: normal; opacity: .55; overflow: hidden; text-overflow: ellipsis; }
-.gravure-liste li.ecrit { opacity: 1; animation: ecrire .5s ease-out both; }
-.gravure-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 10px; }
-body.gravure-ouverte { overflow: hidden; }
+.hp-cone { /* membrane nervurée, suspension en caoutchouc, cache-noyau qui brille */
+  position: absolute; inset: 9%; border-radius: 50%;
+  background:
+    radial-gradient(circle at 42% 38%, rgba(255,255,255,.55) 0 3%, transparent 9%),
+    radial-gradient(circle, #3b3e44 0 17%, #1d1e22 18% 20%, transparent 21%),
+    repeating-conic-gradient(from 0deg, rgba(255,255,255,.07) 0 4deg, rgba(0,0,0,.18) 4deg 10deg),
+    radial-gradient(circle, #2b2d32 0 72%, #3a3c42 78%, #18191c 84%, #2e3035 92%, #141517 100%);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.4);
+  transition: transform .1s;
+}
+body.cd-tourne .hp-cone { animation: pompe var(--battement, .5s) ease-in-out infinite alternate; }
+body.loudness.cd-tourne .hp-cone, body.cd-tourne.energie-forte .hp-cone { animation-name: pompe-fort; }
+@keyframes pompe { to { transform: scale(1.035); filter: brightness(1.12); } }
+@keyframes pompe-fort { to { transform: scale(1.07); filter: brightness(1.25); } }
+/* l'anneau lumineux */
+.hp-boomer i { position: absolute; inset: 4%; border-radius: 50%; box-shadow: 0 0 0 2px var(--lcd-encre); opacity: 0; transition: opacity .4s, box-shadow .4s; }
+body.cd-tourne .hp-boomer i { opacity: .7; box-shadow: 0 0 0 2px var(--lcd-encre), 0 0 18px 2px var(--lcd-halo); }
+body[data-lumieres="eteint"] .hp-boomer i { opacity: 0 !important; }
+body[data-lumieres="tempo"].cd-tourne .hp-boomer i { animation: anneau var(--battement, .5s) ease-in-out infinite alternate; }
+@keyframes anneau { from { opacity: .35; } to { opacity: 1; box-shadow: 0 0 0 2px var(--lcd-encre), 0 0 22px 4px var(--lcd-halo); } }
+body[data-lumieres="arc"] .hp-boomer i { opacity: 1; box-shadow: 0 0 0 2px #ff6ec7, 0 0 20px 3px rgba(255,110,199,.6); animation: arc-en-ciel 3s linear infinite; }
+@keyframes arc-en-ciel { to { filter: hue-rotate(360deg); } }
+/* le vumètre */
+.hp-vu { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; width: 80%; justify-self: center; padding: 5px 6px; border-radius: 4px; background: #0d0e10; box-shadow: inset 0 1px 3px rgba(0,0,0,.7); }
+.hp-vu b { height: 5px; border-radius: 1px; background: #23262b; transition: background .08s, box-shadow .08s; }
+.hp-vu b.on { background: var(--lcd-encre); box-shadow: 0 0 5px var(--lcd-halo); }
+.hp-vu b.on:nth-child(n+8) { background: #ffcf5c; box-shadow: 0 0 5px rgba(255,200,80,.6); }
+.hp-vu b.on:nth-child(10) { background: #ff5a3c; box-shadow: 0 0 5px rgba(255,90,60,.7); }
+body[data-dimmer="1"] .hp-vu b.on { filter: brightness(.6); box-shadow: none; }
+/* l'évent bass-reflex */
+.hp-event { align-self: end; justify-self: center; width: 46%; aspect-ratio: 3.4 / 1; border-radius: 999px; background: radial-gradient(60% 90% at 50% 40%, #050506, #1d1e22 70%, #34363c); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8); }
+body.loudness.cd-tourne .hp-event { animation: souffle var(--battement, .5s) ease-in-out infinite alternate; }
+@keyframes souffle { to { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8), 0 0 14px 2px var(--lcd-halo); } }
+/* la grille, qu'on met ou qu'on enlève */
+.hp-grille {
+  position: absolute; inset: 6px; border-radius: 12px; pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(0,0,0,.72) 0 1.1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(160deg, rgba(255,255,255,.14), rgba(0,0,0,.1)),
+    #2a2c31;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.25), inset 0 0 18px rgba(0,0,0,.5);
+  transform: translateY(-104%); transition: transform .5s cubic-bezier(.3,1.2,.4,1);
+}
+body.grilles .hp-grille { transform: none; }
+.hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .1em; color: #c9ccd2; opacity: .6; }
+/* les petites bidouilles : on tape sur les haut-parleurs, ils répondent */
+.hp-boomer.coup { animation: coup .5s cubic-bezier(.2,.8,.3,1); }
+.hp-boomer.coup .hp-cone { animation: coup-cone .5s cubic-bezier(.2,.8,.3,1); }
+@keyframes coup { 0% { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 0 var(--lcd-halo); } 100% { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 34px transparent; } }
+@keyframes coup-cone { 20% { transform: scale(.9); filter: brightness(.8); } 55% { transform: scale(1.06); filter: brightness(1.25); } }
+.hp-tweeter.ping { animation: ping .55s ease-out; }
+@keyframes ping { 0% { box-shadow: 0 1px 0 rgba(255,255,255,.4), inset 0 1px 3px rgba(0,0,0,.4), 0 0 0 0 var(--lcd-halo); transform: scale(.92); } 100% { box-shadow: 0 1px 0 rgba(255,255,255,.4), inset 0 1px 3px rgba(0,0,0,.4), 0 0 0 20px transparent; transform: none; } }
+/* un morceau qui cogne fait trembler les enceintes */
+body.cd-tourne.energie-forte .hifi-enceinte { animation: tremble calc(var(--battement, .5s) * .5) linear infinite; }
+@keyframes tremble { 0%, 100% { translate: 0 0; } 25% { translate: .7px -.9px; } 50% { translate: -.8px .5px; } 75% { translate: .6px .8px; } }
 
-/* ─────────────────────────────── LE LIVRET ─────────────────────────────── */
+/* ─── le lecteur ─── */
+.hifi-corps {
+  grid-area: corps; position: relative; display: grid; min-width: 0;
+  grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "commandes" "trappe";
+  gap: 16px 22px; padding: clamp(16px, 2vw, 26px); border-radius: 20px;
+  background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
+}
+body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); grid-template-areas: "haut haut" "afficheur ecran" "commandes commandes" "trappe trappe"; }
+.hifi-haut { grid-area: haut; display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--hifi-trait); }
+.hifi-marque { font-family: "Unbounded", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; }
+.hifi-modele { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
+.hifi-veille { margin-left: 4px; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
+body.chaine-allumee .hifi-veille { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
+body[data-dimmer="1"] .hifi-veille { opacity: .5; }
+/* le choix d'affichage et la cosmétique, en haut de la façade */
+.choix-affichage { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); align-self: center; }
+.choix-affichage button { min-height: 28px; padding: 0 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; transition: background-color .15s, color .15s; }
+.choix-affichage button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
+.bouton-cosmetique {
+  align-self: center; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 12px; border-radius: 9px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--hifi-encre);
+  background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); transition: transform .08s, box-shadow .08s;
+}
+.bouton-cosmetique span[aria-hidden] { font-size: 13px; letter-spacing: 0; opacity: .7; }
+.bouton-cosmetique:active, .bouton-cosmetique[aria-expanded="true"] { box-shadow: var(--hifi-bouton-enfonce); transform: translateY(1px); }
+.bouton-cosmetique[aria-expanded="true"] span[aria-hidden] { opacity: 1; color: var(--aiguille); }
+
+/* l'afficheur : le disque qui tourne (avec son étiquette) ou l'écran à cristaux liquides, au choix */
+.afficheur { grid-area: afficheur; display: grid; min-width: 0; align-self: stretch; }
+body[data-affichage="disque"] .afficheur { grid-template-columns: auto minmax(0, 1fr); gap: clamp(14px, 2vw, 24px); align-items: center; }
+body[data-affichage="disque"] .afficheur > .lcd { display: none; }
+body[data-affichage="ecran"] .afficheur > .tiroir, body[data-affichage="ecran"] .afficheur > .etiquette { display: none; }
+/* la porte à hublot : on voit le disque tourner ; elle descend quand on change de disque */
+.tiroir { position: relative; align-self: center; width: clamp(150px, 17vw, 225px); aspect-ratio: 1 / 1; border-radius: 14px; overflow: hidden; background: var(--hifi-creux); box-shadow: inset 0 3px 14px rgba(0,0,0,.55); }
+.tiroir-plateau { position: absolute; inset: 7%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #2b2d32 0 6%, #4b4e55 6.5% 9%, #18191c 9.5% 100%); transition: transform .45s cubic-bezier(.3,.9,.3,1); }
+.tiroir-creux { position: absolute; inset: 2%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.disque-tiroir { --d: 210px; width: 96%; }
+body.cd-tourne .disque-tiroir { animation: tourne 1.8s linear infinite; }
+body[data-vitesse="45"].cd-tourne .disque-tiroir { animation-duration: 1.33s; }
+body[data-vitesse="hypno"].cd-tourne .disque-tiroir { animation-duration: 5.5s; }
+body[data-vitesse="hypno"] .disque-tiroir::after { /* une spirale qui semble s'enfoncer */
+  background: var(--spirale) center / 100% 100% no-repeat;
+  mix-blend-mode: overlay; opacity: .6;
+}
+body[data-vitesse="hypno"] .plateau-reflet { opacity: .8; animation-duration: 9s; }
+.tiroir-facade {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: var(--hifi-porte);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 0 83%, #000 83.6%);
+  mask: radial-gradient(circle closest-side, transparent 0 83%, #000 83.6%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+  transition: transform .42s cubic-bezier(.5,0,.3,1);
+}
+.tiroir::after { /* le verre fumé du hublot */
+  content: ""; position: absolute; inset: 8.5%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.22), transparent 38%), radial-gradient(circle, rgba(20,22,28,.18), rgba(10,11,14,.42));
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.35), inset 0 0 0 4px rgba(255,255,255,.07);
+  transition: opacity .3s;
+}
+.tiroir-logo { position: absolute; left: 9%; bottom: 5%; font-size: 8px; font-weight: 700; letter-spacing: .14em; line-height: 1.05; text-transform: uppercase; opacity: .5; }
+.tiroir-fente { position: absolute; right: 8%; bottom: 6%; width: 20%; height: 3px; border-radius: 2px; background: rgba(0,0,0,.25); box-shadow: 0 1px 0 rgba(255,255,255,.4); }
+.tiroir.ouvert .tiroir-facade { transform: translateY(104%); }
+.tiroir.ouvert::after { opacity: 0; }
+.tiroir.ouvert .tiroir-plateau { transform: scale(1.06); }
+.tiroir.ouvert .disque-tiroir { animation-play-state: paused; }
+.tiroir.pose .disque-tiroir { animation: poser .5s cubic-bezier(.2,.9,.3,1.2) both; }
+.tiroir.ouvert .plateau-reflet, .tiroir.pose .plateau-reflet { opacity: 0; }
+@keyframes poser { from { transform: translateY(-55%) scale(1.2) rotate(-20deg); opacity: 0; } }
+/* l'étiquette imprimée sur la façade, à côté du disque */
+.etiquette { display: grid; gap: 6px; align-content: center; min-width: 0; color: var(--hifi-encre); }
+.etiquette-haut { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: .14em; opacity: .55; font-variant-numeric: tabular-nums; }
+.etiquette-titre { font-family: var(--display); font-weight: var(--display-poids, 700); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.3rem, 2.1vw, 2rem); line-height: 1.06; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-wrap: balance; }
+.etiquette-artiste { font-size: clamp(.95rem, 1.2vw, 1.1rem); font-weight: 500; opacity: .8; overflow-wrap: anywhere; }
+.etiquette-ensuite { font-size: 13px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
+/* l'écran à cristaux liquides (on le touche : il change de couleur) */
+.lcd {
+  position: relative; overflow: hidden; min-width: 0; min-height: 200px; align-self: stretch; cursor: pointer;
+  display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 8px;
+  padding: 16px 18px; border-radius: 10px;
+  background: var(--lcd-fond); color: var(--lcd-encre); text-shadow: 0 0 7px var(--lcd-halo);
+  font-family: "Doto", ui-monospace, monospace; font-weight: 900; letter-spacing: .04em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 4px 18px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.35);
+}
+.lcd::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45; background: repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px); }
+.lcd::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(162deg, rgba(255,255,255,.09), transparent 38%); }
+.lcd.lcd-clic { animation: lcd-clic .3s ease-out; }
+@keyframes lcd-clic { 0% { filter: brightness(1.8) contrast(1.2); } }
+.lcd-ligne { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; white-space: nowrap; font-size: 14px; }
+.lcd-badge { flex: none; padding: 0 6px; border: 1.5px solid currentColor; border-radius: 3px; font-size: 11px; line-height: 1.5; }
+.lcd-disque { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lcd-piste { flex: none; }
+.lcd-piste b { font-size: 18px; }
+.lcd-temps { margin-left: auto; flex: none; font-size: 22px; font-variant-numeric: tabular-nums; }
+.lcd-defile { position: relative; overflow: hidden; white-space: nowrap; font-size: 26px; line-height: 1.15; }
+.lcd-defile span { display: inline-block; padding-left: 100%; animation: defile 14s linear infinite; }
+.lcd-defile.fixe span { padding-left: 0; animation: none; }
+@keyframes defile { to { transform: translateX(-100%); } }
+body.lecture-disque .lcd-defile span { padding-left: 0; animation: clignote .5s steps(2, jump-none) infinite; }
+@keyframes clignote { 50% { opacity: .15; } }
+.lcd-spectre { position: relative; display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; align-items: end; height: 52px; }
+.lcd-spectre i { --h: .06; display: block; height: calc(var(--h) * 100%); min-height: 3px; background: repeating-linear-gradient(0deg, currentColor 0 3px, transparent 3px 5px); transition: height .1s linear; }
+.lcd-spectre i::before { content: ""; display: block; height: 3px; margin-top: -6px; background: currentColor; opacity: .6; transform: translateY(calc(var(--pic, 0) * -1px)); }
+.lcd-suite { font-size: 12px; opacity: .7; }
+.lcd-bas { font-size: 12px; opacity: .9; }
+.lcd-ensuite { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lcd-etat { margin-left: auto; flex: none; }
+/* la couleur de l'écran, l'égaliseur, le rétroéclairage (réglages de « Cosmétique ») */
+html[data-lcd="glacier"] { --lcd-encre: #8fdcff; --lcd-halo: rgba(110, 200, 255, .55); }
+html[data-lcd="ambre"]   { --lcd-encre: #ffb35c; --lcd-halo: rgba(255, 160, 70, .55); }
+html[data-lcd="menthe"]  { --lcd-encre: #8dffc4; --lcd-halo: rgba(90, 255, 170, .5); }
+html[data-lcd="rose"]    { --lcd-encre: #ff9bd2; --lcd-halo: rgba(255, 110, 190, .55); }
+html[data-lcd="blanc"]   { --lcd-encre: #f4f6ff; --lcd-halo: rgba(230, 236, 255, .45); }
+body[data-eq="points"] .lcd-spectre i { display: flex; flex-direction: column; justify-content: flex-start; background: none; }
+body[data-eq="points"] .lcd-spectre i::before { height: 4px; border-radius: 2px; opacity: 1; transform: none; margin-top: 0; }
+body[data-eq="miroir"] .lcd-spectre { align-items: center; }
+body[data-eq="miroir"] .lcd-spectre i { background: currentColor; border-radius: 2px; opacity: .9; }
+body[data-eq="miroir"] .lcd-spectre i::before { display: none; }
+body[data-eq="eteint"] .lcd-spectre { visibility: hidden; }
+body[data-dimmer="2"] .lcd { filter: brightness(.72) saturate(.9); }
+body[data-dimmer="1"] .lcd { filter: brightness(.45) saturate(.8); text-shadow: none; }
+/* la vidéo, à côté de l'afficheur */
+.emplacement-ecran {
+  position: relative; overflow: hidden; width: 100%; aspect-ratio: 16 / 9;
+  border-radius: var(--rayon-ecran);
+  background: var(--verre-fond);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,.5), 0 0 0 1px var(--trait);
+}
+@supports not (aspect-ratio: 16 / 9) { .emplacement-ecran::before { content: ""; display: block; padding-top: 56.25%; } }
+.emplacement-cd { grid-area: ecran; align-self: center; min-height: 200px; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.35); }
+body:not(.video-machine) .emplacement-cd { display: none; }
+
+/* les commandes : la lecture, ton avis sur le morceau (j'aime / pas trop), le volume */
+.hifi-commandes { grid-area: commandes; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 18px; padding-top: 16px; border-top: 1px solid var(--hifi-trait); }
+.transport { display: flex; align-items: center; gap: 10px; }
+.rond {
+  width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
+  transition: transform .08s, box-shadow .08s;
+}
+.rond:active { transform: translateY(2px) scale(.97); box-shadow: var(--hifi-bouton-enfonce); }
+.rond-lecture { width: 64px; height: 64px; background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort); }
+.icone {
+  display: block; width: 0; height: 0; margin-left: 3px;
+  border-left: 12px solid currentColor; border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+}
+.icone.pause { width: 12px; height: 14px; margin-left: 0; border: 0; border-left: 4px solid currentColor; border-right: 4px solid currentColor; }
+.icone-prec, .icone-suiv { position: relative; border-left-width: 10px; }
+.icone-prec { transform: scaleX(-1); }
+.icone-prec::after, .icone-suiv::after { content: ""; position: absolute; left: 0; top: -7px; width: 3px; height: 14px; background: currentColor; }
+.icone-stop { width: 12px; height: 12px; background: currentColor; border-radius: 1px; }
+.hifi-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.pilule {
+  min-height: 42px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+  font-weight: 600; font-size: 14px; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
+  transition: transform .08s, box-shadow .08s, color .2s;
+}
+.pilule:active { transform: translateY(2px); box-shadow: var(--hifi-bouton-enfonce); }
+.pilule-coeur .pilule-icone { font-size: 15px; line-height: 1; }
+.pilule-coeur.est-garde { color: var(--aiguille); }
+.pouce { width: 16px; height: 16px; flex: none; }
+/* le volume : un curseur, comme une table de mixage */
+.fader { display: grid; justify-items: center; gap: 4px; margin-left: auto; }
+.fader input { -webkit-appearance: none; appearance: none; width: 150px; height: 28px; background: transparent; cursor: pointer; --v: 60%; }
+.fader input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--lcd-encre) var(--v), var(--hifi-creux) var(--v)); box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+.fader input::-moz-range-track { height: 6px; border-radius: 3px; background: var(--hifi-creux); }
+.fader input::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--lcd-encre); }
+.fader input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 28px; margin-top: -11px; border-radius: 4px; background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45), inset 0 1px 0 #fff; }
+.fader input::-moz-range-thumb { width: 18px; height: 28px; border: 0; border-radius: 4px; background: linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45); }
+.fader-nom { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--hifi-encre); opacity: .6; }
+.ios .fader { display: none; }
+
+/* ─── « Cosmétique » : des petits réglages inutiles, qui se déplient d'un bouton de la chaîne ─── */
+.trappe { grid-area: trappe; display: none; gap: 8px; }
+body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,.9,.3,1.15) both; transform-origin: top; }
+@keyframes trappe { from { transform: perspective(600px) rotateX(-70deg); opacity: 0; } }
+.trappe-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.trappe-titre { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; opacity: .55; padding-top: 4px; }
+.trappe-fermer { width: 32px; height: 32px; border-radius: 50%; font-size: 20px; line-height: 1; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); }
+.trappe-panneau {
+  display: flex; flex-wrap: wrap; align-items: end; gap: 16px 28px; padding: 16px 18px 18px; border-radius: 12px;
+  background: var(--hifi-creux); color: #e9eaee; box-shadow: inset 0 3px 12px rgba(0,0,0,.5);
+}
+.bidouille { display: grid; gap: 8px; }
+.bidouille-ligne { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bidouille-nom { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
+.leds { display: flex; gap: 9px; }
+.led-choix { --c: #888; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--c) 40%, #fff), var(--c) 55%, color-mix(in srgb, var(--c) 60%, #000)); box-shadow: 0 0 0 2px #0b0c0e, 0 1px 0 3px rgba(255,255,255,.08); transition: transform .12s, box-shadow .2s; }
+.led-choix:hover { transform: scale(1.1); }
+.led-choix:active { transform: scale(.9); }
+.led-choix[aria-checked="true"] { box-shadow: 0 0 0 2px #0b0c0e, 0 0 0 4px var(--c), 0 0 14px 3px var(--c); }
+.led-choix[data-val="origine"] { --c: #9aa0a8; background: conic-gradient(#8fdcff 0 50%, #ffb35c 50%); }
+.led-choix[data-val="glacier"] { --c: #8fdcff; } .led-choix[data-val="ambre"] { --c: #ffb35c; } .led-choix[data-val="menthe"] { --c: #8dffc4; }
+.led-choix[data-val="rose"] { --c: #ff9bd2; } .led-choix[data-val="blanc"] { --c: #f4f6ff; }
+.segments { display: inline-flex; padding: 3px; border-radius: 9px; background: #0b0c0e; gap: 2px; }
+.segments button { min-height: 32px; padding: 0 11px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #b9bcc4; transition: background-color .15s, color .15s; }
+.segments button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 2px 4px rgba(0,0,0,.4); }
+.glissiere { --pos: 0; position: relative; display: grid; grid-template-columns: repeat(3, 56px); height: 34px; border-radius: 17px; background: #0b0c0e; box-shadow: inset 0 2px 5px rgba(0,0,0,.6); }
+.glissiere button { position: relative; z-index: 1; font-size: 12px; font-weight: 700; color: #8d9098; transition: color .2s; }
+.glissiere button[aria-checked="true"] { color: #111; }
+.glissiere-curseur { position: absolute; top: 3px; left: 3px; width: 50px; height: 28px; border-radius: 14px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 4px rgba(0,0,0,.5), inset 0 1px 0 #fff; transform: translateX(calc(var(--pos) * 56px)); transition: transform .28s cubic-bezier(.3,1.4,.5,1); }
+.interrupteur-mini { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #d9dbe0; background: linear-gradient(#3e4148, #2a2c31); box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 3px 0 #0b0c0e, 0 4px 6px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s; }
+.interrupteur-mini:active, .interrupteur-mini[aria-pressed="true"] { transform: translateY(2px); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 1px 0 #0b0c0e, 0 1px 2px rgba(0,0,0,.4); }
+.interrupteur-mini .led { display: inline-block; flex: none; width: 7px; height: 7px; border-radius: 50%; background: #3a1714; transition: background .2s, box-shadow .2s; }
+.interrupteur-mini[aria-pressed="true"] .led { background: #ff5a3c; box-shadow: 0 0 8px 1px rgba(255,90,60,.8); }
+
+/* ─── le tuner : orienter la suite, juste sous le lecteur ───
+   La même façade que le lecteur. En haut, ce que joue la chaîne (la radio ou ta sélection) ;
+   puis la bande des époques, trois réglages par deux, et l'afficheur « Ensuite » :
+   le prochain titre, la direction en cours, et de quoi y passer tout de suite. */
+.tuner {
+  grid-area: tuner; position: relative; min-width: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;
+  padding: 14px clamp(16px, 2vw, 26px) clamp(16px, 2vw, 22px); border-radius: 16px;
+  background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
+}
+.tuner-haut { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 10px; border-bottom: 1px solid var(--hifi-trait); }
+.tuner-titre { font-family: "Unbounded", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; line-height: 1.2; }
+.tuner-consigne { font-size: 13px; opacity: .7; }
+/* la radio ou ta sélection : le sélecteur « FUNCTION » des chaînes */
+.sources { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
+.source-choix { min-height: 30px; padding: 0 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; white-space: nowrap; transition: background-color .15s, color .15s; }
+.source-choix b { margin-left: 4px; letter-spacing: 0; opacity: .8; }
+.source-choix[aria-pressed="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
+.reglage-nom { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; white-space: nowrap; }
+/* la bande des époques : on règle la radio comme une vraie */
+.cadran { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 10px; }
+.cadran-bande {
+  position: relative; display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
+  height: 48px; padding: 0 6px; border-radius: 10px; overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 40 - 1px), color-mix(in srgb, var(--lcd-encre) 28%, transparent) calc(100% / 40 - 1px) calc(100% / 40)) left 6px top 7px / calc(100% - 12px) 7px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 8 - 1px), color-mix(in srgb, var(--lcd-encre) 55%, transparent) calc(100% / 8 - 1px) calc(100% / 8)) left 6px top 7px / calc(100% - 12px) 12px no-repeat,
+    radial-gradient(120% 140% at 50% 120%, color-mix(in srgb, var(--lcd-encre) 16%, #0c0e12), #07080b 70%);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 rgba(255,255,255,.5);
+}
+.cadran-bande::after { /* le reflet de la vitre */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+  background: linear-gradient(180deg, rgba(255,255,255,.1), transparent 45%);
+}
+.cadran-choix {
+  position: relative; z-index: 1; align-self: end; height: 30px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; font-weight: 700; letter-spacing: .02em;
+  color: color-mix(in srgb, var(--lcd-encre) 62%, transparent); text-shadow: 0 0 6px var(--lcd-halo); white-space: nowrap;
+  transition: color .2s;
+}
+.cadran-choix:hover { color: var(--lcd-encre); }
+.cadran-choix[aria-checked="true"] { color: var(--lcd-encre); text-shadow: 0 0 10px var(--lcd-halo), 0 0 2px var(--lcd-encre); }
+.cadran-choix:focus-visible { outline: 2px solid var(--lcd-encre); outline-offset: -4px; border-radius: 6px; }
+.cadran-aiguille {
+  position: absolute; z-index: 2; top: 4px; height: 22px; width: 2px; margin-left: -1px; border-radius: 1px; pointer-events: none;
+  left: calc(6px + (100% - 12px) * (var(--pos, 0) + .5) / var(--n, 8));
+  background: #ff4a3d; box-shadow: 0 0 8px 1px rgba(255, 74, 61, .7);
+  transition: left .55s cubic-bezier(.3, 1.4, .5, 1);
+}
+.cadran-aiguille::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -4px; border: 4px solid transparent; border-top: 5px solid #ff4a3d; border-bottom: 0; }
+/* trois réglages, par deux */
+.rails { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
+.reglage { display: grid; gap: 5px; min-width: 0; }
+.reglage-paire { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rail-bout {
+  min-height: 44px; padding: 0 8px; border-radius: 10px; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-weight: 600; font-size: 13.5px; line-height: 1.15; white-space: nowrap;
+  color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
+  transition: transform .08s, box-shadow .08s, color .2s, background-color .2s;
+}
+.rail-bout .fleche { opacity: .5; }
+.rail-bout:active { transform: translateY(2px); box-shadow: var(--hifi-bouton-enfonce); }
+.rail-bout[aria-pressed="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 5px rgba(0,0,0,.35); }
+.rail-bout[aria-pressed="true"] .fleche { opacity: .9; }
+.rail-bout.a-bout { color: color-mix(in srgb, var(--hifi-encre) 50%, transparent); }
+.rail-bout { position: relative; }
+/* « max » : une petite étiquette dans le coin du bouton, qui ne pousse pas le texte */
+.rail-max { position: absolute; top: -7px; right: 8px; padding: 1px 5px; border-radius: 4px; font-size: 8.5px; font-weight: 800; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; color: #c9ccd3; background: var(--hifi-creux); box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.rail-bout:disabled { opacity: .45; cursor: default; transform: none; }
+/* l'afficheur « Ensuite » */
+.ensuite {
+  display: flex; align-items: center; gap: 12px; min-height: 58px; min-width: 0; padding: 7px 7px 7px 14px; border-radius: 10px;
+  background: var(--lcd-fond); color: var(--lcd-encre);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 4px 14px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.35);
+}
+.ensuite:empty { display: none; }
+.ensuite-mot { flex: none; font-family: "Doto", ui-monospace, monospace; font-weight: 900; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; text-shadow: 0 0 6px var(--lcd-halo); opacity: .8; }
+.ensuite-morceau { flex: 1; min-width: 0; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 10px; text-align: left; border-radius: 6px; }
+.pochette-ensuite { width: 40px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
+.ensuite-textes { display: grid; min-width: 0; line-height: 1.25; }
+.ensuite-titre { font-weight: 600; font-size: 15px; color: color-mix(in srgb, var(--lcd-encre) 35%, #fff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ensuite-artiste { font-size: 13px; opacity: .78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (hover: hover) { .ensuite-morceau:hover .ensuite-titre { text-decoration: underline; text-underline-offset: 3px; } }
+.ensuite-cap { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 3px 3px 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lcd-encre) 60%, transparent); text-shadow: 0 0 6px var(--lcd-halo); }
+.ensuite-cap-x { width: 22px; height: 22px; border-radius: 50%; font-size: 15px; line-height: 1; background: rgba(255,255,255,.1); }
+.ensuite-cap-x:hover { background: rgba(255,255,255,.2); }
+.ensuite-passer { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; color: var(--lcd-encre); background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); transition: background-color .15s; }
+.ensuite-passer:hover { background: rgba(255,255,255,.14); }
+.ensuite-passer .icone-suiv { margin-left: 0; }
+/* quand un réglage change le prochain titre, l'afficheur s'allume et le titre arrive */
+.ensuite.change { animation: ensuite-allume .9s ease-out; }
+.ensuite.change .ensuite-morceau { animation: ensuite-arrive .45s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes ensuite-allume { 0% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 4px 14px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.35), 0 0 0 2px var(--lcd-encre), 0 0 22px var(--lcd-halo); } }
+@keyframes ensuite-arrive { from { opacity: 0; transform: translateX(16px); } }
+
+/* ─── le post-it : ton mot sur le morceau, collé sur l'enceinte de droite (placé en JS) ─── */
+.post-it {
+  --penche: -2deg;
+  position: absolute; z-index: 4; right: -14px; top: 8%;
+  width: 206px; padding: 26px 18px 14px;
+  background: linear-gradient(170deg, #fff6b8, #fde98a 70%, #f7dc6a);
+  color: #2b2a33; box-shadow: 0 14px 24px -8px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.12);
+  transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--penche)); transform-origin: 50% 0;
+}
+.post-it::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: linear-gradient(transparent, rgba(0,0,0,.05)); pointer-events: none; }
+.post-it-scotch { position: absolute; top: -11px; left: 50%; width: 78px; height: 24px; margin-left: -39px; transform: rotate(calc(var(--penche) * -1.6)); background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.12); backdrop-filter: blur(1px); }
+.post-it-texte { font-family: "Caveat", "Bradley Hand", cursive; font-weight: 500; font-size: 23px; line-height: 1.12; overflow-wrap: anywhere; text-wrap: pretty; }
+.post-it.long .post-it-texte { font-size: 19px; }
+.post-it-signe { margin-top: 8px; text-align: right; font-family: "Caveat", cursive; font-weight: 700; font-size: 17px; opacity: .6; }
+.post-it-signe::before { content: "— "; }
+.post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
+@keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
+/* on le décolle, on le recolle ailleurs (double-clic : il revient) */
+.post-it.souleve { cursor: grabbing; z-index: 30; transition: box-shadow .15s; box-shadow: 0 28px 40px -10px rgba(0,0,0,.45), 0 4px 8px rgba(0,0,0,.15); transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(calc(var(--penche) * 2.2)) scale(1.04); }
+@media (min-width: 1240px) {
+  .post-it { width: 196px; }
+  .hifi > .post-it { cursor: grab; touch-action: none; user-select: none; }
+}
+@media (max-width: 1239px) {
+  .hifi .post-it { position: relative; right: auto; top: auto; grid-column: 1 / -1; justify-self: center; width: auto; max-width: min(420px, 92%); margin-top: 8px; }
+}
+
+/* ─── sous la chaîne : « Des pubs ? » une fois, et l'extrait quand YouTube refuse ─── */
+.avis-pub {
+  display: grid; gap: 6px 12px; width: 100%; max-width: 720px; padding: 10px 14px; border-radius: 12px;
+  font-size: 14px; border: 1px dashed var(--trait); animation: sortie .45s cubic-bezier(.2,.9,.3,1.1);
+}
+.avis-titre { font-family: var(--texte); font-weight: 700; font-size: 14px; line-height: 1.1; color: var(--encre); }
+.avis-pub p { line-height: 1.45; }
+.avis-pub p:not(.avis-titre) { color: var(--encre-2); }
+.avis-actions { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 2px; }
+.avis-pub .gros-bouton { min-height: 32px; padding: 0 14px; font-size: 13px; box-shadow: none; }
+.avis-pub .lien-bouton { font-size: 13px; }
+.machine-source { margin-top: -14px; font-size: 14px; color: var(--encre-2); text-align: center; }
+
+/* ─────────────────────────────── L'ÉCRAN VIDÉO ───────────────────────────────
+   Une seule vidéo, posée sur la chaîne ; quand on descend lire la suite, elle
+   suit dans un coin (YouTube veut qu'elle reste visible, 200 × 200 px au moins). */
+.ecran-video {
+  position: fixed; top: 0; left: 0; z-index: 36;
+  overflow: hidden; border-radius: var(--rayon-ecran);
+  background: #000;
+  will-change: transform;
+}
+.ecran-video #yt-lecteur, .ecran-video iframe { width: 100%; height: 100%; display: block; border: 0; }
+.ecran-video.cache { visibility: hidden; pointer-events: none; transform: translate(-200vw, 0) !important; width: 320px !important; height: 180px !important; }
+.coin-video { position: fixed; z-index: 30; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: 356px; display: grid; gap: 6px; justify-items: end; }
+.emplacement-coin { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border-radius: 12px; background: #000; box-shadow: 0 16px 34px rgba(0,0,0,.35); }
+.coin-retour { min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--encre); color: var(--fond); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+
+/* ─────────────────────────────── LE LIVRET (« Plus d'infos ») ───────────────────────────────
+   Comme le livret d'un CD : l'album, l'artiste, et où écouter le morceau en entier. */
 .livret { width: 100%; padding-top: 24px; border-top: 1px solid var(--trait); scroll-margin-top: 92px; }
-.fouille .livret { grid-area: livret; }
+.livret-machine { position: relative; max-width: 1100px; margin-top: 10px; }
 .livret-bouton { display: flex; align-items: center; gap: 18px; text-align: left; padding: 4px 0; max-width: 100%; }
 .livret-icone { position: relative; flex: none; width: 54px; height: 44px; }
 .livret-icone::before, .livret-icone::after {
@@ -579,7 +730,11 @@ body.gravure-ouverte { overflow: hidden; }
 .livret-bouton-texte strong { font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.15rem, 2vw, 1.55rem); line-height: 1.1; }
 .livret-bouton-texte span { color: var(--encre-2); font-size: 15px; overflow-wrap: anywhere; }
 .livret-bouton:hover strong { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
-
+.livret-fermer { position: absolute; top: 18px; right: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; line-height: 1; background: var(--fond-2); box-shadow: var(--relief); }
+.livret-genre { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--aiguille); margin: 14px 0 -6px; }
+.livret-chronique { margin-top: 4px; font-size: 15px; line-height: 1.55; color: var(--encre-2); max-width: 52ch; min-height: 1.5em; opacity: 0; transition: opacity .5s; }
+.livret-chronique.pret { opacity: 1; }
+.chronique-source { display: inline-block; margin-left: 4px; font-size: 13px; color: var(--encre-2); text-decoration: underline; text-decoration-color: var(--encre-3); text-underline-offset: 3px; white-space: nowrap; }
 .livret-pages {
   position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 22px; border-radius: 6px;
@@ -606,279 +761,24 @@ button.piste-btn:hover { background: var(--fond-2); }
 .piste-ecoute { color: var(--encre-2); font-weight: 500; opacity: 0; transition: opacity .15s; }
 button.piste-btn:hover .piste-ecoute, .pistes li.ecoute .piste-ecoute { opacity: 1; color: var(--aiguille); }
 .pistes li.ecoute .piste-btn { background: var(--fond-2); box-shadow: inset 3px 0 0 var(--aiguille); }
-.pistes li.ici .piste-note { color: inherit; }
 .piste-titre { overflow-wrap: anywhere; }
 .piste-duree { color: var(--encre-2); }
 .pistes li.ici { background: var(--aiguille); color: var(--sur-aiguille); font-weight: 600; }
 .pistes li.ici .piste-btn { cursor: default; }
-.pistes li.ici::before, .pistes li.ici .piste-duree { color: inherit; }
+.pistes li.ici::before, .pistes li.ici .piste-duree, .pistes li.ici .piste-note { color: inherit; }
 .livret-artiste-tete { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
 .livret-photo { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; box-shadow: var(--ombre-pochette); }
 .livret-liens { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-.livret-liens .lien-bouton { font-size: 14px; }
+.livret-liens .lien-bouton, .livret-paroles .lien-bouton { font-size: 14px; }
 .livret-vide, .livret-attente { color: var(--encre-2); max-width: 50ch; }
 .livret-ailleurs { display: grid; gap: 10px; margin-top: 24px; }
 .livret-ailleurs-titre { font-weight: 600; }
-.livret-paroles .lien-bouton { font-size: 14px; }
-.livret-machine { max-width: 1100px; margin-top: 34px; }
-
 /* écouter en entier ailleurs, légalement */
 .ailleurs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
 .ailleurs a { padding: 7px 13px; border-radius: 999px; background: var(--fond-2); box-shadow: var(--relief); color: var(--encre); font-weight: 600; text-decoration: none; transition: box-shadow .15s; }
 .ailleurs a:hover { box-shadow: var(--relief), 0 0 0 2px var(--aiguille); }
 
-/* pourquoi des pubs (affiché une fois, dans la page : jamais par-dessus la vidéo) */
-.avis-pub { display: grid; gap: 10px; max-width: min(560px, 100%); padding: 18px 20px; border-radius: var(--rayon-objet); background: var(--fond-2); box-shadow: var(--relief), 0 0 0 1px var(--trait); font-size: 15px; animation: sortie .45s cubic-bezier(.2,.9,.3,1.1); }
-.avis-titre { font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); font-size: 1.15rem; line-height: 1.1; }
-.avis-pub p { color: var(--encre-2); }
-.avis-pub .avis-titre { color: var(--encre); }
-.avis-actions { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; margin-top: 4px; }
-.avis-machine { width: 100%; max-width: 880px; margin-top: 30px; }
-.machine-source { margin-top: 26px; font-size: 14px; color: var(--encre-2); text-align: center; }
-
-.emplacement-ecran {
-  position: relative; overflow: hidden; width: 100%; aspect-ratio: 16 / 9;
-  border-radius: var(--rayon-ecran);
-  background: var(--verre-fond);
-  box-shadow: inset 0 2px 10px rgba(0,0,0,.5), 0 0 0 1px var(--trait);
-}
-@supports not (aspect-ratio: 16 / 9) { .emplacement-ecran::before { content: ""; display: block; padding-top: 56.25%; } }
-.bouton-garder {
-  min-height: 52px; padding: 0 26px 0 22px; border-radius: 999px;
-  display: inline-flex; align-items: center; gap: 10px;
-  font-weight: 600; font-size: 1.05rem;
-  background: var(--fond-2); box-shadow: var(--relief);
-  transition: background-color .2s, color .2s, transform .12s;
-}
-.bouton-garder::before { content: "+"; font-size: 1.4em; line-height: 0; }
-.bouton-garder.est-garde { background: var(--aiguille); color: var(--sur-aiguille); }
-.bouton-garder.est-garde::before { content: "✓"; font-size: 1.05em; }
-.bouton-garder:active { transform: scale(.96); }
-
-
-/* ─────────────────────────────── ÉTAPE 3 : LA CHAÎNE ───────────────────────────────
-   Une micro-chaîne CD du milieu des années 2000 : façade alu brossé (ou laque noire
-   la nuit), porte à hublot fumé où l'on voit tourner le disque, écran à cristaux
-   liquides avec son petit égaliseur, gros bouton de volume à anneau lumineux. */
-.ecran-machine { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(28px, 4vw, 48px); padding-top: clamp(20px, 3.5vw, 48px); }
-.hifi {
-  position: relative; isolation: isolate;
-  display: grid; grid-template-columns: minmax(84px, 150px) minmax(0, 1000px) minmax(84px, 150px);
-  gap: clamp(12px, 2vw, 26px); align-items: end; width: 100%; max-width: 1340px;
-}
-.hifi::after { content: ""; position: absolute; z-index: -1; left: 3%; right: 3%; bottom: -24px; height: 42px; background: radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.22), transparent 72%); }
-
-/* les enceintes satellites */
-.hifi-enceinte {
-  position: relative; display: grid; grid-template-rows: auto auto 1fr; justify-items: center; gap: 12%;
-  aspect-ratio: 1 / 1.95; padding: 22% 12% 10%; border-radius: 16px 16px 12px 12px;
-  background: var(--hifi-corps); box-shadow: var(--hifi-ombre);
-}
-.hp-tweeter { width: 36%; aspect-ratio: 1 / 1; border-radius: 50%; background: radial-gradient(circle at 44% 38%, #fbfbfb 0 14%, #a7adb4 26%, #33363c 56%, #121316 66%, var(--hifi-anneau) 68%); box-shadow: 0 1px 0 rgba(255,255,255,.4), inset 0 1px 3px rgba(0,0,0,.4); }
-.hp-boomer { position: relative; width: 92%; aspect-ratio: 1 / 1; border-radius: 50%;
-  background: radial-gradient(circle, #34363c 0 13%, #191a1d 13.5% 17%, #2a2c31 17.5% 53%, #121315 54% 63%, #2f3136 64% 71%, var(--hifi-anneau) 72%);
-  box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5); }
-.hp-boomer i { position: absolute; inset: 27%; border-radius: 50%; box-shadow: 0 0 0 2px var(--lcd-encre); opacity: 0; transition: opacity .4s, box-shadow .4s; }
-body.cd-tourne .hp-boomer { animation: basse var(--battement, .5s) ease-in-out infinite alternate; }
-body.cd-tourne .hp-boomer i { opacity: .7; box-shadow: 0 0 0 2px var(--lcd-encre), 0 0 18px 2px var(--lcd-halo); }
-@keyframes basse { to { transform: scale(1.035); filter: brightness(1.12); } }
-.hifi-enceinte-pied { align-self: end; font-size: 9px; font-weight: 600; letter-spacing: .24em; color: var(--hifi-encre); opacity: .45; }
-
-/* le corps de la chaîne */
-.hifi-corps {
-  position: relative; display: grid; min-width: 0;
-  grid-template-columns: minmax(180px, 230px) minmax(0, 1fr);
-  grid-template-areas: "haut haut" "tiroir lcd" "commandes commandes";
-  gap: 16px 22px; padding: clamp(16px, 2vw, 26px); border-radius: 20px;
-  background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
-}
-body.video-machine .hifi-corps { grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) 356px; grid-template-areas: "haut haut haut" "tiroir lcd ecran" "commandes commandes commandes"; }
-.hifi-haut { grid-area: haut; display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--hifi-trait); }
-.hifi-marque { font-family: "Unbounded", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; }
-.hifi-modele { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
-.hifi-veille { margin-left: auto; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
-body.chaine-allumee .hifi-veille { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
-
-/* la porte à hublot : on voit le disque tourner ; elle descend quand on change de disque */
-.tiroir { grid-area: tiroir; position: relative; align-self: start; aspect-ratio: 1 / 1; border-radius: 14px; overflow: hidden; background: var(--hifi-creux); box-shadow: inset 0 3px 14px rgba(0,0,0,.55); }
-.tiroir-plateau { position: absolute; inset: 7%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #2b2d32 0 6%, #4b4e55 6.5% 9%, #18191c 9.5% 100%); transition: transform .45s cubic-bezier(.3,.9,.3,1); }
-.tiroir-creux { position: absolute; inset: 2%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
-.disque-tiroir { --d: 210px; width: 96%; }
-body.cd-tourne .disque-tiroir { animation: tourne 1.15s linear infinite; }
-.tiroir-facade {
-  position: absolute; inset: 0; border-radius: inherit;
-  background: var(--hifi-porte);
-  -webkit-mask: radial-gradient(circle closest-side, transparent 0 83%, #000 83.6%);
-  mask: radial-gradient(circle closest-side, transparent 0 83%, #000 83.6%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
-  transition: transform .42s cubic-bezier(.5,0,.3,1);
-}
-.tiroir::after { /* le verre fumé du hublot */
-  content: ""; position: absolute; inset: 8.5%; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.22), transparent 38%), radial-gradient(circle, rgba(20,22,28,.18), rgba(10,11,14,.42));
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,.35), inset 0 0 0 4px rgba(255,255,255,.07);
-  transition: opacity .3s;
-}
-.tiroir-logo { position: absolute; left: 9%; bottom: 5%; font-size: 8px; font-weight: 700; letter-spacing: .14em; line-height: 1.05; text-transform: uppercase; opacity: .5; }
-.tiroir-fente { position: absolute; right: 8%; bottom: 6%; width: 20%; height: 3px; border-radius: 2px; background: rgba(0,0,0,.25); box-shadow: 0 1px 0 rgba(255,255,255,.4); }
-.tiroir.ouvert .tiroir-facade { transform: translateY(104%); }
-.tiroir.ouvert::after { opacity: 0; }
-.tiroir.ouvert .tiroir-plateau { transform: scale(1.06); }
-.tiroir.pose .disque-tiroir { animation: poser .5s cubic-bezier(.2,.9,.3,1.2) both; }
-@keyframes poser { from { transform: translateY(-55%) scale(1.2) rotate(-20deg); opacity: 0; } }
-
-/* l'écran à cristaux liquides */
-.lcd {
-  grid-area: lcd; position: relative; overflow: hidden; min-width: 0; align-self: stretch;
-  display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 8px;
-  padding: 16px 18px; border-radius: 10px;
-  background: var(--lcd-fond); color: var(--lcd-encre); text-shadow: 0 0 7px var(--lcd-halo);
-  font-family: "Doto", ui-monospace, monospace; font-weight: 900; letter-spacing: .04em;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 4px 18px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.35);
-}
-.lcd::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45; background: repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px); }
-.lcd::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(162deg, rgba(255,255,255,.09), transparent 38%); }
-.lcd-ligne { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; white-space: nowrap; font-size: 14px; }
-.lcd-badge { flex: none; padding: 0 6px; border: 1.5px solid currentColor; border-radius: 3px; font-size: 11px; line-height: 1.5; }
-.lcd-disque { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.lcd-piste { flex: none; }
-.lcd-piste b { font-size: 18px; }
-.lcd-temps { margin-left: auto; flex: none; font-size: 22px; font-variant-numeric: tabular-nums; }
-.lcd-defile { position: relative; overflow: hidden; white-space: nowrap; font-size: 26px; line-height: 1.15; }
-.lcd-defile span { display: inline-block; padding-left: 100%; animation: defile 14s linear infinite; }
-.lcd-defile.fixe span { padding-left: 0; animation: none; }
-@keyframes defile { to { transform: translateX(-100%); } }
-body.lecture-disque .lcd-defile span { padding-left: 0; animation: clignote .5s steps(2, jump-none) infinite; }
-@keyframes clignote { 50% { opacity: .15; } }
-.lcd-spectre { position: relative; display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; align-items: end; height: 52px; }
-.lcd-spectre i { --h: .06; display: block; height: calc(var(--h) * 100%); min-height: 3px; background: repeating-linear-gradient(0deg, currentColor 0 3px, transparent 3px 5px); transition: height .1s linear; }
-.lcd-spectre i::before { content: ""; display: block; height: 3px; margin-top: -6px; background: currentColor; opacity: .6; transform: translateY(calc(var(--pic, 0) * -1px)); }
-.lcd-suite { font-size: 12px; opacity: .7; }
-.lcd-bas { font-size: 12px; opacity: .9; }
-.lcd-ensuite { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.lcd-etat { margin-left: auto; flex: none; }
-
-.emplacement-cd { grid-area: ecran; align-self: stretch; width: 356px; height: auto; min-height: 200px; aspect-ratio: auto; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.35); }
-body:not(.video-machine) .emplacement-cd { display: none; }
-
-/* les commandes */
-.hifi-commandes { grid-area: commandes; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; padding-top: 16px; border-top: 1px solid var(--hifi-trait); }
-.transport { display: flex; align-items: center; gap: 10px; }
-.rond {
-  width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; flex: none;
-  color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
-  transition: transform .08s, box-shadow .08s;
-}
-.rond:active { transform: translateY(2px) scale(.97); box-shadow: var(--hifi-bouton-enfonce); }
-.rond-lecture { width: 64px; height: 64px; background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort); }
-.rond-ejecter { margin-left: 8px; }
-.icone-ejecter { position: relative; display: block; width: 14px; height: 14px; }
-.icone-ejecter::before { content: ""; position: absolute; left: 0; top: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 8px solid currentColor; }
-.icone-ejecter::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: currentColor; border-radius: 1px; }
-.icone-stop { width: 12px; height: 12px; background: currentColor; border-radius: 1px; }
-.hifi-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.pilule {
-  min-height: 42px; padding: 0 18px; border-radius: 999px; display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
-  font-weight: 600; font-size: 14px; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
-  transition: transform .08s, box-shadow .08s;
-}
-.pilule:active { transform: translateY(2px); box-shadow: var(--hifi-bouton-enfonce); }
-.led { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,.25); box-shadow: inset 0 1px 2px rgba(0,0,0,.4); transition: background .2s, box-shadow .2s; }
-.cd-garder.est-garde .led { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
-.bouton-rotatif-hifi { margin-left: auto; grid-auto-flow: column; align-items: center; gap: 12px; }
-.bouton-rotatif-hifi .molette { width: 78px; height: 78px; }
-.bouton-rotatif-hifi .molette-arc circle { stroke: var(--lcd-encre); stroke-width: 2.4; filter: drop-shadow(0 0 3px var(--lcd-halo)); }
-.bouton-rotatif-hifi .bouton-rotatif-nom { color: var(--hifi-encre); opacity: .6; font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
-body[data-vue="machine"] .facade-droite [data-molette="volume"] { display: none; }
-
-/* le rack de disques, posé sur une étagère */
-.rack { width: 100%; max-width: 1220px; display: grid; gap: 16px; }
-.rack-tete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 26px; }
-.rack-tete h2 { font-size: clamp(1.3rem, 2.2vw, 1.85rem); }
-.rack-tete p { color: var(--encre-2); font-size: 15px; max-width: 54ch; }
-.rack-disques {
-  display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 20px);
-  padding: 20px clamp(12px, 2vw, 24px) 18px; border-radius: 16px;
-  background: var(--etagere); box-shadow: var(--relief), inset 0 -12px 0 var(--etagere-bord);
-}
-.rack-disque { display: grid; justify-items: center; align-content: start; gap: 6px; min-width: 0; text-align: center; }
-.rack-galette { position: relative; display: block; width: 100%; max-width: 124px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.3)); transition: transform .5s cubic-bezier(.2,.9,.3,1.25); }
-.rack-galette .disque { --d: 112px; }
-.rack-galette::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--aiguille); opacity: 0; transition: opacity .2s; }
-.rack-disque:hover .rack-galette { transform: translateY(-6px) rotate(28deg); }
-.rack-disque[aria-checked="true"] .rack-galette { transform: translateY(-4px); }
-.rack-disque[aria-checked="true"] .rack-galette::after { opacity: 1; }
-.rack-disque[aria-checked="true"] .rack-nom { color: var(--aiguille); }
-.rack-nom { font-weight: 600; font-size: 14px; line-height: 1.15; }
-.rack-sous { font-size: 12px; color: var(--encre-2); line-height: 1.2; }
-.rack-disque[data-vide] .rack-galette { opacity: .5; filter: none; }
-.rack.appel .rack-disques { animation: appel .9s ease 2; }
-@keyframes appel { 50% { box-shadow: var(--relief), inset 0 -12px 0 var(--etagere-bord), 0 0 0 3px var(--aiguille); } }
-.machine-source { margin-top: -14px; font-size: 14px; color: var(--encre-2); text-align: center; }
-.livret-machine { max-width: 1100px; }
-
-/* ─────────────────────────────── touches rondes (poste) ─────────────────────────────── */
-.touche {
-  width: 62px; height: 62px; border-radius: 50%; flex: none;
-  background: var(--fond-2); box-shadow: var(--relief);
-  display: grid; place-items: center;
-  transition: transform .1s, box-shadow .1s;
-}
-.touche:active { transform: translateY(2px); box-shadow: var(--relief-enfonce); }
-.touche-grosse { width: 82px; height: 82px; background: var(--encre); color: var(--fond); box-shadow: var(--relief-plein); }
-.icone {
-  display: block; width: 0; height: 0; margin-left: 3px;
-  border-left: 12px solid currentColor; border-top: 7px solid transparent; border-bottom: 7px solid transparent;
-}
-.icone.pause { width: 12px; height: 14px; margin-left: 0; border: 0; border-left: 4px solid currentColor; border-right: 4px solid currentColor; }
-.icone-prec, .icone-suiv { position: relative; border-left-width: 10px; }
-.icone-prec { transform: scaleX(-1); }
-.icone-prec::after, .icone-suiv::after { content: ""; position: absolute; left: 0; top: -7px; width: 3px; height: 14px; background: currentColor; }
-
-/* ─────────────────────────────── LE POSTE (lecteur en cours) ───────────────────────────────
-   Replié (extraits) : une vignette et les touches. Avec une vidéo YouTube, l'écran
-   fait au moins 200 px de haut, comme l'exigent les règles du lecteur YouTube. */
-.poste {
-  position: fixed; z-index: 35; left: 16px; bottom: 16px;
-  width: min(470px, calc(100vw - 32px));
-  display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px;
-  padding: 8px 10px 8px 8px; border-radius: calc(var(--rayon-objet) - 4px);
-  background: var(--fond-2); box-shadow: var(--relief-fort), 0 0 0 1px var(--trait);
-  animation: sortie .45s cubic-bezier(.2,.9,.3,1.1);
-}
-.emplacement-poste { width: 56px; aspect-ratio: 1 / 1; border-radius: calc(var(--rayon-ecran) - 2px); }
-.poste.avec-video {
-  width: min(660px, calc(100vw - 32px));
-  grid-template-columns: 356px minmax(0, 1fr); grid-template-rows: 1fr auto;
-  column-gap: 16px; row-gap: 12px; padding: 10px;
-}
-.poste.avec-video .emplacement-poste { grid-row: 1 / 3; width: 356px; height: 200px; aspect-ratio: auto; }
-.poste.avec-video .poste-infos { align-self: end; }
-.poste.avec-video .poste-touches { align-self: start; }
-.poste-infos { display: grid; text-align: left; min-width: 0; }
-.poste-titre { font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.poste-artiste { font-size: 14px; color: var(--encre-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.poste-touches { display: flex; gap: 6px; align-items: center; }
-.touche-mini { width: 44px; height: 44px; }
-.touche-mini .icone-suiv::after { top: -7px; }
-.icone-garder::before { content: "+"; display: block; font-size: 24px; line-height: 1; font-weight: 500; }
-#poste-garder.est-garde { background: var(--aiguille); color: var(--sur-aiguille); }
-#poste-garder.est-garde .icone-garder::before { content: "✓"; font-size: 17px; }
-.icone-chevron { display: block; width: 10px; height: 10px; border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: translateY(-2px) rotate(45deg); }
-.touche-reduire.deplier .icone-chevron { transform: translateY(2px) rotate(-135deg); }
-
-/* ─────────────────────────────── L'ÉCRAN VIDÉO ─────────────────────────────── */
-.ecran-video {
-  position: fixed; top: 0; left: 0; z-index: 36;
-  overflow: hidden; border-radius: var(--rayon-ecran);
-  background: #000;
-  will-change: transform;
-}
-.ecran-video #yt-lecteur, .ecran-video iframe { width: 100%; height: 100%; display: block; border: 0; }
-.ecran-video.cache { visibility: hidden; pointer-events: none; transform: translate(-200vw, 0) !important; width: 320px !important; height: 180px !important; }
-#poste[hidden] ~ .ecran-video.cache { visibility: hidden; }
-
-/* ─────────────────────────────── MES TROUVAILLES + RÉGLAGES (panneaux) ─────────────────────────────── */
+/* ─────────────────────────────── MA SÉLECTION + RÉGLAGES (panneaux) ─────────────────────────────── */
 .voile { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); opacity: 0; transition: opacity .3s; }
 body.panneau-ouvert .voile { opacity: 1; }
 .bac, .reglages {
@@ -893,11 +793,9 @@ body.panneau-ouvert .voile { opacity: 1; }
 }
 body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .reglages { grid-template-rows: auto auto auto 1fr; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.reglage-son, .reglage-teinte { padding: 10px 22px 20px; }
-.reglage-titre { font-weight: 600; margin-bottom: 4px; }
-.bac-explication { margin-top: 6px; font-size: 14px; color: var(--encre-2); max-width: 34ch; }
 .bac-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 22px 22px 8px; }
 .bac-tete h2 { font-size: 2rem; }
+.bac-explication { margin-top: 6px; font-size: 14px; color: var(--encre-2); max-width: 34ch; }
 .onglets { display: flex; gap: 6px; padding: 8px 22px 12px; }
 .onglet { padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--encre-2); }
 .onglet[aria-selected="true"] { background: var(--encre); color: var(--fond); }
@@ -915,15 +813,41 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .bac-vide { padding: 24px 10px; color: var(--encre-2); max-width: 34ch; }
 .bac-pied { padding: 16px 22px 18px; border-top: 1px solid var(--trait); display: grid; gap: 14px; }
 .bac-pied-liens { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-
-/* ─────────────────────────────── COMMENT ÉCOUTER ─────────────────────────────── */
+/* ma sélection : des boîtiers de CD sur l'étagère (le disque sort au survol, le cœur retire) */
+.bac-liste.etagere { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 14px; padding: 18px 20px 26px; }
+.boitier { position: relative; min-width: 0; transform: rotate(var(--incl, 0deg)); transition: transform .35s cubic-bezier(.2,.9,.3,1.25); }
+.boitier:hover, .boitier:focus-within { transform: translateY(-5px) rotate(0deg); z-index: 2; }
+.boitier-morceau { display: grid; gap: 1px; width: 100%; text-align: left; border-radius: 6px; }
+.boitier-cd { position: relative; display: block; margin-bottom: 8px; }
+.boitier-etui { position: relative; display: block; border-radius: 3px 5px 5px 3px; overflow: hidden; background: #111; box-shadow: 0 8px 14px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.35) inset; z-index: 1; }
+.boitier-etui .pochette { width: 100%; display: block; border-radius: 0; box-shadow: none; }
+.boitier-dos { position: absolute; z-index: 2; left: 0; top: 0; bottom: 0; width: 9%; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.18) 70%, rgba(0,0,0,.25)); }
+.boitier-reflet { position: absolute; z-index: 2; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 72%, rgba(255,255,255,.12) 100%); pointer-events: none; }
+.boitier-disque { position: absolute; z-index: 0; top: 7%; bottom: 7%; right: 2%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, var(--fond) 0 11%, transparent 12%), conic-gradient(from 20deg, #e9e9ee, #b9bfd0, #f4f1ec, #c9b9d4, #e9e9ee); box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: transform .45s cubic-bezier(.2,.9,.3,1.25); }
+.boitier:hover .boitier-disque, .boitier:focus-within .boitier-disque { transform: translateX(26%); }
+.boitier-titre { display: block; font-weight: 600; font-size: 13px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boitier-artiste { display: block; font-size: 12px; color: var(--encre-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boitier-retirer { position: absolute; z-index: 3; top: -9px; right: -7px; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; line-height: 1; color: var(--aiguille); background: var(--fond); box-shadow: var(--relief), 0 0 0 1px var(--trait); opacity: 0; transform: scale(.8); transition: opacity .15s, transform .15s; }
+.boitier:hover .boitier-retirer, .boitier:focus-within .boitier-retirer { opacity: 1; transform: none; }
+@media (hover: none) { .boitier-retirer { opacity: 1; transform: none; } }
+/* « Repartir avec une cassette » */
+.cassette-bloc { display: flex; align-items: center; gap: 14px; }
+.cassette { position: relative; flex: none; width: 54px; height: 36px; border-radius: 5px; background: linear-gradient(#e9e4d8, #cfc8b8); box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: space-around; padding: 0 9px; transform: rotate(-4deg); }
+.cassette::before { content: ""; position: absolute; left: 7px; right: 7px; top: 5px; height: 9px; border-radius: 2px; background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.cassette::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 7px; border-radius: 3px 3px 0 0; background: rgba(0,0,0,.3); }
+.cassette i { position: relative; z-index: 1; width: 11px; height: 11px; margin-top: 10px; border-radius: 50%; background: #2a2a2e; box-shadow: 0 0 0 2px #f4f1ea inset; }
+.cassette-titre { font-weight: 700; font-size: 15px; line-height: 1.2; }
+.cassette-sous { font-size: 13px; color: var(--encre-2); line-height: 1.35; margin-top: 2px; }
+/* réglages : comment écouter, teinte du site */
+.reglage-son, .reglage-teinte { padding: 10px 22px 20px; }
 .reglage-son { display: grid; gap: 8px; margin-bottom: 14px; }
+.reglage-titre { font-weight: 600; margin-bottom: 4px; }
 .choix-son { display: grid; gap: 2px; text-align: left; padding: 10px 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--trait); }
 .choix-son span { font-size: 14px; color: var(--encre-2); }
 .choix-son[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--aiguille); background: var(--fond-2); }
 .reglage-note { font-size: 14px; color: var(--encre-2); margin-top: 4px; }
 
-/* ─────────────────────────────── TOAST ─────────────────────────────── */
+/* ─────────────────────────────── MESSAGES ─────────────────────────────── */
 .toast {
   position: fixed; left: 50%; top: 92px; z-index: 60;
   transform: translate(-50%, -10px); opacity: 0; pointer-events: none;
@@ -933,10 +857,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
 }
 .toast.visible { opacity: 1; transform: translate(-50%, 0); }
-
-
-/* ─────────────────────────────── NAVIGATEUR D'APPLI ───────────────────────────────
-   Ouvert depuis Instagram, TikTok, Messenger… : on propose le vrai navigateur. */
+/* ouvert depuis Instagram, TikTok, Messenger… : on propose le vrai navigateur */
 .avis-appli {
   position: fixed; z-index: 45; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
   max-width: 560px; margin: 0 auto; display: grid; gap: 12px; padding: 16px 18px; border-radius: 18px;
@@ -949,40 +870,80 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .avis-appli .gros-bouton-plein { background: var(--aiguille); color: var(--sur-aiguille); }
 .avis-appli .lien-bouton { color: inherit; opacity: .75; }
 
+/* ─────────────────────────────── ORDINATEUR ─────────────────────────────── */
+/* tant qu'une vidéo YouTube joue, « Plus d'infos » garde une marge à droite pour la vidéo en coin */
+@media (min-width: 1100px) {
+  body.video-machine .livret-machine { width: min(1100px, calc(100% - 392px)); justify-self: start; }
+}
+@media (max-width: 1200px) { #teintes-facade { display: none; } }
+
+@media (min-width: 1100px) and (max-height: 860px) {
+  .ecran-machine { padding-top: 10px; }
+  .hifi-corps { padding: 18px 22px; gap: 12px 20px; }
+  body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0, 356px); }
+  .hifi-haut { padding-bottom: 10px; }
+  .hifi-commandes { padding-top: 12px; }
+  .tuner { padding: 12px 22px 14px; gap: 10px; }
+  .tuner-haut { padding-bottom: 8px; }
+  .cadran-bande { height: 44px; }
+  .rail-bout { min-height: 40px; }
+  .ensuite { min-height: 52px; }
+}
+/* portables : des enceintes un peu plus fines, pour laisser la place aux réglages */
+@media (min-width: 1100px) and (max-width: 1439px) {
+  .hifi { grid-template-columns: minmax(96px, 150px) minmax(0, 980px) minmax(96px, 150px); }
+  .rail-bout { font-size: 13px; padding: 0 6px; gap: 4px; }
+  .reglage-paire { gap: 5px; }
+  .rails { gap: 10px; }
+  .hifi-commandes { column-gap: 14px; }
+  .fader input { width: 120px; }
+}
+
+@media (min-width: 1100px) and (max-height: 760px) {
+  .facade-haut { height: 64px; }
+  #scene { padding-top: 64px; }
+  .toast { top: 76px; }
+  .ecran-machine { padding-top: 8px; }
+  .hifi-corps { padding: 14px 20px; gap: 10px 18px; }
+  .hifi-haut { padding-bottom: 8px; }
+  .hifi-commandes { padding-top: 10px; }
+  .rond-lecture { width: 58px; height: 58px; }
+  .tuner { padding: 10px 20px 12px; gap: 8px; }
+  .ensuite { min-height: 50px; padding-top: 5px; padding-bottom: 5px; }
+}
+
 /* ─────────────────────────────── TABLETTE ─────────────────────────────── */
-@media (max-width: 1280px) {
-  body.video-machine .hifi-corps { grid-template-columns: minmax(160px, 210px) minmax(0, 1fr); grid-template-areas: "haut haut" "tiroir lcd" "ecran ecran" "commandes commandes"; }
-  body.video-machine .emplacement-cd { justify-self: center; width: min(100%, 600px); aspect-ratio: 16 / 9; min-height: 200px; }
-}
-@media (max-width: 1200px) { #teintes-facade { display: none; } .bacs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (max-width: 1100px) {
-  .ecran-accueil { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tete" "bacs" "jour"; }
-  .accueil-jour { justify-self: start; }
-}
-@media (max-width: 960px) {
-  .fouille { grid-template-columns: minmax(0, 1fr); grid-template-areas: "platine" "suite" "compil" "livret"; }
-  .platine-pochette { width: min(100%, 360px); }
-  .hifi { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1099px) {
+  /* les enceintes s'effacent : la place va au lecteur, l'écran et la vidéo restent côte à côte */
+  .hifi { grid-template-columns: minmax(0, 1fr); grid-template-areas: "corps" "tuner"; max-width: 980px; }
   .hifi-enceinte { display: none; }
-  .rack-disques { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .coin-video { right: 12px; }
+  body.video-coin .ecran-machine { padding-bottom: 260px; }
+}
+@media (max-width: 860px) {
+  body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "ecran" "commandes" "trappe"; }
+  .emplacement-cd { justify-self: center; width: min(100%, 480px); }
+  .hifi-modele { display: none; }
+  .hifi-commandes { column-gap: 12px; }
+  .transport { gap: 8px; }
+  .fader { flex: 1 1 100px; }
+  .fader input { width: 100%; }
+  .rails { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .reglage { grid-template-columns: 92px minmax(0, 1fr); align-items: center; gap: 10px; }
 }
 @media (max-width: 760px) {
   .livret-pages { grid-template-columns: minmax(0, 1fr); }
   .livret-pages::before { display: none; }
   .livret-page + .livret-page { border-top: 1px solid var(--trait); }
-  .hifi-corps, body.video-machine .hifi-corps {
-    grid-template-columns: 104px minmax(0, 1fr);
-    grid-template-areas: "haut haut" "tiroir lcd" "ecran ecran" "commandes commandes";
-    gap: 12px; padding: 14px; border-radius: 18px;
-  }
-  body.video-machine .emplacement-cd { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; }
-  .hifi-modele { display: none; }
-  .tiroir { border-radius: 12px; }
+  .hifi-corps { gap: 12px; padding: 14px; border-radius: 18px; }
+  .hifi-modele, .hifi-veille { display: none; }
+  .tiroir { width: 104px; border-radius: 12px; }
   .tiroir-logo, .tiroir-fente { display: none; }
-  .lcd { padding: 10px 12px; gap: 6px; grid-template-rows: auto auto auto auto; }
+  .etiquette-titre { font-size: 1.2rem; }
+  .etiquette-ensuite { display: none; }
+  .lcd { padding: 10px 12px; gap: 6px; grid-template-rows: auto auto 1fr auto; }
   .lcd-ligne { font-size: 11px; gap: 8px; }
   .lcd-badge, .lcd-suite { display: none; }
-  .lcd { grid-template-rows: auto auto 1fr auto; }
   .lcd-temps { font-size: 16px; }
   .lcd-piste b { font-size: 14px; }
   .lcd-defile { font-size: 18px; }
@@ -991,35 +952,22 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .transport { width: 100%; justify-content: space-between; gap: 6px; }
   .rond { width: 48px; height: 48px; }
   .rond-lecture { width: 60px; height: 60px; }
-  .rond-ejecter { margin-left: 0; }
   .hifi-actions { flex: 1; }
-  .pilule { flex: 1; justify-content: center; padding: 0 10px; font-size: 13px; }
-  .bouton-rotatif-hifi { margin-left: 0; }
-  .bouton-rotatif-hifi .molette { width: 54px; height: 54px; }
-  .bouton-rotatif-hifi .bouton-rotatif-nom { display: none; }
-  .rack-disques { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 96px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 16px 14px 18px; }
-  .rack-disques::-webkit-scrollbar { display: none; }
-  .rack-disque { scroll-snap-align: start; }
-  .rack-galette .disque { --d: 88px; }
-  .gravure-boite { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
-  .gravure-disque { width: min(56vw, 220px); }
-  .gravure-texte { justify-items: center; }
-  .gravure-actions { justify-content: center; }
+  .pilule { flex: 1; padding: 0 10px; font-size: 13px; }
+  .fader { flex: 1; margin-left: 0; }
+  .fader input { width: 100%; }
 }
 
 /* ─────────────────────────────── TÉLÉPHONE ─────────────────────────────── */
 @media (max-width: 640px) {
   body { font-size: 16px; }
-  .facade-haut { height: 64px; grid-template-columns: auto auto; justify-content: space-between; gap: 8px; padding: 0 12px; padding-top: env(safe-area-inset-top); }
+  .facade-haut { height: 64px; gap: 8px; padding: 0 12px; padding-top: env(safe-area-inset-top); }
   .marque { display: none; }
   #scene { padding-top: calc(64px + env(safe-area-inset-top)); }
   .ecran { min-height: calc(100vh - 64px); padding: 18px 16px 120px; }
-  body.avec-poste .ecran { padding-bottom: calc(var(--poste-h, 70px) + 28px); }
-  .selecteur { justify-self: start; }
-  .selecteur-pos { min-width: 0; height: 38px; padding: 0 13px; font-size: 14px; }
   .bouton-reglages { width: 38px; padding: 0; justify-content: center; }
   .facade-droite { gap: 6px; }
-  .facade-droite .bouton-rotatif, .masquer-mobile { display: none; }
+  .masquer-mobile { display: none; }
   .bouton-facade { height: 38px; padding: 0 12px; font-size: 14px; }
   .bouton-trouvailles { padding-right: 8px; }
   .bouton-trouvailles .mini-cdr { display: none; }
@@ -1033,813 +981,84 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .bouton-rotatif-grand .molette { width: 88px; height: 88px; }
   .interrupteur { width: 104px; height: 104px; }
 
-  /* les bacs, deux par rangée */
-  .ecran-accueil { gap: 22px; }
-  .envie-titre { font-size: clamp(2.1rem, 10vw, 2.9rem); }
-  .bacs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .bac-couleur { aspect-ratio: 1 / 1.02; border-radius: 14px; }
-  .bac-pochettes { top: 7%; height: 50%; left: 14%; right: 14%; }
-  .bac-pochettes .pochette { width: 64%; margin-left: -32%; }
-  .bac-intercalaire { height: 52%; padding: 10px 12px 12px; }
-  .bac-intercalaire::before { top: -12px; height: 16px; left: 10px; }
-  .bac-nom { font-size: 1.15rem; }
-  .bac-sous { font-size: 12px; }
-  .bac-nombre { display: none; }
-  .accueil-jour { justify-self: stretch; justify-items: center; text-align: center; }
-  .accueil-jour .carte-jour { width: min(70vw, 280px); }
+  /* une chaîne compacte : l'écran réduit à son titre, la vidéo, les commandes, puis le tuner */
+  .ecran-machine { padding-top: 12px; gap: 24px; }
+  .hifi { row-gap: 10px; }
+  .hifi-corps { padding: 12px; gap: 10px; }
+  .hifi-haut { padding-bottom: 8px; gap: 6px 10px; }
+  .hifi-marque { font-size: 12px; }
+  .bouton-cosmetique { width: 34px; padding: 0; justify-content: center; }
+  .bouton-cosmetique-texte { display: none; }
+  .tiroir { width: 64px; border-radius: 10px; }
+  body[data-affichage="disque"] .afficheur { gap: 12px; }
+  .etiquette { gap: 2px; }
+  .etiquette-haut { font-size: 10px; }
+  .etiquette-titre { font-size: 1.05rem; -webkit-line-clamp: 2; }
+  .etiquette-artiste { font-size: .9rem; }
+  .lcd { min-height: 0; padding: 10px 12px; grid-template-rows: auto auto; gap: 4px; }
+  .lcd .lcd-spectre, .lcd .lcd-suite, .lcd .lcd-bas { display: none; }
+  .lcd .lcd-defile { font-size: 17px; }
+  .rond { width: 46px; height: 46px; }
+  .rond-lecture { width: 56px; height: 56px; }
+  .hifi-commandes { gap: 10px; padding-top: 10px; }
+  .hifi-actions { flex: none; flex-wrap: nowrap; gap: 8px; }
+  .hifi-actions .pilule { flex: none; width: 46px; padding: 0; }
+  .pilule-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .pilule-coeur .pilule-icone { font-size: 17px; }
+  .pilule-bof .pouce { width: 18px; height: 18px; }
+  .trappe-panneau { gap: 14px 18px; padding: 14px; }
+  .glissiere { grid-template-columns: repeat(3, 52px); }
+  .glissiere-curseur { width: 46px; transform: translateX(calc(var(--pos) * 52px)); }
 
-  /* la fouille : la vidéo en haut, puis les trois directions en lignes */
-  .fouille { gap: 24px; }
-  .platine { gap: 14px; padding: 10px; }
-  .platine-pochette { width: min(72vw, 300px); }
-  .platine-titre { font-size: clamp(1.5rem, 7vw, 2rem); }
-  .platine-artiste { font-size: 1.02rem; }
-  .platine-actions { margin-top: 8px; gap: 10px 16px; }
-  .bouton-garder { min-height: 48px; }
-  .suite-options { grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 8px; }
-  .option {
-    grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px;
-    padding: 10px 10px 10px 12px; border-radius: 14px; background: var(--fond-2);
-    box-shadow: var(--relief), inset 4px 0 0 var(--amb);
-  }
-  .option-choix { grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 12px; }
-  .option-pochette, .option:hover .option-pochette, .option.ecoute .option-pochette, .option.compte .option-pochette { transform: none; }
-  .option-pochette .pochette { box-shadow: var(--ombre-pochette); }
-  .option .sticker { display: none; }
-  .option-dir { display: block; font-family: var(--display); font-weight: var(--display-poids); font-stretch: var(--display-etirement, 100%); letter-spacing: var(--display-interlettre, -0.02em); font-size: 1.08rem; line-height: 1.1; }
-  .option-style { font-size: 12px; margin-top: 2px; }
-  .option-titre { font-size: 14px; font-weight: 500; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .option-artiste { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .option-ecoute { margin: 0; width: 46px; height: 46px; padding: 0; justify-content: center; border-radius: 50%; }
-  .option-ecoute-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .option-barre { bottom: -6px; }
-  .option.mystere .carte-dos-texte { display: none; }
-  .coup { grid-template-columns: minmax(0, 1fr); }
-  .coup .option-pochette { width: min(70vw, 280px); }
-  .carte-dos-texte { font-size: .95rem; }
+  .tuner { padding: 12px; gap: 10px; }
+  .tuner-haut { gap: 2px 10px; padding-bottom: 8px; }
+  .tuner-titre { font-size: 12px; }
+  .tuner-consigne { font-size: 12.5px; flex: 1 1 100%; }
+  .sources { margin-left: 0; flex: 1 1 100%; margin-top: 6px; }
+  .source-choix { flex: 1; }
+  .cadran { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .cadran-bande { padding: 0 2px; }
+  .cadran-choix { font-size: 11px; letter-spacing: 0; }
+  .reglage { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .rail-bout { font-size: 13px; padding: 0 4px; gap: 4px; }
+  .ensuite { gap: 10px; padding-left: 10px; flex-wrap: wrap; }
+  .ensuite-mot { display: none; }
+  .ensuite-passer { width: 44px; padding: 0; justify-content: center; }
+  .ensuite-passer-texte { display: none; }
+  .ensuite-morceau { flex: 1 1 200px; }
+  .ensuite-cap { order: 3; margin-left: 50px; margin-bottom: 2px; }
+  .ensuite-indice { display: none; }
 
-  /* la compil */
-  .compil { grid-template-columns: minmax(0, 1fr); }
-  .compil-liste { font-size: 16px; }
-  .compil-liste li.vide:nth-child(n+6) { display: none; }
-  .compil-boitier { grid-template-columns: minmax(0, 1fr) 128px; }
+  /* quand on descend, la vidéo se range en haut, sous la barre (comme dans l'appli YouTube) :
+     le tuner et « Plus d'infos » défilent dessous, rien n'est caché en bas de l'écran */
+  .coin-video { left: 16px; right: 16px; top: calc(70px + env(safe-area-inset-top)); bottom: auto; width: auto; }
+  .emplacement-coin { aspect-ratio: 16 / 9; min-height: 200px; border-radius: 10px; }
+  .coin-retour { display: none; }
+  body.video-coin .ecran-machine { padding-bottom: 120px; }
+  body.video-coin .toast { top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); }
+  body.video-machine .livret { scroll-margin-top: 290px; }
+
   .livret-album-tete { grid-template-columns: 76px minmax(0, 1fr); gap: 14px; }
   .pochette-livret { width: 76px; }
   .livret-photo { width: 68px; height: 68px; }
   .livret-icone { width: 46px; height: 38px; }
   .livret-icone::before, .livret-icone::after { width: 22px; }
 
-  .touche { width: 56px; height: 56px; }
-  .poste {
-    left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: auto;
-    grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; padding: 8px;
-  }
-  .emplacement-poste { width: 48px; }
-  .poste.avec-video { width: auto; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; column-gap: 8px; row-gap: 8px; padding: 8px; }
-  .poste.avec-video .emplacement-poste { grid-row: auto; grid-column: 1 / -1; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 200px; }
-  .poste.avec-video .poste-infos, .poste.avec-video .poste-touches { align-self: center; }
-  .poste-touches { gap: 4px; }
-  .touche-mini { width: 40px; height: 40px; }
-
   .bac, .reglages { top: auto; width: 100vw; height: 86vh; border-radius: 18px 18px 0 0; transform: translateY(105%); }
   .toast { top: calc(72px + env(safe-area-inset-top)); }
 }
+@media (max-width: 380px) {
+  .bac-liste.etagere { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rail-bout { font-size: 12px; white-space: normal; }
+}
 
+/* ─────────────────────────────── MOUVEMENTS ─────────────────────────────── */
 /* les transitions entre les écrans, là où le navigateur sait les faire */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .32s; animation-timing-function: cubic-bezier(.2,.9,.3,1); }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+  .plateau-reflet, body.cd-tourne.energie-forte .hifi-enceinte, .hp-boomer.coup, .hp-tweeter.ping { animation: none; }
+  /* le titre ne défile pas : on montre son début, coupé proprement */
+  .lcd-defile { text-overflow: ellipsis; }
+  .lcd-defile span { display: inline; padding-left: 0; animation: none; }
 }
-
-/* ─────────────────────────────── LE PUPITRE (sous la chaîne) ───────────────────────────────
-   Le morceau qui passe et sa petite chronique, l'avis du visiteur,
-   les directions pour la suite, ce qui vient ensuite, et le disque dans la chaîne. */
-.pupitre {
-  width: 100%; max-width: 1220px;
-  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 40px); align-items: start;
-}
-.maintenant {
-  display: grid; grid-template-columns: minmax(140px, 220px) minmax(0, 1fr); gap: clamp(16px, 2.4vw, 28px); align-items: start;
-  padding: clamp(16px, 2vw, 24px); border-radius: var(--rayon-objet); background: var(--fond-2); box-shadow: var(--relief-fort);
-  animation: sortie .5s cubic-bezier(.2,.9,.3,1.1) both;
-}
-.maintenant-vide { grid-column: 1 / -1; color: var(--encre-2); }
-.maintenant-pochette .pochette { box-shadow: var(--ombre-pochette-forte); }
-.maintenant-texte { display: grid; gap: 6px; justify-items: start; min-width: 0; }
-.maintenant-style { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--aiguille); }
-.maintenant-titre { font-size: clamp(1.5rem, 2.8vw, 2.3rem); overflow-wrap: anywhere; }
-.maintenant-artiste { font-size: clamp(1rem, 1.5vw, 1.2rem); font-weight: 500; }
-.maintenant-note { margin-top: 4px; font-family: var(--note, var(--texte)); font-size: 1.05rem; max-width: 46ch; }
-.maintenant-note::before { content: "« "; color: var(--aiguille); } .maintenant-note::after { content: " »"; color: var(--aiguille); }
-.maintenant-chronique { margin-top: 4px; font-size: 15px; line-height: 1.55; color: var(--encre-2); max-width: 52ch; min-height: 1.5em; opacity: 0; transition: opacity .5s; }
-.maintenant-chronique.pret { opacity: 1; }
-.avis-boutons { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
-.avis-bouton {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px;
-  font-weight: 600; font-size: 14px; background: var(--fond); box-shadow: inset 0 0 0 1.5px var(--trait);
-  transition: background-color .2s, color .2s, box-shadow .2s, transform .1s;
-}
-.avis-bouton:hover { box-shadow: inset 0 0 0 1.5px var(--encre-3); }
-.avis-bouton:active { transform: scale(.97); }
-.avis-bouton span[aria-hidden] { font-size: 1.05em; }
-.avis-aime.actif { background: color-mix(in srgb, var(--aiguille) 14%, var(--fond)); color: var(--aiguille); box-shadow: inset 0 0 0 1.5px var(--aiguille); }
-.avis-garder.est-garde { background: var(--aiguille); color: var(--sur-aiguille); box-shadow: none; }
-.avis-garder.est-garde span[aria-hidden] { display: none; }
-.pupitre-cote { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
-.pupitre-cote > *, .maintenant { min-width: 0; }
-.pupitre-titre { font-size: clamp(1.1rem, 1.6vw, 1.3rem); margin-bottom: 10px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
-.pupitre-aide { font-family: var(--texte); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--encre-2); }
-.caps { display: flex; flex-wrap: wrap; gap: 8px; }
-.cap {
-  min-height: 40px; padding: 0 15px; border-radius: 999px; font-weight: 600; font-size: 14px;
-  background: var(--fond-2); box-shadow: var(--relief), inset 0 0 0 1px var(--trait);
-  transition: background-color .2s, color .2s, transform .1s;
-}
-.cap:hover { transform: translateY(-1px); }
-.cap[aria-pressed="true"] { background: var(--encre); color: var(--fond); }
-.cap:disabled { opacity: .45; cursor: default; transform: none; }
-.file { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; counter-reset: f; }
-.file li { counter-increment: f; }
-.file-titre { position: relative; display: grid; grid-template-columns: 22px 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 7px 10px 7px 6px; border-radius: 10px; text-align: left; transition: background-color .15s; animation: sortie .45s cubic-bezier(.2,.9,.3,1.1) both; }
-.file li:nth-child(2) .file-titre { animation-delay: .04s; } .file li:nth-child(3) .file-titre { animation-delay: .08s; } .file li:nth-child(4) .file-titre { animation-delay: .12s; } .file li:nth-child(5) .file-titre { animation-delay: .16s; }
-.file-titre::before { content: counter(f); text-align: right; font-size: 13px; color: var(--encre-2); font-variant-numeric: tabular-nums; }
-.file-titre:hover { background: var(--fond-2); }
-.pochette-file { width: 48px; }
-.file-texte { display: grid; min-width: 0; line-height: 1.25; }
-.file-nom { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-artiste { font-size: 14px; color: var(--encre-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-style { font-size: 12px; color: var(--encre-2); opacity: .8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-cap { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--encre); color: var(--fond); white-space: nowrap; }
-.file-vide { color: var(--encre-2); padding: 6px 0; }
-.sources-choix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.source { display: grid; justify-items: center; gap: 4px; text-align: center; min-width: 0; }
-.source-galette { position: relative; display: block; width: 100%; max-width: 92px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.28)); transition: transform .45s cubic-bezier(.2,.9,.3,1.25); }
-.source-galette::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--aiguille); opacity: 0; transition: opacity .2s; }
-.source:hover .source-galette { transform: translateY(-4px) rotate(24deg); }
-.source[aria-checked="true"] .source-galette::after { opacity: 1; }
-.source[aria-checked="true"] .source-nom { color: var(--aiguille); }
-.source[data-vide] .source-galette { opacity: .5; }
-.source-nom { font-weight: 600; font-size: 14px; line-height: 1.15; }
-.source-sous { font-size: 12px; color: var(--encre-2); line-height: 1.2; }
-.sources.appel .sources-choix { animation: appel-sources .9s ease 2; }
-@keyframes appel-sources { 50% { transform: scale(1.03); } }
-/* le fond du bac : un disque noir, mat */
-.disque-fond { --amb-encre: #e9e2cf; background:
-  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.55) 7.4% 8.4%, rgba(90,90,96,.6) 8.6% 15.5%, rgba(255,255,255,.35) 15.7% 16.4%, transparent 16.6%),
-  repeating-radial-gradient(circle, rgba(255,255,255,.035) 0 1px, transparent 1px 3px),
-  radial-gradient(120% 120% at 30% 20%, #3a3833, #141311 60%, #050505); }
-.disque-fond .disque-nom { font-size: 10px; font-size: 10.5cqw; top: 20%; }
-.ecran-machine .avis-machine { width: 100%; max-width: 1220px; margin: 0; }
-.maintenant .avis-pub { grid-column: 1 / -1; }
-
-@media (max-width: 960px) { .pupitre { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 640px) {
-  .maintenant { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; padding: 14px; }
-  .maintenant-titre { font-size: 1.35rem; }
-  .avis-boutons { grid-column: 1 / -1; }
-  .maintenant-texte { display: contents; }
-  .maintenant-style, .maintenant-titre, .maintenant-artiste { grid-column: 2; }
-  .maintenant-pochette { grid-row: 1 / span 3; }
-  .maintenant-note, .maintenant-chronique, .avis-boutons, .maintenant > .lien-bouton, .maintenant-texte > .lien-bouton { grid-column: 1 / -1; }
-  .avis-bouton { flex: 1 1 auto; justify-content: center; padding: 0 12px; }
-  .caps { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 6px; scrollbar-width: none; }
-  .caps::-webkit-scrollbar { display: none; }
-  .cap { flex: none; }
-}
-
-/* la ligne « ensuite » : un seul titre, qu'on peut lancer tout de suite */
-.ensuite { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; padding-top: 16px; border-top: 1px solid var(--trait); font-size: 15px; }
-.ensuite-mot { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--encre-2); }
-.ensuite-titre { font-weight: 600; text-align: left; text-decoration: underline; text-decoration-color: var(--encre-3); text-underline-offset: 4px; }
-.ensuite-titre em { font-style: normal; font-weight: 500; color: var(--encre-2); }
-.ensuite-titre:hover { text-decoration-color: currentColor; }
-.ensuite-source { flex-basis: 100%; font-size: 14px; color: var(--encre-2); }
-.chronique-source { display: inline-block; margin-left: 4px; font-size: 13px; color: var(--encre-2); text-decoration: underline; text-decoration-color: var(--encre-3); text-underline-offset: 3px; white-space: nowrap; }
-/* « Juste la musique » : la chaîne, rien d'autre */
-body.epure .avis-machine, body.epure .livret-machine, body.epure .machine-source, body.epure .lien-infos, body.epure .maintenant-chronique { display: none !important; }
-body.epure .ecran-machine { align-content: center; min-height: calc(100vh - 76px); }
-#bouton-epure[aria-pressed="true"] { box-shadow: inset 0 2px 5px rgba(0,0,0,.25); }
-
-/* ─────────────────────────────── LE PICTURE DISC ───────────────────────────────
-   La pochette du morceau imprimée sur le disque, des sillons, un anneau stroboscopique
-   sur la tranche. Le reflet irisé ne tourne pas avec le disque : il reste sous la
-   lumière pendant que l'image file dessous, et c'est ça qui hypnotise. */
-.disque-image { background:
-  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.6) 8.6% 15.5%, rgba(255,255,255,.75) 15.7% 16.4%, transparent 16.6%),
-  radial-gradient(circle, transparent 0 16.5%, rgba(0,0,0,.35) 16.6% 17.3%, transparent 17.6%),
-  var(--pochette) center / cover no-repeat, #222; }
-.disque-image.disque-yt { background:
-  radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.9) 7.4% 8.4%, rgba(160,170,180,.6) 8.6% 15.5%, rgba(255,255,255,.75) 15.7% 16.4%, transparent 16.6%),
-  radial-gradient(circle, transparent 0 16.5%, rgba(0,0,0,.35) 16.6% 17.3%, transparent 17.6%),
-  var(--pochette) center / auto 134% no-repeat, #222; }
-.disque-image > * { display: none; }
-.disque-image::before { /* sillons + anneau stroboscopique sur la tranche */
-  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-  background:
-    var(--strobe) center / 100% 100% no-repeat,
-    radial-gradient(circle, transparent 0 94.5%, rgba(10,10,12,.82) 95% 100%),
-    radial-gradient(circle, transparent 0 17.6%, rgba(255,255,255,.18) 17.8% 18.3%, transparent 18.6% 61%, rgba(0,0,0,.22) 61.2% 61.7%, transparent 62%),
-    repeating-radial-gradient(circle, rgba(255,255,255,.06) 0 1px, rgba(0,0,0,.08) 1px 2.6px);
-}
-.plateau-reflet {
-  position: absolute; width: 96%; aspect-ratio: 1 / 1; border-radius: 50%; pointer-events: none;
-  background:
-    conic-gradient(from 0deg, transparent 0 6%, rgba(255,120,200,.55) 10%, rgba(120,200,255,.6) 14%, rgba(160,255,190,.5) 18%, transparent 24% 52%, rgba(255,230,140,.45) 57%, rgba(200,140,255,.5) 61%, transparent 67%),
-    radial-gradient(90% 60% at 30% 22%, rgba(255,255,255,.35), transparent 60%);
-  mix-blend-mode: screen; opacity: .55;
-  -webkit-mask: radial-gradient(circle, transparent 0 16.6%, #000 17%); mask: radial-gradient(circle, transparent 0 16.6%, #000 17%);
-  animation: balayage 14s linear infinite; animation-play-state: paused;
-}
-body.cd-tourne .plateau-reflet, body.demo .plateau-reflet { animation-play-state: running; }
-@keyframes balayage { to { transform: rotate(-360deg); } }
-.tiroir.ouvert .plateau-reflet, .tiroir.pose .plateau-reflet { opacity: 0; }
-/* vitesse du disque */
-body[data-vitesse="33"].cd-tourne .disque-tiroir { animation-duration: 1.8s; }
-body[data-vitesse="45"].cd-tourne .disque-tiroir { animation-duration: 1.33s; }
-body[data-vitesse="hypno"].cd-tourne .disque-tiroir { animation-duration: 5.5s; }
-body[data-vitesse="hypno"] .disque-tiroir::after { /* une spirale qui semble s'enfoncer */
-  background: var(--spirale) center / 100% 100% no-repeat;
-  mix-blend-mode: overlay; opacity: .6;
-}
-body[data-vitesse="hypno"] .plateau-reflet { opacity: .8; animation-duration: 9s; }
-body.demo .disque-tiroir { animation: tourne .5s linear infinite !important; }
-body.demo .lcd { animation: arc-en-ciel 2s linear infinite; }
-@keyframes arc-en-ciel { to { filter: hue-rotate(360deg); } }
-
-/* la couleur de l'écran */
-html[data-lcd="glacier"] { --lcd-encre: #8fdcff; --lcd-halo: rgba(110, 200, 255, .55); }
-html[data-lcd="ambre"]   { --lcd-encre: #ffb35c; --lcd-halo: rgba(255, 160, 70, .55); }
-html[data-lcd="menthe"]  { --lcd-encre: #8dffc4; --lcd-halo: rgba(90, 255, 170, .5); }
-html[data-lcd="rose"]    { --lcd-encre: #ff9bd2; --lcd-halo: rgba(255, 110, 190, .55); }
-html[data-lcd="blanc"]   { --lcd-encre: #f4f6ff; --lcd-halo: rgba(230, 236, 255, .45); }
-/* l'égaliseur */
-body[data-eq="points"] .lcd-spectre i { background: none; }
-body[data-eq="points"] .lcd-spectre i::before { height: 4px; border-radius: 2px; opacity: 1; transform: none; margin-top: 0; }
-body[data-eq="points"] .lcd-spectre i { display: flex; flex-direction: column; justify-content: flex-start; }
-body[data-eq="miroir"] .lcd-spectre { align-items: center; }
-body[data-eq="miroir"] .lcd-spectre i { background: repeating-linear-gradient(90deg, currentColor 0 100%), linear-gradient(currentColor, currentColor); background: currentColor; border-radius: 2px; opacity: .9; }
-body[data-eq="miroir"] .lcd-spectre i::before { display: none; }
-body[data-eq="eteint"] .lcd-spectre { visibility: hidden; }
-/* loudness : les enceintes poussent plus fort */
-body.loudness.cd-tourne .hp-boomer { animation-name: basse-fort; }
-@keyframes basse-fort { to { transform: scale(1.075); filter: brightness(1.22); } }
-
-/* ─────────────────────────────── LA TRAPPE ─────────────────────────────── */
-.trappe { grid-column: 1 / -1; display: grid; gap: 0; margin-top: -4px; }
-.trappe-poignee {
-  justify-self: center; display: inline-flex; align-items: center; gap: 10px; min-height: 34px; padding: 0 16px;
-  font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--hifi-encre); opacity: .6;
-  border-radius: 0 0 10px 10px; transition: opacity .2s;
-}
-.trappe-poignee:hover, .trappe.ouverte .trappe-poignee { opacity: 1; }
-.trappe-poignee i { width: 22px; height: 4px; border-radius: 2px; background: var(--hifi-trait); box-shadow: inset 0 1px 2px rgba(0,0,0,.35); position: relative; }
-.trappe-poignee i::after { content: ""; position: absolute; left: 50%; top: -5px; width: 7px; height: 7px; margin-left: -3.5px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s; opacity: .7; }
-.trappe.ouverte .trappe-poignee i::after { transform: translateY(5px) rotate(225deg); }
-.trappe-panneau {
-  display: flex; flex-wrap: wrap; align-items: end; gap: 16px 28px; padding: 16px 18px 18px; border-radius: 12px;
-  background: var(--hifi-creux); color: #e9eaee; box-shadow: inset 0 3px 12px rgba(0,0,0,.5);
-  transform-origin: top; animation: trappe .38s cubic-bezier(.2,.9,.3,1.15) both;
-}
-@keyframes trappe { from { transform: perspective(600px) rotateX(-70deg); opacity: 0; } }
-.bidouille { display: grid; gap: 8px; }
-.bidouille-ligne { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.bidouille-nom { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
-.leds { display: flex; gap: 9px; }
-.led-choix { --c: #888; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--c) 40%, #fff), var(--c) 55%, color-mix(in srgb, var(--c) 60%, #000)); box-shadow: 0 0 0 2px #0b0c0e, 0 1px 0 3px rgba(255,255,255,.08); transition: transform .12s, box-shadow .2s; }
-.led-choix:hover { transform: scale(1.1); }
-.led-choix:active { transform: scale(.9); }
-.led-choix[aria-checked="true"] { box-shadow: 0 0 0 2px #0b0c0e, 0 0 0 4px var(--c), 0 0 14px 3px var(--c); }
-.led-choix[data-val="origine"] { --c: #9aa0a8; background: conic-gradient(#8fdcff 0 50%, #ffb35c 50%); }
-.led-choix[data-val="glacier"] { --c: #8fdcff; } .led-choix[data-val="ambre"] { --c: #ffb35c; } .led-choix[data-val="menthe"] { --c: #8dffc4; }
-.led-choix[data-val="rose"] { --c: #ff9bd2; } .led-choix[data-val="blanc"] { --c: #f4f6ff; }
-.segments { display: inline-flex; padding: 3px; border-radius: 9px; background: #0b0c0e; gap: 2px; }
-.segments button { min-height: 32px; padding: 0 11px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #b9bcc4; transition: background-color .15s, color .15s; }
-.segments button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 2px 4px rgba(0,0,0,.4); }
-.glissiere { --pos: 0; position: relative; display: grid; grid-template-columns: repeat(3, 56px); height: 34px; border-radius: 17px; background: #0b0c0e; box-shadow: inset 0 2px 5px rgba(0,0,0,.6); }
-.glissiere button { position: relative; z-index: 1; font-size: 12px; font-weight: 700; color: #8d9098; transition: color .2s; }
-.glissiere button[aria-checked="true"] { color: #111; }
-.glissiere-curseur { position: absolute; top: 3px; left: 3px; width: 50px; height: 28px; border-radius: 14px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 4px rgba(0,0,0,.5), inset 0 1px 0 #fff; transform: translateX(calc(var(--pos) * 56px)); transition: transform .28s cubic-bezier(.3,1.4,.5,1); }
-.interrupteur-mini { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #d9dbe0; background: linear-gradient(#3e4148, #2a2c31); box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 3px 0 #0b0c0e, 0 4px 6px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s; }
-.interrupteur-mini:active, .interrupteur-mini[aria-pressed="true"] { transform: translateY(2px); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 1px 0 #0b0c0e, 0 1px 2px rgba(0,0,0,.4); }
-.interrupteur-mini .led { width: 7px; height: 7px; border-radius: 50%; background: #3a1714; transition: background .2s, box-shadow .2s; }
-.interrupteur-mini[aria-pressed="true"] .led { background: #ff5a3c; box-shadow: 0 0 8px 1px rgba(255,90,60,.8); }
-.bouton-demo { min-height: 36px; padding: 0 16px; border-radius: 18px; font-size: 12px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #111; background: linear-gradient(#ffd56b, #e9a93a); box-shadow: 0 3px 0 #8a5a12, 0 5px 8px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s; }
-.bouton-demo:active, body.demo .bouton-demo { transform: translateY(2px); box-shadow: 0 1px 0 #8a5a12, 0 2px 3px rgba(0,0,0,.4); }
-body.demo .bouton-demo { animation: arc-en-ciel 1.2s linear infinite; }
-
-/* ─────────────────────────────── LA CURIOSITÉ ─────────────────────────────── */
-.ensuite-mystere { font-weight: 600; font-style: italic; color: var(--encre); }
-.ensuite-mystere::before { content: "? "; font-style: normal; color: var(--aiguille); }
-.ensuite-maintenant { font-size: 14px; color: var(--encre-2); }
-.cap-libre { background: transparent; box-shadow: inset 0 0 0 1.5px var(--encre-3); color: var(--encre-2); }
-.devinette { display: grid; gap: 8px; margin: 6px 0 2px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--aiguille) 8%, var(--fond)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--aiguille) 30%, transparent); animation: sortie .4s cubic-bezier(.2,.9,.3,1.1) both; }
-.devinette-question { font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
-.devinette-score { font-weight: 500; font-size: 13px; color: var(--encre-2); }
-.devinette-choix { display: flex; flex-wrap: wrap; gap: 6px; }
-.devinette-option { min-height: 38px; padding: 0 13px; border-radius: 999px; font-size: 14px; font-weight: 600; background: var(--fond); box-shadow: inset 0 0 0 1.5px var(--trait); transition: background-color .2s, color .2s, transform .1s; }
-.devinette-option:not(:disabled):hover { transform: translateY(-1px); box-shadow: inset 0 0 0 1.5px var(--encre-3); }
-.devinette-option.bonne { background: var(--aiguille); color: var(--sur-aiguille); box-shadow: none; animation: bien-vu .5s cubic-bezier(.3,1.6,.5,1); }
-.devinette-option.fausse { text-decoration: line-through; opacity: .6; }
-.devinette-option:disabled:not(.bonne):not(.fausse) { opacity: .45; }
-@keyframes bien-vu { 40% { transform: scale(1.12); } }
-@media (max-width: 640px) {
-  .devinette { grid-column: 1 / -1; }
-  .trappe-panneau { gap: 14px 18px; padding: 14px; }
-  .glissiere { grid-template-columns: repeat(3, 52px); }
-  .glissiere-curseur { width: 46px; transform: translateX(calc(var(--pos) * 52px)); }
-}
-@media (prefers-reduced-motion: reduce) { .plateau-reflet { animation: none; } }
-/* trois pilules + le volume sur une seule ligne */
-@media (min-width: 761px) {
-  .hifi-commandes { column-gap: 18px; }
-  .hifi-actions .pilule { padding: 0 15px; }
-}
-
-/* ─────────────────────────────── MISE EN PAGE DU TEXTE ───────────────────────────────
-   Des lignes équilibrées, pas de mot tout seul en fin de paragraphe. */
-h1, h2, h3, .maintenant-titre, .pupitre-titre, .avis-titre { text-wrap: balance; }
-p, li, .livret-texte { text-wrap: pretty; }
-.allumage-conseil { max-width: 52ch; }
-.allumage-libre { max-width: 44ch; }
-
-/* le nom sous la molette de volume, toujours */
-.bouton-rotatif-hifi { grid-auto-flow: row; justify-items: center; gap: 6px; }
-.bouton-rotatif-hifi .bouton-rotatif-nom { display: block !important; font-size: 10px; letter-spacing: .18em; }
-
-/* le sélecteur de source, façon « FUNCTION » des chaînes : deux positions, une diode chacune */
-.selecteur-source { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 14px; background: var(--hifi-creux); box-shadow: inset 0 2px 6px rgba(0,0,0,.5); }
-.selecteur-source-nom { padding: 0 8px 0 6px; font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #8d9098; }
-.selecteur-source button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px; border-radius: 10px; font-size: 13px; font-weight: 700; color: #b9bcc4; white-space: nowrap; transition: background-color .2s, color .2s; }
-.selecteur-source button b { font-size: 11px; min-width: 18px; padding: 1px 5px; border-radius: 9px; background: rgba(255,255,255,.1); text-align: center; }
-.selecteur-source .led { width: 6px; height: 6px; border-radius: 50%; background: #2c2e33; transition: background .2s, box-shadow .2s; }
-.selecteur-source button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 4px rgba(0,0,0,.4); }
-.selecteur-source button[aria-checked="true"] .led { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
-/* le cœur : seulement en « Juste la musique », discret */
-.pilule-coeur { display: none; flex: none !important; width: 42px; padding: 0 !important; justify-content: center; font-size: 17px; }
-body.epure .pilule-coeur { display: inline-flex; }
-.pilule-coeur.est-garde { color: var(--aiguille); }
-
-/* les réglages inutiles, toujours à vue */
-.trappe { margin-top: 0; gap: 8px; }
-.trappe-titre { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; opacity: .55; padding-top: 4px; }
-.trappe-panneau { animation: none; }
-/* rétroéclairage */
-body[data-dimmer="2"] .lcd { filter: brightness(.72) saturate(.9); }
-body[data-dimmer="1"] .lcd { filter: brightness(.45) saturate(.8); text-shadow: none; }
-body[data-dimmer="1"] .hifi-veille { opacity: .5; }
-
-/* ─────────────────────────────── LES ENCEINTES ───────────────────────────────
-   Plus grandes, et pas tout à fait classiques : vis apparentes, tweeter dans un pavillon,
-   membrane à nervures, anneau lumineux, vumètre à diodes, évent bass-reflex. */
-@media (min-width: 961px) { .hifi { grid-template-columns: minmax(96px, 180px) minmax(0, 980px) minmax(96px, 180px); max-width: 1420px; } }
-.hifi-enceinte {
-  aspect-ratio: 1 / 2.75; padding: 18% 12% 14%; gap: 7%; grid-template-rows: auto auto auto auto 1fr; overflow: hidden;
-  background:
-    radial-gradient(circle at 14px 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at calc(100% - 14px) 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at 14px calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    var(--hifi-corps);
-}
-.hp-plaque { justify-self: center; font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .12em; color: var(--hifi-encre); opacity: .55; text-align: center; line-height: 1; }
-.hp-plaque small { display: block; font-family: var(--texte); font-weight: 600; font-size: 8px; letter-spacing: .2em; text-transform: uppercase; margin-top: 3px; }
-.hp-tweeter { position: relative; width: 52%; aspect-ratio: 1 / 1; border-radius: 26%; background: radial-gradient(circle, #1a1b1e 0 30%, #2c2e33 46%, #3d4046 62%, #2a2c30 70%); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.6); }
-.hp-tweeter i { position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fbfbfb 0 12%, #a7adb4 30%, #33363c 70%); }
-.hp-boomer {
-  position: relative; width: 96%; aspect-ratio: 1 / 1; border-radius: 50%;
-  background: radial-gradient(circle, transparent 0 66%, #121315 66.5% 71%, var(--hifi-anneau) 72% 100%);
-  box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5);
-}
-.hp-cone { /* membrane nervurée, suspension en caoutchouc, cache-noyau qui brille */
-  position: absolute; inset: 9%; border-radius: 50%;
-  background:
-    radial-gradient(circle at 42% 38%, rgba(255,255,255,.55) 0 3%, transparent 9%),
-    radial-gradient(circle, #3b3e44 0 17%, #1d1e22 18% 20%, transparent 21%),
-    repeating-conic-gradient(from 0deg, rgba(255,255,255,.07) 0 4deg, rgba(0,0,0,.18) 4deg 10deg),
-    radial-gradient(circle, #2b2d32 0 72%, #3a3c42 78%, #18191c 84%, #2e3035 92%, #141517 100%);
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,.4);
-  transition: transform .1s;
-}
-.hp-boomer i { inset: 4%; box-shadow: 0 0 0 2px var(--lcd-encre); }
-body.cd-tourne .hp-boomer { animation: none; }
-body.cd-tourne .hp-cone { animation: pompe var(--battement, .5s) ease-in-out infinite alternate; }
-body.loudness.cd-tourne .hp-cone { animation-name: pompe-fort; }
-@keyframes pompe { to { transform: scale(1.035); filter: brightness(1.12); } }
-@keyframes pompe-fort { to { transform: scale(1.07); filter: brightness(1.25); } }
-/* l'anneau lumineux */
-body[data-lumieres="eteint"] .hp-boomer i { opacity: 0 !important; }
-body[data-lumieres="tempo"].cd-tourne .hp-boomer i { animation: anneau var(--battement, .5s) ease-in-out infinite alternate; }
-@keyframes anneau { from { opacity: .35; } to { opacity: 1; box-shadow: 0 0 0 2px var(--lcd-encre), 0 0 22px 4px var(--lcd-halo); } }
-body[data-lumieres="arc"] .hp-boomer i { opacity: 1; box-shadow: 0 0 0 2px #ff6ec7, 0 0 20px 3px rgba(255,110,199,.6); animation: arc-en-ciel 3s linear infinite; }
-/* le vumètre */
-.hp-vu { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; width: 80%; justify-self: center; padding: 5px 6px; border-radius: 4px; background: #0d0e10; box-shadow: inset 0 1px 3px rgba(0,0,0,.7); }
-.hp-vu b { height: 5px; border-radius: 1px; background: #23262b; transition: background .08s, box-shadow .08s; }
-.hp-vu b.on { background: var(--lcd-encre); box-shadow: 0 0 5px var(--lcd-halo); }
-.hp-vu b.on:nth-child(n+8) { background: #ffcf5c; box-shadow: 0 0 5px rgba(255,200,80,.6); }
-.hp-vu b.on:nth-child(10) { background: #ff5a3c; box-shadow: 0 0 5px rgba(255,90,60,.7); }
-body[data-dimmer="1"] .hp-vu b.on { filter: brightness(.6); box-shadow: none; }
-/* l'évent bass-reflex */
-.hp-event { align-self: end; justify-self: center; width: 46%; aspect-ratio: 3.4 / 1; border-radius: 999px; background: radial-gradient(60% 90% at 50% 40%, #050506, #1d1e22 70%, #34363c); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8); }
-body.loudness.cd-tourne .hp-event { animation: souffle var(--battement, .5s) ease-in-out infinite alternate; }
-@keyframes souffle { to { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8), 0 0 14px 2px var(--lcd-halo); } }
-/* la grille, qu'on met ou qu'on enlève */
-.hp-grille {
-  position: absolute; inset: 6px; border-radius: 12px; pointer-events: none;
-  background:
-    radial-gradient(circle, rgba(0,0,0,.72) 0 1.1px, transparent 1.6px) 0 0 / 5px 5px,
-    linear-gradient(160deg, rgba(255,255,255,.14), rgba(0,0,0,.1)),
-    #2a2c31;
-  box-shadow: inset 0 0 0 3px rgba(0,0,0,.25), inset 0 0 18px rgba(0,0,0,.5);
-  transform: translateY(-104%); transition: transform .5s cubic-bezier(.3,1.2,.4,1);
-}
-body.grilles .hp-grille { transform: none; }
-.hifi-enceinte .hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .1em; color: #c9ccd2; opacity: .6; }
-
-/* devine l'époque, dans la ligne du style */
-.devine-ici, .devine-option {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 30px; min-height: 26px; padding: 0 9px; margin: 0 2px; border-radius: 999px;
-  font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--aiguille);
-  box-shadow: inset 0 0 0 1.5px currentColor; transition: background-color .15s, color .15s, transform .1s;
-}
-.devine-ici { animation: clin 2.4s ease-in-out 1s 2; }
-@keyframes clin { 50% { background: color-mix(in srgb, var(--aiguille) 16%, transparent); } }
-.devine-ici:hover, .devine-option:hover { background: var(--aiguille); color: var(--sur-aiguille); }
-.devine-choix { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; animation: sortie .3s cubic-bezier(.2,.9,.3,1.1) both; }
-.devine-reponse { display: inline-block; animation: bien-vu .5s cubic-bezier(.3,1.6,.5,1); }
-.devine-reponse.bonne { background: var(--aiguille); color: var(--sur-aiguille); padding: 1px 7px; border-radius: 6px; }
-.devine-verdict { font-weight: 500; letter-spacing: .02em; text-transform: none; color: var(--encre-2); }
-.icone-coeur { font-size: 17px; line-height: 1; }
-#poste-garder.est-garde .icone-coeur { color: var(--aiguille); }
-@media (max-width: 760px) {
-  .selecteur-source { width: 100%; }
-  .selecteur-source button { flex: 1; justify-content: center; }
-}
-
-/* ═══════════════════════════════ LA CHAÎNE, VERSION RANGÉE ═══════════════════════════════
-   Un afficheur au choix (le disque qui tourne avec son étiquette, ou l'écran LCD), la vidéo
-   à côté, les commandes en dessous. Puis un seul bloc : ton avis, ton mot, et la suite. */
-body .hifi .hifi-corps { grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "commandes" "trappe"; }
-body.video-machine .hifi .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); grid-template-areas: "haut haut" "afficheur ecran" "commandes commandes" "trappe trappe"; }
-body .hifi .emplacement-cd { grid-area: ecran; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 200px; align-self: center; justify-self: stretch; }
-.trappe { grid-area: trappe; }
-.afficheur { grid-area: afficheur; display: grid; min-width: 0; align-self: stretch; }
-.afficheur > .tiroir, .afficheur > .lcd { grid-area: auto; }
-body[data-affichage="disque"] .afficheur { grid-template-columns: auto minmax(0, 1fr); gap: clamp(14px, 2vw, 24px); align-items: center; }
-body[data-affichage="disque"] .afficheur > .lcd { display: none; }
-body[data-affichage="ecran"] .afficheur > .tiroir, body[data-affichage="ecran"] .afficheur > .etiquette { display: none; }
-.afficheur > .tiroir { width: clamp(150px, 17vw, 225px); align-self: center; }
-.afficheur > .lcd { min-height: 200px; }
-/* l'étiquette imprimée sur la façade, à côté du disque */
-.etiquette { display: grid; gap: 6px; align-content: center; min-width: 0; color: var(--hifi-encre); }
-.etiquette-haut { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: .14em; opacity: .55; font-variant-numeric: tabular-nums; }
-.etiquette-titre { font-family: var(--display); font-weight: var(--display-poids, 700); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.3rem, 2.1vw, 2rem); line-height: 1.06; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-wrap: balance; }
-.etiquette-artiste { font-size: clamp(.95rem, 1.2vw, 1.1rem); font-weight: 500; opacity: .8; overflow-wrap: anywhere; }
-.etiquette-ensuite { font-size: 13px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
-/* le choix d'affichage, en haut de la façade */
-.choix-affichage { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
-.choix-affichage button { min-height: 28px; padding: 0 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; transition: background-color .15s, color .15s; }
-.choix-affichage button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
-.hifi-haut .hifi-veille { margin-left: 10px; }
-/* le volume : un curseur, comme une table de mixage */
-.fader { display: grid; justify-items: center; gap: 4px; margin-left: auto; }
-.fader input { -webkit-appearance: none; appearance: none; width: 150px; height: 28px; background: transparent; cursor: pointer; --v: 60%; }
-.fader input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--lcd-encre) var(--v), var(--hifi-creux) var(--v)); box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
-.fader input::-moz-range-track { height: 6px; border-radius: 3px; background: var(--hifi-creux); }
-.fader input::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--lcd-encre); }
-.fader input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 28px; margin-top: -11px; border-radius: 4px; background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45), inset 0 1px 0 #fff; }
-.fader input::-moz-range-thumb { width: 18px; height: 28px; border: 0; border-radius: 4px; background: linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45); }
-.fader-nom { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--hifi-encre); opacity: .6; }
-.ios .fader { display: none; }
-.pilule-coeur, body.epure .pilule-coeur { display: inline-flex; }
-/* le tiroir ouvert à la main : on voit le disque arrêté */
-.tiroir.ouvert .disque-tiroir { animation-play-state: paused; }
-
-/* le pupitre : un seul bloc */
-.pupitre {
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: "onglets onglets" "maintenant orienter";
-  gap: 18px clamp(22px, 3vw, 40px); padding: clamp(18px, 2.2vw, 26px); border-radius: var(--rayon-objet); background: var(--fond-2); box-shadow: var(--relief-fort);
-}
-.pupitre-onglets { grid-area: onglets; display: flex; gap: 6px; padding-bottom: 14px; border-bottom: 1px solid var(--trait); }
-.pupitre-onglets button { min-height: 38px; padding: 0 16px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--encre-2); transition: background-color .15s, color .15s; }
-.pupitre-onglets button b { font-size: 12px; margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--trait); color: var(--encre); }
-.pupitre-onglets button[aria-selected="true"] { background: var(--encre); color: var(--fond); }
-.pupitre-onglets button[aria-selected="true"] b { background: rgba(255,255,255,.2); color: inherit; }
-.pupitre .maintenant { grid-area: maintenant; display: block; padding: 0; background: none; box-shadow: none; border-radius: 0; animation: none; }
-.pupitre .maintenant-texte { display: grid; gap: 8px; justify-items: start; }
-.maintenant-qui { font-size: 15px; color: var(--encre-2); }
-.maintenant-qui b { color: var(--encre); font-weight: 600; }
-.pupitre .maintenant-note { font-size: clamp(1.15rem, 1.6vw, 1.35rem); line-height: 1.4; margin-top: 2px; }
-.pupitre .orienter { grid-area: orienter; display: grid; gap: 12px; align-content: start; }
-.pupitre .pupitre-titre { margin-bottom: 0; }
-.pupitre .ensuite { padding-top: 12px; }
-.cap.a-bout { opacity: .55; }
-body.epure .ecran-machine { min-height: 0; align-content: start; }
-/* fermer, partout */
-.touche-fermer { font-size: 22px; line-height: 1; }
-.livret-machine { position: relative; }
-.livret-fermer { position: absolute; top: 18px; right: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; line-height: 1; background: var(--fond-2); box-shadow: var(--relief); }
-
-@media (max-width: 1100px) {
-  body .hifi .hifi-corps, body.video-machine .hifi .hifi-corps { grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "ecran" "commandes" "trappe"; }
-  body.video-machine .hifi .hifi-commandes { flex-direction: row; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--hifi-trait); padding-top: 14px; }
-}
-@media (max-width: 760px) {
-  .afficheur > .tiroir { width: 104px; }
-  .etiquette-titre { font-size: 1.2rem; }
-  .etiquette-ensuite { display: none; }
-  .fader { flex: 1; margin-left: 0; }
-  .fader input { width: 100%; }
-  .hifi-modele, .hifi-haut .hifi-veille { display: none; }
-  .pupitre { grid-template-columns: minmax(0, 1fr); grid-template-areas: "onglets" "maintenant" "orienter"; padding: 16px; }
-  .pupitre-onglets button { flex: 1; padding: 0 10px; }
-  .pupitre .maintenant-style, .pupitre .maintenant-qui { grid-column: auto; }
-}
-
-/* « Cosmétique » : les petits réglages se déplient d'un bouton de la chaîne, et se replient */
-.hifi .trappe { display: none; }
-body.cosmetique .hifi .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,.9,.3,1.15) both; transform-origin: top; }
-.trappe-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.trappe-fermer { width: 32px; height: 32px; border-radius: 50%; font-size: 20px; line-height: 1; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); }
-.pilule-cosmetique::before { content: "✦"; font-size: 12px; opacity: .7; }
-.pilule-cosmetique[aria-expanded="true"] { box-shadow: inset 0 2px 5px rgba(0,0,0,.25); }
-.pilule-cosmetique[aria-expanded="true"]::before { opacity: 1; color: var(--aiguille); }
-.livret-genre { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--aiguille); margin: 14px 0 -6px; }
-
-/* ═══════════════════════════════ VERSION FINALE : LE POSTE, ORIENTER, PLUS D'INFOS ═══════════════════════════════ */
-/* le pupitre ne sert plus qu'à orienter, par catégories */
-.pupitre { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: none; gap: 18px; }
-.pupitre-tete { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
-.pupitre-tete .pupitre-titre { font-size: clamp(1.25rem, 1.9vw, 1.6rem); margin: 0; }
-.pupitre-tete .pupitre-aide { font-size: 14px; max-width: 62ch; }
-.axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 30px; }
-.axe { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; }
-.axe-nom { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--encre-2); }
-.axe-paire { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 13px; background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); min-width: 0; }
-.axe-choix { min-height: 42px; padding: 0 10px; border-radius: 10px; font-weight: 600; font-size: 14px; line-height: 1.15; transition: background-color .15s, color .15s, transform .08s; }
-.axe-choix:hover:not([aria-pressed="true"]):not(:disabled) { background: var(--fond-2); }
-.axe-choix:active { transform: scale(.97); }
-.axe-choix[aria-pressed="true"] { background: var(--encre); color: var(--fond); }
-.axe-choix b { font-size: 12px; margin-left: 3px; padding: 1px 7px; border-radius: 999px; background: var(--trait); }
-.axe-choix[aria-pressed="true"] b { background: rgba(255,255,255,.22); }
-.axe-choix span[aria-hidden] { opacity: .6; }
-.axe-choix.a-bout { opacity: .5; }
-.pente { font-size: 14px; color: var(--encre-2); }
-.pente b { color: var(--aiguille); }
-.pupitre .ensuite { padding-top: 14px; }
-@media (max-width: 860px) { .axes { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 640px) {
-  .axe { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .axe-choix { font-size: 13px; padding: 0 6px; }
-}
-
-/* le post-it : ton mot sur le morceau, collé sur l'enceinte de droite (sous la chaîne sur petit écran) */
-.post-it {
-  --penche: -2deg;
-  position: absolute; z-index: 4; right: -14px; top: 8%;
-  width: 206px; padding: 26px 18px 14px;
-  background: linear-gradient(170deg, #fff6b8, #fde98a 70%, #f7dc6a);
-  color: #2b2a33; box-shadow: 0 14px 24px -8px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.12);
-  transform: rotate(var(--penche)); transform-origin: 50% 0;
-}
-.post-it::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: linear-gradient(transparent, rgba(0,0,0,.05)); pointer-events: none; }
-.post-it-scotch { position: absolute; top: -11px; left: 50%; width: 78px; height: 24px; margin-left: -39px; transform: rotate(calc(var(--penche) * -1.6)); background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.12); backdrop-filter: blur(1px); }
-.post-it-texte { font-family: "Caveat", "Bradley Hand", cursive; font-weight: 500; font-size: 23px; line-height: 1.12; overflow-wrap: anywhere; text-wrap: pretty; }
-.post-it-signe { margin-top: 8px; text-align: right; font-family: "Caveat", cursive; font-weight: 700; font-size: 17px; opacity: .6; }
-.post-it-signe::before { content: "— "; }
-.post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
-@keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
-@media (max-width: 1239px) {
-  .hifi .post-it { position: relative; right: auto; top: auto; grid-column: 1 / -1; justify-self: center; width: auto; max-width: min(420px, 92%); margin-top: 6px; }
-}
-@media (prefers-reduced-motion: reduce) { .post-it.colle { animation: none; } }
-.hifi-actions .pilule-coeur { width: auto; padding: 0 16px !important; gap: 7px; font-size: 14px; }
-.pilule-coeur span[aria-hidden] { font-size: 15px; }
-.pilule-coeur.est-garde span[aria-hidden] { color: var(--aiguille); }
-
-/* ─── Oriente la suite : trois réglettes ─── */
-.sources { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding-bottom: 14px; border-bottom: 1px solid var(--trait); }
-.sources-nom { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--encre-2); margin-right: 6px; }
-.source-choix { min-height: 38px; padding: 0 16px; border-radius: 999px; font-weight: 600; font-size: 14px; box-shadow: inset 0 0 0 1px var(--trait); transition: background-color .15s, color .15s; }
-.source-choix b { font-size: 12px; margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--trait); }
-.source-choix[aria-pressed="true"] { background: var(--encre); color: var(--fond); box-shadow: none; }
-.source-choix[aria-pressed="true"] b { background: rgba(255,255,255,.22); }
-.rails { display: grid; gap: 14px; }
-.rail-ligne { display: grid; grid-template-columns: minmax(130px, 170px) minmax(0, 1fr) minmax(130px, 170px); align-items: center; gap: 14px; }
-.rail-bout { min-height: 42px; padding: 0 12px; border-radius: 12px; font-weight: 600; font-size: 14px; line-height: 1.15; background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); transition: background-color .15s, color .15s, transform .08s; }
-.rail-bout:hover:not([aria-pressed="true"]):not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--encre-3); }
-.rail-bout:active { transform: scale(.97); }
-.rail-bout[aria-pressed="true"] { background: var(--encre); color: var(--fond); box-shadow: none; }
-.rail-bout span[aria-hidden] { opacity: .55; }
-.rail-bout.a-bout { opacity: .5; }
-.rail { position: relative; display: grid; gap: 7px; padding: 4px 0; cursor: pointer; }
-.rail-nom { justify-self: center; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--encre-2); }
-.rail-piste { position: relative; display: block; height: 8px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, var(--aiguille) 18%, var(--fond)), color-mix(in srgb, var(--aiguille) 45%, var(--fond))); box-shadow: inset 0 1px 2px rgba(0,0,0,.15); }
-.rail-piste::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--trait); }
-.rail-actuel, .rail-ensuite { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; transition: left .6s cubic-bezier(.3,1.3,.5,1); }
-.rail-actuel { background: var(--aiguille); box-shadow: 0 0 0 3px var(--fond-2), 0 2px 6px rgba(0,0,0,.25); z-index: 1; }
-.rail-ensuite { background: var(--fond-2); box-shadow: inset 0 0 0 2.5px var(--aiguille); }
-/* quand on pousse : des chevrons qui filent vers le côté choisi */
-.rail.pousse-d .rail-piste::after, .rail.pousse-g .rail-piste::after {
-  content: ""; position: absolute; inset: -6px 0; pointer-events: none;
-  background: repeating-linear-gradient(90deg, transparent 0 14px, color-mix(in srgb, var(--aiguille) 55%, transparent) 14px 16px);
-  -webkit-mask: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
-  animation: file-d 1s linear infinite;
-}
-.rail.pousse-g .rail-piste::after { animation-name: file-g; }
-@keyframes file-d { from { background-position: 0 0; } to { background-position: 16px 0; } }
-@keyframes file-g { from { background-position: 0 0; } to { background-position: -16px 0; } }
-.autres { display: flex; flex-wrap: wrap; gap: 8px; }
-.autre-choix { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 999px; font-weight: 600; font-size: 14px; background: var(--fond); box-shadow: inset 0 0 0 1px var(--trait); }
-.autre-choix[aria-pressed="true"] { background: var(--encre); color: var(--fond); box-shadow: none; }
-.pouce { width: 16px; height: 16px; }
-.repere-actuel, .repere-ensuite { display: inline-block; width: 11px; height: 11px; border-radius: 50%; vertical-align: -1px; }
-.repere-actuel { background: var(--aiguille); }
-.repere-ensuite { box-shadow: inset 0 0 0 2px var(--aiguille); }
-@media (max-width: 640px) {
-  .rail-ligne { grid-template-columns: 1fr 1fr; grid-template-areas: "rail rail" "g d"; gap: 8px 8px; }
-  .rail-ligne .rail { grid-area: rail; }
-  .rail-ligne .rail-g { grid-area: g; } .rail-ligne .rail-d { grid-area: d; }
-  .rail-bout { font-size: 13px; }
-  .rails { gap: 18px; }
-}
-/* Ma sélection n'apparaît qu'à partir de deux morceaux */
-body.sans-selection .bouton-trouvailles { display: none; }
-
-/* la vidéo sort de l'écran : pause, et une pastille pour remonter */
-.pause-defile {
-  position: fixed; z-index: 40; left: 50%; top: calc(86px + env(safe-area-inset-top)); transform: translateX(-50%);
-  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 999px;
-  background: var(--encre); color: var(--fond); font-size: 14px; font-weight: 500; box-shadow: 0 10px 24px rgba(0,0,0,.25);
-  animation: sortie .35s cubic-bezier(.2,.9,.3,1.1) both;
-}
-.pause-defile b { font-weight: 700; }
-@media (max-width: 640px) { .pause-defile { top: calc(72px + env(safe-area-inset-top)); font-size: 13px; white-space: nowrap; } }
-
-/* le post-it suit l'enceinte (placé en JS) ; les longs mots s'écrivent un peu plus petit */
-.post-it.long .post-it-texte { font-size: 19px; }
-@media (min-width: 1240px) { .post-it { width: 196px; } }
-/* téléphone : une chaîne compacte, pour que la vidéo reste à l'écran pendant qu'on oriente */
-@media (max-width: 640px) {
-  .afficheur > .tiroir { width: 64px; border-radius: 10px; }
-  body[data-affichage="disque"] .afficheur { gap: 12px; }
-  .etiquette { gap: 2px; }
-  .etiquette-haut { font-size: 10px; }
-  .etiquette-titre { font-size: 1.05rem; -webkit-line-clamp: 2; }
-  .etiquette-artiste { font-size: .9rem; }
-  .afficheur > .lcd { min-height: 0; padding: 10px 12px; grid-template-rows: auto auto; gap: 4px; }
-  .afficheur > .lcd .lcd-spectre, .afficheur > .lcd .lcd-suite, .afficheur > .lcd .lcd-bas { display: none; }
-  .afficheur > .lcd .lcd-defile { font-size: 17px; }
-  .rail-ligne { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: none; gap: 8px; }
-  .rail-ligne .rail, .rail-ligne .rail-g, .rail-ligne .rail-d { grid-area: auto; }
-  .rail-bout { padding: 0 6px; font-size: 12.5px; min-height: 44px; }
-  .rails { gap: 12px; }
-  .pupitre .post-it { position: relative; right: auto; top: auto; justify-self: center; width: auto; max-width: min(330px, 92%); margin: 6px 0 4px; }
-  .pupitre-tete .pupitre-aide { font-size: 13px; }
-}
-@media (max-width: 640px) {
-  .hifi-corps, body.video-machine .hifi-corps { padding: 12px; gap: 10px; }
-  .hifi-haut { padding-bottom: 8px; }
-  .hifi-marque { font-size: 12px; }
-  .rond { width: 46px; height: 46px; }
-  .rond-lecture { width: 56px; height: 56px; }
-  .hifi-commandes { gap: 10px; padding-top: 10px; }
-  .hifi-actions { flex: none; flex-wrap: nowrap; gap: 8px; }
-  .hifi-actions .pilule-coeur, .hifi-actions .pilule-cosmetique { flex: none; width: 46px; padding: 0 !important; justify-content: center; font-size: 0; }
-  .hifi-actions .pilule-coeur span[aria-hidden] { font-size: 17px; }
-  .hifi-actions .pilule-cosmetique::before { font-size: 16px; opacity: .85; }
-  .fader { flex: 1; }
-  .pupitre-tete .pupitre-aide { display: none; }
-  .pupitre { gap: 14px; }
-}
-.pupitre-tete { display: grid; gap: 4px; }
-.pupitre-consigne { font-size: 15px; color: var(--encre); }
-.pupitre-tete .pupitre-aide { font-size: 13px; color: var(--encre-2); }
-@media (max-width: 640px) { .pupitre-tete .pupitre-aide { display: block; } .pupitre-consigne { font-size: 14px; } }
-
-/* la vidéo dans un coin quand on descend : la musique continue, et la page lui laisse sa place */
-.coin-video { position: fixed; z-index: 30; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: 356px; display: grid; gap: 6px; }
-.emplacement-coin { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border-radius: 12px; background: #000; box-shadow: 0 16px 34px rgba(0,0,0,.35); }
-.coin-retour { justify-self: end; min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--encre); color: var(--fond); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
-/* ordinateur : tant qu'une vidéo YouTube joue, le bas de page garde une marge à droite pour elle */
-@media (min-width: 1100px) {
-  body.video-machine .pupitre, body.video-machine .livret-machine, body.video-machine .avis-machine { width: min(1220px, calc(100% - 392px)); justify-self: start; }
-}
-/* tablette et téléphone : la vidéo en bas, et de quoi faire défiler la page au-dessus */
-@media (max-width: 1099px) {
-  .coin-video { left: 12px; right: 12px; width: auto; max-width: 420px; margin-left: auto; }
-  body.video-coin .ecran-machine { padding-bottom: 300px; }
-}
-
-/* ─── Oriente la suite : des boutons simples, rangés par deux ─── */
-.rails { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 18px; }
-.reglage { display: grid; gap: 6px; min-width: 0; }
-.reglage-nom { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--encre-2); padding-left: 4px; }
-.reglage-paire { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.reglage-paire .rail-bout { min-height: 48px; font-size: 14px; }
-@media (max-width: 900px) { .rails { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 640px) { .reglage-paire .rail-bout { font-size: 13.5px; min-height: 46px; } }
-.rail-bout.a-bout { opacity: 1; }
-.rails { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
-.reglage-paire .rail-bout { white-space: nowrap; padding: 0 10px; }
-@media (max-width: 900px) { .rails { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 380px) { .reglage-paire .rail-bout { white-space: normal; } }
-.rail-passer { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
-.autres:empty { display: none; }
-
-/* « Des pubs ? » : une note discrète sous le poste, plus une carte qui pousse les réglages */
-.avis-pub { max-width: min(640px, 100%); padding: 10px 14px; gap: 6px 12px; font-size: 14px; box-shadow: none; background: transparent; border: 1px dashed var(--trait); border-radius: 12px; }
-.avis-pub .avis-titre { font-family: var(--texte); font-weight: 700; font-size: 14px; display: inline; }
-.avis-pub p { margin: 0; line-height: 1.45; }
-.avis-pub .avis-titre + p { display: inline; margin-left: 6px; }
-.avis-pub .avis-actions { margin-top: 2px; gap: 6px 16px; }
-.avis-pub .gros-bouton { min-height: 32px; padding: 0 14px; font-size: 13px; box-shadow: none; }
-.avis-pub .lien-bouton { font-size: 13px; }
-
-/* ─────────────────────────────── MA SÉLECTION : des boîtiers de CD sur l'étagère ─────────────────────────────── */
-.bac-liste.etagere { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 14px; padding: 18px 20px 26px; }
-.boitier { position: relative; min-width: 0; transform: rotate(var(--incl, 0deg)); transition: transform .35s cubic-bezier(.2,.9,.3,1.25); }
-.boitier:hover, .boitier:focus-within { transform: translateY(-5px) rotate(0deg); z-index: 2; }
-.boitier-morceau { display: grid; gap: 1px; width: 100%; text-align: left; border-radius: 6px; }
-.boitier-cd { position: relative; display: block; margin-bottom: 8px; }
-.boitier-etui { position: relative; display: block; border-radius: 3px 5px 5px 3px; overflow: hidden; background: #111; box-shadow: 0 8px 14px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.35) inset; z-index: 1; }
-.boitier-etui .pochette, .boitier-etui .pochette-mini { width: 100%; display: block; border-radius: 0; box-shadow: none; }
-.boitier-dos { position: absolute; z-index: 2; left: 0; top: 0; bottom: 0; width: 9%; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.18) 70%, rgba(0,0,0,.25)); }
-.boitier-reflet { position: absolute; z-index: 2; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 72%, rgba(255,255,255,.12) 100%); pointer-events: none; }
-.boitier-disque { position: absolute; z-index: 0; top: 7%; bottom: 7%; right: 2%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, var(--fond) 0 11%, transparent 12%), conic-gradient(from 20deg, #e9e9ee, #b9bfd0, #f4f1ec, #c9b9d4, #e9e9ee); box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: transform .45s cubic-bezier(.2,.9,.3,1.25); }
-.boitier:hover .boitier-disque, .boitier:focus-within .boitier-disque { transform: translateX(26%); }
-.boitier-titre { display: block; font-weight: 600; font-size: 13px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.boitier-artiste { display: block; font-size: 12px; color: var(--encre-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.boitier-retirer { position: absolute; z-index: 3; top: -9px; right: -7px; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; line-height: 1; color: var(--aiguille); background: var(--fond); box-shadow: var(--relief), 0 0 0 1px var(--trait); opacity: 0; transform: scale(.8); transition: opacity .15s, transform .15s; }
-.boitier:hover .boitier-retirer, .boitier:focus-within .boitier-retirer { opacity: 1; transform: none; }
-@media (hover: none) { .boitier-retirer { opacity: 1; transform: none; } }
-@media (max-width: 380px) { .bac-liste.etagere { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .boitier, .boitier-disque { transition: none; } }
-
-/* « Repartir avec une cassette » */
-.cassette-bloc { display: flex; align-items: center; gap: 14px; }
-.cassette { position: relative; flex: none; width: 54px; height: 36px; border-radius: 5px; background: linear-gradient(#e9e4d8, #cfc8b8); box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: space-around; padding: 0 9px; transform: rotate(-4deg); }
-.cassette::before { content: ""; position: absolute; left: 7px; right: 7px; top: 5px; height: 9px; border-radius: 2px; background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
-.cassette::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 7px; border-radius: 3px 3px 0 0; background: rgba(0,0,0,.3); }
-.cassette i { position: relative; z-index: 1; width: 11px; height: 11px; margin-top: 10px; border-radius: 50%; background: #2a2a2e; box-shadow: 0 0 0 2px #f4f1ea inset; }
-.cassette-titre { font-weight: 700; font-size: 15px; line-height: 1.2; }
-.cassette-sous { font-size: 13px; color: var(--encre-2); line-height: 1.35; margin-top: 2px; }
-
-/* ─────────────────────────────── bidouilles ─────────────────────────────── */
-.hp-boomer, .hp-tweeter { cursor: pointer; }
-.hp-boomer.coup { animation: coup .5s cubic-bezier(.2,.8,.3,1); }
-.hp-boomer.coup .hp-cone { animation: coup-cone .5s cubic-bezier(.2,.8,.3,1); }
-@keyframes coup { 0% { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 0 var(--lcd-halo); } 100% { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 34px transparent; } }
-@keyframes coup-cone { 20% { transform: scale(.9); filter: brightness(.8); } 55% { transform: scale(1.06); filter: brightness(1.25); } }
-.hp-tweeter.ping { animation: ping .55s ease-out; }
-@keyframes ping { 0% { box-shadow: 0 1px 0 rgba(255,255,255,.4), inset 0 1px 3px rgba(0,0,0,.4), 0 0 0 0 var(--lcd-halo); transform: scale(.92); } 100% { box-shadow: 0 1px 0 rgba(255,255,255,.4), inset 0 1px 3px rgba(0,0,0,.4), 0 0 0 20px transparent; transform: none; } }
-.lcd { cursor: pointer; }
-.lcd.lcd-clic { animation: lcd-clic .3s ease-out; }
-@keyframes lcd-clic { 0% { filter: brightness(1.8) contrast(1.2); } }
-/* un morceau qui cogne fait trembler les enceintes */
-body.cd-tourne.energie-forte .hifi-enceinte { animation: tremble calc(var(--battement, .5s) * .5) linear infinite; }
-body.cd-tourne.energie-forte .hp-cone { animation-name: pompe-fort; }
-@keyframes tremble { 0%, 100% { translate: 0 0; } 25% { translate: .7px -.9px; } 50% { translate: -.8px .5px; } 75% { translate: .6px .8px; } }
-/* le post-it se déplace */
-.post-it { transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--penche)); }
-.hifi > .post-it { cursor: grab; touch-action: none; user-select: none; }
-.post-it.souleve { cursor: grabbing; z-index: 30; transition: box-shadow .15s; box-shadow: 0 28px 40px -10px rgba(0,0,0,.45), 0 4px 8px rgba(0,0,0,.15); transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(calc(var(--penche) * 2.2)) scale(1.04); }
-@media (prefers-reduced-motion: reduce) { body.cd-tourne.energie-forte .hifi-enceinte, .hp-boomer.coup, .hp-tweeter.ping { animation: none; } }
-
-/* ─────────────────────────────── la molette d'époque : une bande de radio qu'on règle ─────────────────────────────── */
-.cadran { display: grid; gap: 8px; margin: 4px 0 18px; }
-.cadran[hidden] { display: none; }
-.cadran-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.cadran-etat { font-size: 13px; color: var(--encre-2); font-weight: 500; }
-.cadran-bande {
-  position: relative; display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
-  height: 58px; padding: 0 6px; border-radius: 10px; overflow: hidden;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 calc(100% / 40 - 1px), color-mix(in srgb, var(--lcd-encre) 28%, transparent) calc(100% / 40 - 1px) calc(100% / 40)) left 6px top 8px / calc(100% - 12px) 8px no-repeat,
-    repeating-linear-gradient(90deg, transparent 0 calc(100% / 8 - 1px), color-mix(in srgb, var(--lcd-encre) 55%, transparent) calc(100% / 8 - 1px) calc(100% / 8)) left 6px top 8px / calc(100% - 12px) 14px no-repeat,
-    radial-gradient(120% 140% at 50% 120%, color-mix(in srgb, var(--lcd-encre) 16%, #0c0e12), #07080b 70%);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 rgba(255,255,255,.5);
-}
-.cadran-choix {
-  position: relative; z-index: 1; align-self: end; height: 36px;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; font-weight: 700; letter-spacing: .02em;
-  color: color-mix(in srgb, var(--lcd-encre) 62%, transparent); text-shadow: 0 0 6px var(--lcd-halo); white-space: nowrap;
-  transition: color .2s;
-}
-.cadran-choix:hover { color: var(--lcd-encre); }
-.cadran-choix[aria-checked="true"] { color: var(--lcd-encre); text-shadow: 0 0 10px var(--lcd-halo), 0 0 2px var(--lcd-encre); }
-.cadran-choix:focus-visible { outline: 2px solid var(--lcd-encre); outline-offset: -4px; border-radius: 6px; }
-.cadran-aiguille {
-  position: absolute; z-index: 2; top: 4px; bottom: 4px; width: 2px; margin-left: -1px; border-radius: 1px; pointer-events: none;
-  left: calc(6px + (100% - 12px) * (var(--pos, 0) + .5) / var(--n, 8));
-  background: #ff4a3d; box-shadow: 0 0 8px 1px rgba(255, 74, 61, .7);
-  transition: left .55s cubic-bezier(.3, 1.4, .5, 1);
-}
-.cadran-bande::after { /* le reflet de la vitre */
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
-  background: linear-gradient(180deg, rgba(255,255,255,.1), transparent 45%);
-}
-@media (max-width: 420px) { .cadran-choix { font-size: 11px; letter-spacing: 0; } .cadran-bande { padding: 0 2px; } }
-@media (prefers-reduced-motion: reduce) { .cadran-aiguille { transition: none; } }
-.cadran-aiguille { bottom: auto; height: 27px; }
-.cadran-aiguille::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -4px; border: 4px solid transparent; border-top: 5px solid #ff4a3d; border-bottom: 0; }
