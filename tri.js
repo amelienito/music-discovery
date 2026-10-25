@@ -856,10 +856,47 @@ function pullUp() {
   if (!courant || !lecteur) return;
   try { lecteur.seekTo(0, true); lecteur.playVideo(); } catch (e) {}
   vibre([20, 40, 20, 40, 60]);
+  grandEffet();
   const e = $('#ecran'), b = $('#t-pullup');
   [[e, 'pull'], [b, 'boum']].forEach(([el, c]) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); setTimeout(() => el.classList.remove(c), 750); });
 }
 $('#t-pullup').addEventListener('click', pullUp);
+$('#opt-son').checked = (() => { try { return localStorage.getItem('md-tri-son') !== '0'; } catch (e) { return true; } })();
+$('#opt-son').addEventListener('change', () => { try { localStorage.setItem('md-tri-son', $('#opt-son').checked ? '1' : '0'); } catch (e) {} });
+// le bruit d'un disque qu'on ramène en arrière : un scratch, puis un sifflement de rembobinage (fabriqué sur place, pas de fichier)
+let ctxSon = null;
+function bruitScratch() {
+  if (!$('#opt-son').checked) return;
+  try {
+    ctxSon = ctxSon || new (window.AudioContext || window.webkitAudioContext)();
+    const c = ctxSon, t = c.currentTime;
+    const n = c.createBuffer(1, c.sampleRate * 0.6, c.sampleRate), d = n.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(); src.buffer = n;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 3;
+    f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(3200, t + 0.12);
+    f.frequency.exponentialRampToValueAtTime(500, t + 0.24); f.frequency.exponentialRampToValueAtTime(4200, t + 0.34);
+    const g = c.createGain(); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+    const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.45);
+    const go = c.createGain(); go.gain.setValueAtTime(0.08, t); go.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    src.connect(f); f.connect(g); g.connect(c.destination); o.connect(go); go.connect(c.destination);
+    src.start(t); src.stop(t + 0.6); o.start(t); o.stop(t + 0.5);
+  } catch (e) {}
+}
+function grandEffet() {
+  bruitScratch();
+  const fx = $('#pull-fx');
+  fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go');
+  setTimeout(() => fx.classList.remove('go'), 900);
+  const r = $('#t-pullup').getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const couleurs = ['#ff2d6f', '#2de2ff', '#ffd23f', '#ffffff', '#6f88ff'];
+  for (let k = 0; k < 26; k++) {
+    const s = document.createElement('i'); s.className = 'etincelle';
+    const a = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 160;
+    s.style.cssText = `left:${cx}px;top:${cy}px;--x:${Math.cos(a) * dist * 1.4}px;--y:${Math.sin(a) * dist - 40}px;--c:${couleurs[k % couleurs.length]}`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), 800);
+  }
+}
 $('#t-annuler').addEventListener('click', annuler);
 $('#t-lecture').addEventListener('click', () => {
   const st = lecteur.getPlayerState();
