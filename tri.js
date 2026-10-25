@@ -24,6 +24,7 @@ T.active = T.active || null;
 T.notes = T.notes || {};        // commentaire par morceau (identifiant YouTube)
 T.coeurs = T.coeurs || {};      // coups de cœur
 T.ressentis = T.ressentis || {};// énergie / étrange / danse, quand tu les as réglés
+T.tard = T.tard || {};          // « oui, mais commentaire plus tard »
 T.jours = T.jours || {};        // nombre de morceaux jugés par jour
 T.objectif = T.objectif || 30;
 T.duree = T.duree || { ms: 0, n: 0 }; // temps moyen passé par morceau
@@ -116,6 +117,27 @@ function statutChaine(chaine, artiste) {
   if (a && b && (a.includes(b) || b.includes(a))) return { ok: true, texte: `Chaîne de l'artiste (${chaine})` };
   return { ok: false, texte: `Mise en ligne par « ${chaine} » : peut-être pas officielle, cherche la version de l'artiste ou du label` };
 }
+// un titre « clean », « radio edit » ou « edited » : on veut la version explicite, non censurée
+const versionPropre = i => { const t = (i && (i.brut || i.titre)) || ''; return /(clean|radio edit|censored|edited)/i.test(t) && !/(unclean|uncensored|dirty|explicit|not clean)/i.test(t); };
+// commandes de l'écran verrouillé et du centre de contrôle : pause, début du morceau, morceau suivant
+function majMediaSession(i) {
+  if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: (i && i.titre) || 'Table de tri', artist: (i && i.artiste) || '', album: 'Music Discovery' });
+    navigator.mediaSession.setActionHandler('play', () => { try { lecteur.playVideo(); } catch (e) {} });
+    navigator.mediaSession.setActionHandler('pause', () => { try { lecteur.pauseVideo(); } catch (e) {} });
+    navigator.mediaSession.setActionHandler('previoustrack', pullUp);
+    navigator.mediaSession.setActionHandler('seekbackward', () => { try { lecteur.seekTo(Math.max(0, lecteur.getCurrentTime() - 10), true); } catch (e) {} });
+    navigator.mediaSession.setActionHandler('seekforward', () => { try { lecteur.seekTo(lecteur.getCurrentTime() + 30, true); } catch (e) {} });
+  } catch (e) {}
+}
+// si on quitte la page en pleine écoute, on relance : certains navigateurs coupent le son à tort
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden || !lecteur || !courant) return;
+  const avant = (() => { try { return lecteur.getPlayerState(); } catch (e) { return null; } })();
+  if (avant !== 1) return;
+  [400, 1500].forEach(ms => setTimeout(() => { try { if (document.hidden && lecteur.getPlayerState() === 2) lecteur.playVideo(); } catch (e) {} }, ms));
+});
 function lireInfos() {
   if (!courant || !lecteur.getVideoData) return;
   const d = lecteur.getVideoData();
@@ -328,7 +350,10 @@ function afficherFiche(nouveau) {
   if (st) { $('#chaine').textContent = st.texte; $('#chaine').className = 'chaine ' + (st.ok ? 'ok' : 'doute'); }
   $('#deja').hidden = !DEJA.has(courant);
   $('#refus').hidden = !i.refus;
+  $('#propre').hidden = !versionPropre(i);
   $('#lien-yt').href = `https://www.youtube.com/watch?v=${courant}`;
+  $('#lien-ytm').href = `https://music.youtube.com/watch?v=${courant}`;
+  majMediaSession(i);
   if (nouveau) {
     const c = $('#carte'); c.classList.remove('entre'); void c.offsetWidth; c.classList.add('entre');
     majMot();
@@ -373,14 +398,13 @@ function majCoeur() {
   const on = !!T.coeurs[courant];
   $('#coeur').setAttribute('aria-pressed', on);
   $('#coeur').textContent = (on ? '★' : '☆') + ' Coup de cœur';
-  $('#v-coeur').setAttribute('aria-pressed', on);
-  $('#v-coeur').textContent = on ? '★' : '☆';
 }
 $('#note').addEventListener('input', () => {
   if (!courant) return;
   const v = $('#note').value;
   T.notes[courant] = v;                    // vide aussi : on garde « j'ai effacé » face au texte du site
   if (!v.trim() && !NOTE_SITE[courant]) delete T.notes[courant];
+  if (v.trim()) delete T.tard[courant];
   ajusterNote();
   clearTimeout(saveNote); saveNote = setTimeout(() => { sauver(); rendreFrise(); if (R.actif) majRevisionBarre(); }, 350);
 });
@@ -389,7 +413,6 @@ $('#note').addEventListener('focus', () => document.body.classList.add('ecrit'))
 $('#note').addEventListener('blur', () => document.body.classList.remove('ecrit'));
 $('#note').addEventListener('keydown', e => { if (e.key === 'Escape') $('#note').blur(); });
 $('#coeur').addEventListener('click', basculerCoeur);
-$('#v-coeur').addEventListener('click', basculerCoeur);
 function basculerCoeur() {
   if (!courant) return;
   if (T.coeurs[courant]) delete T.coeurs[courant]; else { T.coeurs[courant] = true; vibre(8); }
@@ -467,6 +490,7 @@ function decider(v) {
   const l = L();
   const prev = l.decisions[courant];
   l.decisions[courant] = v;
+  if (v !== 'oui') delete T.tard[courant];
   l.historique.push({ id: courant, prev });
   // le temps passé sur un morceau (au-delà de 3 minutes, on suppose une pause)
   if (!prev && JUGE(v)) {
@@ -486,6 +510,11 @@ function decider(v) {
   const juges = l.ids.filter(x => JUGE(l.decisions[x])).length;
   if (!etaitSaut && !prev && $('#opt-bilan').checked && JUGE(v) && juges > 0 && juges % TAILLE_MANCHE === 0) return montrerBilan(juges);
   suivant();
+}
+function ouiPlusTard() {
+  if (!courant) return;
+  if (!aplati(T.notes[courant] !== undefined ? T.notes[courant] : NOTE_SITE[courant])) T.tard[courant] = true;
+  decider('oui');
 }
 function annuler() {
   const l = L();
@@ -516,7 +545,8 @@ function terminer() {
   const notes = l.ids.filter(id => (T.notes[id] || '').trim() && l.decisions[id] === 'oui').length;
   $('#fin-texte').textContent = `${v.filter(x => x === 'oui').length} oui, ${v.filter(x => x === 'non').length} non` +
     (vus ? `, ${vus} déjà vus (sautés)` : '') + (passes ? `, ${passes} à revoir` : '') +
-    (coeurs ? `, ${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur` : '') + (notes ? `, ${notes} commentaire${notes > 1 ? 's' : ''}` : '') + '.';
+    (coeurs ? `, ${coeurs} coup${coeurs > 1 ? 's' : ''} de cœur` : '') + (notes ? `, ${notes} commentaire${notes > 1 ? 's' : ''}` : '') +
+    (Object.keys(T.tard).length ? `, ${Object.keys(T.tard).length} à commenter plus tard` : '') + '.';
   majCompteurs();
 }
 
@@ -560,7 +590,7 @@ $('#bilan-liste').addEventListener('click', e => { const li = e.target.closest('
 $('#bilan-liste').addEventListener('keydown', e => { if (e.key === 'Enter') { const li = e.target.closest('[data-id]'); if (li) aller(li.dataset.id); } });
 
 /* ─────────── export ─────────── */
-const marque = m => (m.refus ? ' | lecture intégrée refusée' : '') + (m.officiel === false ? ` | chaîne non officielle ? (${m.chaine})` : '');
+const marque = m => (m.refus ? ' | lecture intégrée refusée' : '') + (versionPropre(m) ? ' | version clean ? (chercher l\'explicite)' : '') + (m.officiel === false ? ` | chaîne non officielle ? (${m.chaine})` : '');
 const aplati = t => String(t || '').replace(/\s+/g, ' ').trim();
 const apports = id => {
   const p = [];
@@ -569,6 +599,7 @@ const apports = id => {
   if (r) p.push(`énergie ${r.energie}, étrange ${r.etrange}, danse ${r.danse}`);
   const n = aplati(T.notes[id]);
   if (n) p.push(`note : « ${n} »`);
+  else if (T.tard[id]) p.push('commentaire à écrire plus tard');
   return p.length ? ' | ' + p.join(' | ') : '';
 };
 function lesOui() {
@@ -600,7 +631,8 @@ function texteExport() {
         doutes.map(m => `${m.artiste || '?'} | ${m.titre || '?'} | https://music.youtube.com/watch?v=${m.id}${marque(m)}`).join('\n') : '');
   }
   const oui = lesOui();
-  return `Morceaux validés sur la table de tri (${oui.length}) :\n` + oui.map(m =>
+  const tard = oui.filter(m => T.tard[m.id] && !aplati(T.notes[m.id])).length;
+  return `Morceaux validés sur la table de tri (${oui.length}). Une ligne par morceau : artiste | titre | lien | coup de cœur | ressenti | note | alertes (lecture refusée, chaîne non officielle, version clean). Version audio voulue : explicite, non censurée.${tard ? ` ${tard} sans commentaire pour l'instant (à écrire plus tard).` : ''}\n` + oui.map(m =>
     `${m.artiste || '?'} | ${m.titre || m.brut || '?'} | https://music.youtube.com/watch?v=${m.id}${apports(m.id)}${marque(m)}`).join('\n');
 }
 // les blocs prêts à coller dans data.js, avant le ]; final
@@ -626,6 +658,9 @@ function rendreExport() {
     : 'Clique sur « Copier pour Claude », puis colle le texte dans la conversation : Claude les ajoute au site avec tes commentaires et règle leur énergie, leur étrangeté et leur côté dansant. « Format data.js » donne les blocs prêts à coller dans le fichier.';
   $('#copier-code').hidden = site ? !chg.length : false;
   $('#liste-oui').innerHTML = (site ? lesNon() : liste).map(m => `<li>${esc(m.artiste || '?')}, ${esc(m.titre || m.brut || m.id)}${T.coeurs[m.id] ? ' ★' : ''}${m.officiel === false ? ' <span class="petit">(chaîne à vérifier)</span>' : ''}${aplati(T.notes[m.id]) ? ` <span class="petit">« ${esc(aplati(T.notes[m.id]))} »</span>` : ''}</li>`).join('');
+  const nTard = Object.keys(T.tard).filter(id => !aplati(T.notes[id])).length;
+  $('#ecrire-tard').hidden = !nTard;
+  $('#ecrire-tard').textContent = `Écrire les commentaires en attente (${nTard})`;
   const passes = Object.values(L().decisions).filter(x => x === 'passe').length;
   $('#revoir-passes').hidden = !passes;
   $('#revoir-passes').textContent = `Revoir les « pas sûr » (${passes})`;
@@ -645,7 +680,7 @@ function rendreListes() {
 
 /* ─────────── la revue : tout ce qui est jugé, modifiable ─────────── */
 let filtre = 'tous', revueMax = 60;
-const FILTRES = [['tous', 'Tout'], ['oui', 'Oui'], ['non', 'Non'], ['passe', 'À revoir'], ['coeur', '★'], ['note', 'Avec un mot']];
+const FILTRES = [['tous', 'Tout'], ['oui', 'Oui'], ['non', 'Non'], ['passe', 'À revoir'], ['coeur', '★'], ['note', 'Avec un mot'], ['tard', 'À commenter']];
 function ordreRevue() {
   const l = L();
   const vus = new Set(), ordre = [];
@@ -691,6 +726,7 @@ function rendreRevue(garder) {
   if (filtre === 'oui' || filtre === 'non' || filtre === 'passe') ids = ids.filter(id => l.decisions[id] === filtre);
   if (filtre === 'coeur') ids = ids.filter(id => T.coeurs[id]);
   if (filtre === 'note') ids = ids.filter(id => aplati(T.notes[id]));
+  if (filtre === 'tard') ids = ids.filter(id => T.tard[id]);
   const montres = ids.slice(0, revueMax);
   $('#plus-revue').hidden = ids.length <= revueMax;
   cible.innerHTML = montres.length ? montres.map(id => {
@@ -744,6 +780,7 @@ $('#revue').addEventListener('input', e => {
   const id = t.closest('[data-id]').dataset.id;
   T.notes[id] = t.value;
   if (!t.value.trim() && !NOTE_SITE[id]) delete T.notes[id];
+  if (t.value.trim()) delete T.tard[id];
   clearTimeout(saveNote); saveNote = setTimeout(sauver, 350);
 });
 
@@ -778,7 +815,7 @@ $('#fichier-sauvegarde').addEventListener('change', async e => {
       for (const [id, inf] of Object.entries(lj.infos || {})) if (!ici.infos[id]) ici.infos[id] = inf;
       ici.historique = (ici.historique || []).concat((lj.historique || []).filter(h => !ici.historique.some(x => (x.id || x) === (h.id || h))));
     }
-    for (const cle of ['notes', 'coeurs', 'ressentis']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) T[cle][id] = v;
+    for (const cle of ['notes', 'coeurs', 'ressentis', 'tard']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) T[cle][id] = v;
     for (const [j, n] of Object.entries(J.jours || {})) T.jours[j] = Math.max(T.jours[j] || 0, n);
     T.active = T.active && T.listes[T.active] ? T.active : (J.active && T.listes[J.active] ? J.active : null);
     sauver(); rendreListes(); majObjectif();
@@ -812,7 +849,15 @@ $('#trier-site').addEventListener('click', () => {
 });
 $('#v-oui').addEventListener('click', () => decider('oui'));
 $('#v-non').addEventListener('click', () => decider('non'));
-$('#t-passer').addEventListener('click', () => decider('passe'));
+$('#v-passe').addEventListener('click', () => decider('passe'));
+$('#v-tard').addEventListener('click', ouiPlusTard);
+// pull up : retour au tout début du morceau (sans sauter l'intro)
+function pullUp() {
+  if (!courant || !lecteur) return;
+  try { lecteur.seekTo(0, true); lecteur.playVideo(); } catch (e) {}
+  vibre(10);
+}
+$('#t-pullup').addEventListener('click', pullUp);
 $('#t-annuler').addEventListener('click', annuler);
 $('#t-lecture').addEventListener('click', () => {
   const st = lecteur.getPlayerState();
@@ -831,6 +876,7 @@ $('#copier-code').addEventListener('click', async () => {
 $('#telecharger').addEventListener('click', () => {
   telecharger(T.active === SITE ? 'music-discovery-a-retirer.txt' : 'music-discovery-oui.txt', texteExport() + (T.active === SITE ? '' : '\n\n--- format data.js ---\n' + codeExport()));
 });
+$('#ecrire-tard').addEventListener('click', () => { R.source = 'oui'; R.filtre = 'tard'; sauverR(); if (!R.actif) entrerRevision(); });
 $('#revoir-passes').addEventListener('click', () => {
   const l = L();
   Object.keys(l.decisions).forEach(id => { if (l.decisions[id] === 'passe') delete l.decisions[id]; });
@@ -850,6 +896,7 @@ document.addEventListener('keydown', e => {
     else if (k === 'Enter') { e.preventDefault(); const n = $('#note'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
     else if (k === 'c' || k === 'C') { e.preventDefault(); basculerCoeur(); majRevisionBarre(); }
     else if (k === ' ') { e.preventDefault(); $('#t-lecture').click(); }
+    else if (k === 'p' || k === 'P') { e.preventDefault(); pullUp(); }
     else if (k === 'ArrowUp') { e.preventDefault(); $('#t-avance').click(); }
     return;
   }
@@ -858,6 +905,8 @@ document.addEventListener('keydown', e => {
   if (k === 'ArrowRight' || k === 'o' || k === 'O') { e.preventDefault(); decider('oui'); }
   else if (k === 'ArrowLeft' || k === 'n' || k === 'N') { e.preventDefault(); decider('non'); }
   else if (k === 'ArrowDown') { e.preventDefault(); decider('passe'); }
+  else if (k === 't' || k === 'T') { e.preventDefault(); ouiPlusTard(); }
+  else if (k === 'p' || k === 'P') { e.preventDefault(); pullUp(); }
   else if (k === 'ArrowUp') { e.preventDefault(); $('#t-avance').click(); }
   else if (k === 'c' || k === 'C') { e.preventDefault(); basculerCoeur(); }
   else if (k === ' ') { e.preventDefault(); $('#t-lecture').click(); }
@@ -921,7 +970,7 @@ Object.values(T.listes).forEach(l => { if (l.list && l.ids.length >= 199 && l.id
    Les morceaux du site et tes « oui » de toutes les playlists. Pas de vert ni de rouge ici :
    on écoute, on écrit, on passe au suivant. */
 const RV_SOURCES = [['tout', 'Tout'], ['site', 'Le site'], ['oui', 'Mes oui']];
-const RV_FILTRES = [['sans', 'Sans commentaire'], ['avec', 'Avec commentaire'], ['coeur', '★ Coups de cœur'], ['tous', 'Tous']];
+const RV_FILTRES = [['tard', 'À commenter (plus tard)'], ['sans', 'Sans commentaire'], ['avec', 'Avec commentaire'], ['coeur', '★ Coups de cœur'], ['tous', 'Tous']];
 Object.assign(R, (() => { try { return JSON.parse(localStorage.getItem('md-tri-revision')) || {}; } catch (e) { return {}; } })(), { actif: false, file: [], i: 0, infos: {} });
 R.source = R.source || 'tout'; R.filtre = R.filtre || 'sans';
 const sauverR = () => { try { localStorage.setItem('md-tri-revision', JSON.stringify({ source: R.source, filtre: R.filtre, dernier: R.dernier || null })); } catch (e) {} };
@@ -944,7 +993,7 @@ function poolRevision(source) {
 function fileRevision() {
   const { ids, infos } = poolRevision(R.source);
   R.infos = infos;
-  return ids.filter(id => R.filtre === 'sans' ? !aplati(noteDe(id)) : R.filtre === 'avec' ? !!aplati(noteDe(id)) : R.filtre === 'coeur' ? !!T.coeurs[id] : true);
+  return ids.filter(id => R.filtre === 'tard' ? !!T.tard[id] && !aplati(noteDe(id)) : R.filtre === 'sans' ? !aplati(noteDe(id)) : R.filtre === 'avec' ? !!aplati(noteDe(id)) : R.filtre === 'coeur' ? !!T.coeurs[id] : true);
 }
 function majRevisionBarre() {
   const compte = src => poolRevision(src).ids.length;
@@ -980,7 +1029,10 @@ function ouvrirRevision() {
   $('#artiste').textContent = i.artiste || '';
   $('#chaine').hidden = true;
   $('#refus').hidden = !i.refus;
+  $('#propre').hidden = true;
   $('#lien-yt').href = `https://www.youtube.com/watch?v=${id}`;
+  $('#lien-ytm').href = `https://music.youtube.com/watch?v=${id}`;
+  majMediaSession(i);
   const c = $('#carte'); c.classList.remove('entre'); void c.offsetWidth; c.classList.add('entre');
   majMot();
   majRevisionBarre();
@@ -988,7 +1040,7 @@ function ouvrirRevision() {
 function videRevision() {
   courant = null;
   try { lecteur.stopVideo(); } catch (e) {}
-  $('#titre').textContent = R.filtre === 'sans' ? 'Tout est commenté ici.' : 'Rien ici pour l\'instant.';
+  $('#titre').textContent = (R.filtre === 'sans' || R.filtre === 'tard') ? 'Tout est commenté ici.' : 'Rien ici pour l\'instant.';
   $('#artiste').textContent = 'Choisis un autre filtre au-dessus.';
   $('#refus').hidden = true;
   $('#note').value = '';
@@ -1044,7 +1096,6 @@ $('#rv-quitter').addEventListener('click', quitterRevision);
 $('#rv-suiv').addEventListener('click', revisionSuivant);
 $('#rv-prec').addEventListener('click', revisionPrecedent);
 $('#coeur').addEventListener('click', () => { if (R.actif) majRevisionBarre(); });
-$('#v-coeur').addEventListener('click', () => { if (R.actif) majRevisionBarre(); });
 $('#rv-auto').checked = (() => { try { return localStorage.getItem('md-tri-rv-auto') !== '0'; } catch (e) { return true; } })();
 $('#rv-auto').addEventListener('change', () => { try { localStorage.setItem('md-tri-rv-auto', $('#rv-auto').checked ? '1' : '0'); } catch (e) {} });
 $('#revision-barre').addEventListener('click', e => {

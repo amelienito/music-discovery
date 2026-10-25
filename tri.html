@@ -21,7 +21,7 @@
       --oui: #1f9a5a; --non: #d6402f; --trait: rgba(28,29,34,.12);
       --ombre: 0 10px 30px rgba(0,0,0,.08);
       --deja-fond: #fff3c4; --deja-encre: #5c4a00; --refus-fond: #ffe0dc; --refus-encre: #6b1a10;
-      --ok: #1f7a4a; --doute: #a35a00; --coeur: #b87a00; --coeur-fond: #fff0c9;
+      --doute-fond: #f0b340; --ok: #1f7a4a; --doute: #a35a00; --coeur: #b87a00; --coeur-fond: #fff0c9;
       color-scheme: light;
     }
     [data-theme="sombre"] {
@@ -31,7 +31,7 @@
       --oui: #25a865; --non: #e24a37; --trait: rgba(236,235,230,.12);
       --ombre: 0 10px 30px rgba(0,0,0,.4);
       --deja-fond: #3a3110; --deja-encre: #f3dc8a; --refus-fond: #3d1a16; --refus-encre: #ffb4a8;
-      --ok: #5fd39a; --doute: #ffbe6b; --coeur: #ffcf5a; --coeur-fond: #3d3210;
+      --doute-fond: #ffbe6b; --ok: #5fd39a; --doute: #ffbe6b; --coeur: #ffcf5a; --coeur-fond: #3d3210;
       color-scheme: dark;
     }
     * { box-sizing: border-box; }
@@ -131,12 +131,20 @@
 
     .transport { display: flex; gap: 8px; flex-wrap: wrap; }
     .transport button { min-width: 64px; min-height: 42px; padding: 0 12px; border-radius: 10px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); font-weight: 600; font-size: 14px; }
-    .verdicts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .v { min-height: 92px; border-radius: 18px; color: #fff; font-family: "Unbounded", sans-serif; font-size: 1.6rem; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
+    .verdicts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .v { min-height: 92px; border-radius: 18px; color: #fff; font-family: "Unbounded", sans-serif; font-size: 1.35rem; padding: 0 6px; text-align: center; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
     .v:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
     .v small { display: block; font-family: "Familjen Grotesk", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
     .v-non { background: var(--non); } .v-oui { background: var(--oui); }
-    .v-coeur { display: none; }
+    .v-tard { width: 100%; min-height: 54px; margin-top: 12px; border-radius: 16px; background: var(--carte); color: var(--encre); font-weight: 600; font-size: 15px; box-shadow: 0 4px 0 rgba(0,0,0,.2), inset 0 0 0 1.5px var(--oui); transition: transform .08s, box-shadow .08s; }
+    .v-tard:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.2), inset 0 0 0 1.5px var(--oui); }
+    .v-tard small { color: var(--encre-2); font-weight: 500; }
+    .pullup { width: 100%; min-height: 72px; border-radius: 18px; background: var(--klein); color: var(--sur-klein); font-family: "Unbounded", sans-serif; font-size: 1.5rem; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
+    .pullup:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+    .pullup small { display: block; font-family: "Familjen Grotesk", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
+    .v-passe { background: var(--doute-fond); color: #1c1d22; }
+    .v-passe small { opacity: .75; }
+    .lien-ytm { font-size: 14px; }
     .options { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 14px; color: var(--encre-2); }
     .options label { display: inline-flex; gap: 8px; align-items: center; }
     .lien { text-decoration: underline; text-underline-offset: 4px; font-size: 14px; color: var(--encre-2); }
@@ -201,11 +209,12 @@
     @media (max-width: 760px) {
       .table { grid-template-columns: minmax(0, 1fr); grid-template-areas: "ecran" "fiche" "frise"; grid-template-rows: none; }
       .raccourcis { display: none; }
-      .v { min-height: 76px; font-size: 1.3rem; }
-      .verdicts { position: sticky; bottom: 10px; z-index: 5; grid-template-columns: 1fr 52px 1fr; gap: 8px; }
-      .v-coeur { display: grid; place-items: center; border-radius: 16px; font-size: 1.5rem; background: var(--carte); color: var(--encre-2); box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 0 0 1px var(--trait); }
-      .v-coeur[aria-pressed="true"] { background: var(--coeur-fond); color: var(--coeur); box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 0 0 1.5px var(--coeur); }
-      .mot-ligne .coeur { display: none; }
+      .v { min-height: 76px; font-size: 1.05rem; }
+      .v small { font-size: 11px; }
+      .verdicts { gap: 8px; }
+      .decisions { position: sticky; bottom: 10px; z-index: 5; padding-top: 6px; }
+      .v-tard { margin-top: 8px; min-height: 48px; font-size: 14px; }
+      .pullup { min-height: 60px; font-size: 1.3rem; }
       /* pendant le tri, l'en-tête se fait discret : le morceau d'abord */
       body.en-tri .tete .sous { display: none; }
       body.en-tri .tete h1 { font-size: 1.35rem; }
@@ -214,7 +223,7 @@
       .tete-droite::-webkit-scrollbar { display: none; }
       .compteurs { flex-wrap: nowrap; }
       .compteur, .objectif, .bouton-menu, .bascule-theme { flex: none; white-space: nowrap; }
-      body.ecrit .verdicts { position: static; }
+      body.ecrit .decisions { position: static; }
       .frise { max-height: 140px; }
       .curseur { grid-template-columns: 56px 1fr 24px; }
     }
@@ -227,7 +236,7 @@
     .v-prec { background: var(--carte); color: var(--encre); box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 0 0 1px var(--trait); }
     .v-suiv { background: var(--klein); color: var(--sur-klein); }
     .revision-options { display: none; gap: 10px 18px; flex-wrap: wrap; align-items: center; font-size: 14px; color: var(--encre-2); }
-    body.revision .manche, body.revision .frise-bloc, body.revision .verdicts, body.revision .options,
+    body.revision .manche, body.revision .frise-bloc, body.revision .decisions, body.revision .options,
     body.revision .raccourcis:not(.revision-raccourcis), body.revision #t-annuler, body.revision #deja,
     body.revision #compteurs, body.revision #objectif { display: none !important; }
     .revision-raccourcis { display: none; }
@@ -313,6 +322,8 @@
         <p class="chaine" id="chaine" hidden></p>
         <p class="deja" id="deja" hidden>Ce morceau est déjà sur le site. Vert, il reste ; rouge, il sort.</p>
         <p class="refus" id="refus" hidden>Ce morceau refuse d'être lu hors de YouTube : sur le site, on n'entendrait qu'un extrait de 30 s. <a id="lien-yt" target="_blank" rel="noopener">L'écouter sur YouTube</a></p>
+        <p class="refus" id="propre" hidden>Ce titre ressemble à une version « clean » ou radio edit. Cherche la version explicite, non censurée.</p>
+        <p class="petit"><a class="lien-ytm" id="lien-ytm" target="_blank" rel="noopener">Écouter dans YouTube Music</a> (avec Premium, l'écoute continue écran verrouillé)</p>
       </div>
       <div class="mot">
         <div class="mot-ligne">
@@ -344,19 +355,22 @@
         <label><input type="checkbox" id="rv-auto" checked> Enchaîner tout seul à la fin du morceau</label>
         <button class="lien" id="rv-copier">Copier mes commentaires pour Claude</button>
       </div>
-      <p class="raccourcis revision-raccourcis">Clavier : <kbd>→</kbd> suivant, <kbd>←</kbd> précédent, <kbd>Entrée</kbd> écrire, <kbd>Échap</kbd> sortir du commentaire, <kbd>C</kbd> coup de cœur, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s.</p>
-      <div class="verdicts">
-        <button class="v v-non" id="v-non">Non<small>il sort</small></button>
-        <button class="v-coeur" id="v-coeur" aria-pressed="false" aria-label="Coup de cœur">☆</button>
-        <button class="v v-oui" id="v-oui">Oui<small>il entre sur le site</small></button>
+      <p class="raccourcis revision-raccourcis">Clavier : <kbd>→</kbd> suivant, <kbd>←</kbd> précédent, <kbd>Entrée</kbd> écrire, <kbd>Échap</kbd> sortir du commentaire, <kbd>C</kbd> coup de cœur, <kbd>P</kbd> pull up, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s.</p>
+      <button class="pullup" id="t-pullup">Pull up<small>retour au début du morceau</small></button>
+      <div class="decisions">
+        <div class="verdicts">
+          <button class="v v-non" id="v-non">Non<small>il sort</small></button>
+          <button class="v v-passe" id="v-passe">Pas sûr<small>je reviendrai</small></button>
+          <button class="v v-oui" id="v-oui">Oui<small>il entre sur le site</small></button>
+        </div>
+        <button class="v-tard" id="v-tard">Oui, mais commentaire plus tard <small>(T)</small></button>
       </div>
       <div class="options">
         <label><input type="checkbox" id="opt-intro" checked> Sauter l'intro (démarrer à 0:40)</label>
         <label><input type="checkbox" id="opt-hasard"> Ordre aléatoire</label>
         <label><input type="checkbox" id="opt-bilan" checked> Bilan toutes les 10 écoutes</label>
-        <button class="lien" id="t-passer">Pas sûr, je reviendrai</button>
       </div>
-      <p class="raccourcis">Clavier : <kbd>→</kbd> oui, <kbd>←</kbd> non, <kbd>↓</kbd> plus tard, <kbd>C</kbd> coup de cœur, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s, <kbd>Z</kbd> annuler, <kbd>Échap</kbd> sort du commentaire. Sur téléphone ou à la souris, fais glisser la carte à droite (oui) ou à gauche (non).</p>
+      <p class="raccourcis">Clavier : <kbd>→</kbd> oui, <kbd>←</kbd> non, <kbd>↓</kbd> pas sûr, <kbd>T</kbd> oui + commentaire plus tard, <kbd>P</kbd> pull up, <kbd>C</kbd> coup de cœur, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s, <kbd>Z</kbd> annuler, <kbd>Échap</kbd> sort du commentaire. Sur téléphone ou à la souris, fais glisser la carte à droite (oui) ou à gauche (non).</p>
     </div>
   </section>
 
@@ -391,6 +405,7 @@
       <button class="bouton" id="copier">Copier pour Claude</button>
       <button class="bouton bouton-clair" id="copier-code">Copier au format data.js</button>
       <button class="bouton bouton-clair" id="telecharger">Télécharger la liste</button>
+      <button class="bouton bouton-clair" id="ecrire-tard" hidden>Écrire les commentaires en attente</button>
       <button class="lien" id="revoir-passes">Revoir les « pas sûr »</button>
     </div>
     <ol id="liste-oui"></ol>
@@ -422,7 +437,7 @@
 <input type="file" id="fichier-sauvegarde" accept="application/json,.json" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data.js?v=20"></script>
-<script src="tri.js?v=17"></script>
+<script src="data.js?v=21"></script>
+<script src="tri.js?v=18"></script>
 </body>
 </html>

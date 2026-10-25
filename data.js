@@ -816,4 +816,10 @@ const MORCEAUX = [
     tags: ["chanson", "valse", "orchestre", "rapide"],
     energie: 8, etrange: 2, danse: 5 },
 
+  { titre: "Stay Fly", artiste: "Three 6 Mafia feat. Young Buck, 8Ball & MJG", album: "Most Known Unknowns",
+    lien: "https://music.youtube.com/watch?v=U_jq38d3FFI", note: "Top 5 morceaux",
+    ambiance: "bitume", style: "Rap sudiste, Memphis", annee: 2005, bpm: 82, voix: "rap",
+    tags: ["rap", "sud", "memphis", "clip"],
+    energie: 5, etrange: 3, danse: 5 },
+
 ];
