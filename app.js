@@ -1069,7 +1069,7 @@ function rendreTuner({ repose = false } = {}) {
     const p = S.pile[0];
     el.innerHTML = `<div class="pilote">
       <span class="pilote-led" aria-hidden="true"></span>
-      <div class="pilote-textes"><b>Pilote automatique</b><span>La radio enchaîne toute seule, en douceur.${p ? ` Ensuite : <i>${E(p.m.affiche)}</i>, ${E(p.m.artiste)}` : ''}</span></div>
+      <div class="pilote-textes"><b>Pilote automatique</b>${p ? `<span><i>${E(p.m.affiche)}</i>, ${E(p.m.artiste)}</span>` : ''}</div>
       <button class="pilote-stop" data-action="auto">Reprendre la main</button>
     </div>`;
     majPostIt(m); majGarde();
@@ -1382,15 +1382,16 @@ function toast(msg, duree = 2800) {
 // une seule fois, après un peu d'écoute : l'astuce de « Ma sélection » (rien d'autre, le reste se voit)
 let aideMontree = false;
 function montrerAide() {
-  if (aideMontree || memoire.lire('md-aide-vue', false) || S.vue !== 'machine') return;
+  if (aideMontree || memoire.lire('md-aide-vue-v2', false) || S.vue !== 'machine') return;
   aideMontree = true;
   $('#aide').hidden = false;
   requestAnimationFrame(() => $('#aide').classList.add('ouverte'));
   const b = $('#radio-garder'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
+  $('.bouton-reglages').classList.add('brille');
 }
 function fermerAide() {
   if ($('#aide').hidden) return;
-  memoire.ecrire('md-aide-vue', true);
+  memoire.ecrire('md-aide-vue-v2', true);
   $('#aide').classList.remove('ouverte');
   setTimeout(() => { $('#aide').hidden = true; }, 250);
 }

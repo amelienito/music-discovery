@@ -225,7 +225,7 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
   conic-gradient(from 0deg, #e9ecef, #cfd5db, #f7f8f9, #c8ced5, #eef0f2, #d3d8dd, #f5f6f7, #cdd3d9, #e9ecef); }
 .disque-main {
   position: absolute; left: 50%; top: 14%; transform: translateX(-50%) rotate(-8deg); white-space: nowrap;
-  font-family: "Caveat", "Bradley Hand", cursive; font-weight: 700; font-size: 16px; font-size: 15cqw; line-height: 1; color: var(--amb-encre);
+  font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 700; font-size: 14px; font-size: 12cqw; line-height: 1; color: var(--amb-encre);
 }
 @keyframes tourne { to { transform: rotate(360deg); } }
 /* le picture disc : la pochette du morceau imprimée sur le disque, des sillons, un anneau
@@ -373,13 +373,13 @@ body[data-dimmer="1"] .hifi-veille { opacity: .5; }
 .choix-affichage button { min-height: 28px; padding: 0 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; transition: background-color .15s, color .15s; }
 .choix-affichage button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
 .bouton-cosmetique {
-  align-self: center; display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 12px; border-radius: 9px;
-  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--hifi-encre);
-  background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); transition: transform .08s, box-shadow .08s;
+  align-self: center; display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 9px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 5px rgba(0,0,0,.35); transition: transform .08s, box-shadow .08s, filter .15s;
 }
-.bouton-cosmetique span[aria-hidden] { font-size: 13px; letter-spacing: 0; opacity: .7; }
-.bouton-cosmetique:active, .bouton-cosmetique[aria-expanded="true"] { box-shadow: var(--hifi-bouton-enfonce); transform: translateY(1px); }
-.bouton-cosmetique[aria-expanded="true"] span[aria-hidden] { opacity: 1; color: var(--aiguille); }
+.bouton-cosmetique:hover { filter: brightness(1.15); }
+.bouton-cosmetique:active, .bouton-cosmetique[aria-expanded="true"] { box-shadow: inset 0 2px 6px rgba(0,0,0,.6); transform: translateY(1px); }
 
 /* l'afficheur : le disque qui tourne (avec son étiquette) ou l'écran à cristaux liquides, au choix */
 .afficheur { grid-area: afficheur; display: grid; min-width: 0; align-self: stretch; }
@@ -603,7 +603,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .pile-scotch {
   position: absolute; z-index: 3; top: -13px; left: 50%; max-width: 112%; transform: translateX(-50%) rotate(-3deg);
   padding: 3px 14px 1px; background: rgba(250, 238, 190, .94); box-shadow: 0 2px 4px rgba(0,0,0,.18);
-  font-family: "Caveat", "Bradley Hand", cursive; font-weight: 700; font-size: 21px; line-height: 1.1; color: #2a2620; white-space: nowrap;
+  font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 600; font-size: 16px; line-height: 1.2; color: #2a2620; white-space: nowrap;
 }
 .disque-pile:nth-child(2) .pile-scotch { transform: translateX(-50%) rotate(2deg); }
 .disque-pile:nth-child(3) .pile-scotch { transform: translateX(-50%) rotate(-1.5deg); }
@@ -687,9 +687,9 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 .post-it::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: linear-gradient(transparent, rgba(0,0,0,.05)); pointer-events: none; }
 .post-it-scotch { position: absolute; top: -11px; left: 50%; width: 78px; height: 24px; margin-left: -39px; transform: rotate(calc(var(--penche) * -1.6)); background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.12); backdrop-filter: blur(1px); }
-.post-it-texte { font-family: "Caveat", "Bradley Hand", cursive; font-weight: 500; font-size: 23px; line-height: 1.12; overflow-wrap: anywhere; text-wrap: pretty; }
-.post-it.long .post-it-texte { font-size: 19px; }
-.post-it-signe { margin-top: 8px; text-align: right; font-family: "Caveat", cursive; font-weight: 700; font-size: 17px; opacity: .6; }
+.post-it-texte { font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 500; font-size: 19px; line-height: 1.2; overflow-wrap: anywhere; text-wrap: pretty; }
+.post-it.long .post-it-texte { font-size: 16px; }
+.post-it-signe { margin-top: 8px; text-align: right; font-family: "Shantell Sans", cursive; font-weight: 600; font-size: 14px; opacity: .6; }
 .post-it-signe::before { content: "— "; }
 .post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
 @keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
@@ -971,7 +971,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .marque { display: none; }
   #scene { padding-top: calc(64px + env(safe-area-inset-top)); }
   .ecran { min-height: calc(100vh - 64px); padding: 18px 16px 120px; }
-  .bouton-reglages { width: 38px; padding: 0; justify-content: center; }
   .facade-droite { gap: 6px; }
   .masquer-mobile { display: none; }
   .bouton-facade { height: 38px; padding: 0 12px; font-size: 14px; }
@@ -993,8 +992,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .hifi-corps { padding: 12px; gap: 10px; }
   .hifi-haut { padding-bottom: 8px; gap: 6px 10px; }
   .hifi-marque { font-size: 12px; }
-  .bouton-cosmetique { width: 34px; padding: 0; justify-content: center; }
-  .bouton-cosmetique-texte { display: none; }
+  .bouton-cosmetique { min-height: 30px; padding: 0 10px; font-size: 10px; letter-spacing: .08em; }
   .tiroir { width: 64px; border-radius: 10px; }
   body[data-affichage="disque"] .afficheur { gap: 12px; }
   .etiquette { gap: 2px; }
@@ -1019,7 +1017,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .sources { margin-left: 0; flex: 1 1 100%; margin-top: 6px; }
   .pile-titre { font-size: 12px; }
   .pile-disques { gap: 10px; padding: 38px 0 54px; }
-  .pile-scotch { font-size: 15px; padding: 2px 7px 0; top: -10px; }
+  .pile-scotch { font-size: 12.5px; padding: 2px 7px 1px; top: -10px; }
   .disque-pile.choisi::before { font-size: 9px; top: -34px; padding: 2px 7px; }
   .pile-pied { flex-wrap: wrap; }
   .pile-autres { min-height: 34px; padding: 0 12px; font-size: 13px; }

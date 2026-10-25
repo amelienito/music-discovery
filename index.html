@@ -13,8 +13,8 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=44">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Shantell+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=45">
   <link rel="stylesheet" href="teintes.css?v=14">
 </head>
 <body>
@@ -25,7 +25,7 @@
 
     <div class="facade-droite">
       <div class="teintes masquer-mobile" role="radiogroup" aria-label="Teinte du site" id="teintes-facade"></div>
-      <button class="bouton-facade bouton-reglages" data-action="ouvrir-reglages" aria-haspopup="dialog" aria-label="Réglages : teinte du site et façon d'écouter"><span class="icone-teinte" aria-hidden="true"></span><span class="masquer-mobile">Réglages</span></button>
+      <button class="bouton-facade bouton-reglages" data-action="ouvrir-reglages" aria-haspopup="dialog" aria-label="Réglages : teinte du site et façon d'écouter"><span class="icone-teinte" aria-hidden="true"></span><span>Réglages</span></button>
       <button class="bouton-facade bouton-trouvailles" data-action="ouvrir-bac" aria-label="Ma sélection">
         <span class="mini-cdr" aria-hidden="true"></span>
         <span class="masquer-mobile">Ma sélection</span><span class="seulement-mobile-inline">Sélection</span>
@@ -98,7 +98,7 @@
               <button role="radio" data-action="affichage" data-val="ecran" aria-checked="true">Écran</button>
               <button role="radio" data-action="affichage" data-val="disque" aria-checked="false">Disque</button>
             </div>
-            <button class="bouton-cosmetique" data-action="cosmetique" aria-expanded="false" aria-controls="trappe" title="Les petits réglages inutiles"><span aria-hidden="true">✦</span><span class="bouton-cosmetique-texte">Cosmétique</span></button>
+            <button class="bouton-cosmetique" data-action="cosmetique" aria-expanded="false" aria-controls="trappe" title="Les petits réglages inutiles"><span class="bouton-cosmetique-texte">Cosmétique</span></button>
             <span class="hifi-veille" aria-hidden="true"></span>
           </div>
 
@@ -252,6 +252,7 @@
     <ol class="aide-liste">
       <li>Un morceau te plaît&nbsp;? <b>« J'aime bien »</b> le garde dans ta sélection.</li>
       <li>Dès deux morceaux gardés, tu peux <b>n'écouter que ta sélection</b>, et continuer à y ajouter des titres.</li>
+      <li>Des pubs, ou envie d'une autre couleur&nbsp;? Tout se change dans <b>Réglages</b>, en haut à droite.</li>
     </ol>
     <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">Compris</button>
   </aside>
@@ -303,10 +304,10 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=19"></script>
+  <script src="data.js?v=20"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=15"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=45"></script>
+  <script src="app.js?v=46"></script>
 </body>
 </html>

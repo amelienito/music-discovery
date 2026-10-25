@@ -66,7 +66,7 @@
 const MORCEAUX = [
 
   { titre: "Losin' Weight", artiste: "Cam'ron feat. Prodigy", album: "S.D.E.",
-    lien: "https://music.youtube.com/watch?v=RQxJfDU66rw", note: "Du rap qui rappppppppe",
+    lien: "https://music.youtube.com/watch?v=RQxJfDU66rw", note: "Miam le rap",
     ambiance: "bitume", style: "Rap new-yorkais", annee: 2000, bpm: 92, voix: "rap",
     tags: ["rap", "boom bap", "samples soul", "new york"],
     energie: 5, etrange: 3, danse: 4 },
@@ -120,7 +120,7 @@ const MORCEAUX = [
     energie: 2, etrange: 3, danse: 3 },
 
   { titre: "YOU HAVE TO LEAVE!!!", artiste: "Hyas et Tactic 24", album: "LOUDER!!!",
-    lien: "https://music.youtube.com/watch?v=yM_KeoOHVy8", note: "Je sais même pas c'est quoi le style exact mais c'est super",
+    lien: "https://music.youtube.com/watch?v=yM_KeoOHVy8", note: "Je sais même pas c'est quoi le genre exact mais c'est super",
     ambiance: "piste", style: "Rage, électro dure", annee: 2024, bpm: 150, voix: "rap",
     tags: ["rap", "electro", "club", "hyperpop"],
     energie: 10, etrange: 8, danse: 8 },
@@ -138,7 +138,7 @@ const MORCEAUX = [
     energie: 6, etrange: 5, danse: 7 },
 
   { titre: "CSIRAC", artiste: "Ninajirachi", album: "I Love My Computer", sansExtrait: true,
-    lien: "https://music.youtube.com/watch?v=L_rc7qJyFOQ", note: "J'ai tellement fait de vaisselle grâce à ce titre.",
+    lien: "https://music.youtube.com/watch?v=L_rc7qJyFOQ", note: "J'ai fait tellement de vaisselles grâce à ce titre.",
     ambiance: "piste", style: "Électro club", annee: 2025, bpm: 140, voix: "instru",
     tags: ["electro", "club", "hyperpop", "synthés"],
     energie: 9, etrange: 7, danse: 8 },
@@ -222,7 +222,7 @@ const MORCEAUX = [
     energie: 1, etrange: 2, danse: 0 },
 
   { titre: "Ma Tfel", artiste: "Ziad Rahbani", album: "",
-    lien: "https://music.youtube.com/watch?v=NLurnvYk0aI", note: "La pop libanaise : un peu sous-côté",
+    lien: "https://music.youtube.com/watch?v=NLurnvYk0aI", note: "La pop libanaise : sous-cotée",
     ambiance: "ailleurs", style: "Jazz oriental libanais", annee: 1978, bpm: 100, voix: "chant",
     tags: ["monde", "jazz", "funk", "arabe"],
     energie: 5, etrange: 6, danse: 6 },
@@ -781,7 +781,7 @@ const MORCEAUX = [
     energie: 6, etrange: 6, danse: 6 },
 
   { titre: "Me and Mrs. Jones (Single Version)", artiste: "Billy Paul", album: "360 Degrees of Billy Paul",
-    lien: "https://music.youtube.com/watch?v=mhDsz2HSKwU", note: "La gestion de sa voix",
+    lien: "https://music.youtube.com/watch?v=mhDsz2HSKwU", note: "Purée la gestion de sa voix",
     ambiance: "soleil", style: "Philly soul", annee: 1972, bpm: 66, voix: "chant",
     tags: ["soul", "philly", "ballade", "cordes"],
     energie: 2, etrange: 2, danse: 3 },
