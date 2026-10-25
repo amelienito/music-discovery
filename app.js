@@ -55,6 +55,8 @@ const BANQUE = (typeof MORCEAUX !== 'undefined' ? MORCEAUX : []).map((m, i) => {
     yt: idYouTube(m.lien),
     energie, etrange: num(m.etrange, 5), danse: num(m.danse, 5),
     note: (m.note || '').trim(),
+    // deux versions d'un même morceau (radio edit, version longue…) ne s'enchaînent jamais
+    version: Pochettes.normaliser(Pochettes.artistePrincipal(m.artiste)) + '|' + Pochettes.normaliser(String(m.titre).replace(/\s*[([].*?[)\]]\s*/g, ' ')),
     // les morceaux qui cognent sont joués un peu moins fort, pour ne pas surprendre
     facteur: borner(num(m.volume, energie >= 9 ? 0.66 : energie >= 8 ? 0.78 : energie >= 7 ? 0.88 : 1), 0.1, 1),
   };
@@ -787,9 +789,10 @@ function construireSuite(depuis, n = 6) {
     return [...ordre.slice(i + 1), ...ordre.slice(0, Math.max(0, i))].slice(0, n);
   }
   const recents = new Set(S.historique.slice(-40));
-  const base = poolSource().filter(m => (!depuis || m.id !== depuis.id) && (selection || !S.aimePas.has(m.id)));
+  const versionsRecentes = new Set(S.historique.slice(-12).map(id => parId[id] && parId[id].version));
+  const base = poolSource().filter(m => (!depuis || (m.id !== depuis.id && m.version !== depuis.version)) && (selection || !S.aimePas.has(m.id)));
   const baseE = filtreEpoque(base);
-  let pool = baseE.filter(m => !recents.has(m.id));
+  let pool = baseE.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version));
   // fait le tour de l'époque : on le dira, et la molette repasse sur « Tout »
   if (!pool.length && baseE !== base && depuis) S.epoqueFinie = true;
   // sur une époque, on épuise d'abord ce qu'on n'a pas encore entendu (quitte à prévoir une suite plus courte)
@@ -808,7 +811,7 @@ function construireSuite(depuis, n = 6) {
     if (!x) x = parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
     if (!x) break;
     suite.push(x.id);
-    pool = pool.filter(m => m !== x);
+    pool = pool.filter(m => m !== x && m.version !== x.version);
     cur = x;
   }
   return suite;
