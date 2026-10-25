@@ -726,12 +726,6 @@ const MORCEAUX = [
     tags: ["soul", "rnb", "saxophone", "boîte à rythmes"],
     energie: 3, etrange: 4, danse: 4 },
 
-  { titre: "The Weekend (Original 12 Inch Mix)", artiste: "Michael Gray", album: "",
-    lien: "https://music.youtube.com/watch?v=beO3qViOUiQ", note: "",
-    ambiance: "piste", style: "House disco, version longue", annee: 2004, bpm: 127, voix: "chant",
-    tags: ["house", "disco", "club", "solaire"],
-    energie: 8, etrange: 3, danse: 9 },
-
   { titre: "Night Fever (Serban Mix)", artiste: "Bee Gees", album: "Saturday Night Fever",
     lien: "https://music.youtube.com/watch?v=6bpd7Gkg0MQ", note: "Serban mix, c'est vraiment gage de qualité (j'ai fait mes recherches sur le monsieur)",
     ambiance: "piste", style: "Disco, remixé par Serban Ghenea", annee: 1977, bpm: 109, voix: "chant",
@@ -757,7 +751,7 @@ const MORCEAUX = [
     energie: 4, etrange: 6, danse: 5 },
 
   { titre: "Oh! Tengo Suerte", artiste: "Masayoshi Takanaka", album: "Seychelles",
-    lien: "https://music.youtube.com/watch?v=UGDQVZ4caR0", note: "Les émotions",
+    lien: "https://music.youtube.com/watch?v=qqgmrDE4p40", note: "Les émotions",
     ambiance: "soleil", style: "Fusion japonaise", annee: 1976, bpm: 120, voix: "instru",
     tags: ["citypop", "japon", "guitares", "latin"],
     energie: 6, etrange: 5, danse: 7 },
@@ -768,12 +762,6 @@ const MORCEAUX = [
     tags: ["jazz", "afro", "monde", "nocturne"],
     energie: 3, etrange: 6, danse: 4 },
 
-  { titre: "Sailing Alone", artiste: "Casiopea", album: "Super Flight",
-    lien: "https://music.youtube.com/watch?v=VwgTm70Njs8", note: "",
-    ambiance: "soleil", style: "Fusion japonaise", annee: 1979, bpm: 118, voix: "instru",
-    tags: ["citypop", "japon", "synthés", "guitares"],
-    energie: 6, etrange: 5, danse: 6 },
-
   { titre: "Dream Hill", artiste: "Casiopea", album: "Casiopea",
     lien: "https://music.youtube.com/watch?v=kwNXiXBjiBo", note: "Les samples découverts sans faire exprès",
     ambiance: "soleil", style: "Fusion japonaise", annee: 1979, bpm: 100, voix: "instru",
@@ -781,13 +769,13 @@ const MORCEAUX = [
     energie: 5, etrange: 5, danse: 6 },
 
   { titre: "Toffee", artiste: "Maddie Ashman", album: "",
-    lien: "https://music.youtube.com/watch?v=oPh0uhdLt64", note: "Je vous recommande de plonger dans la musique micro tonale",
+    lien: "https://music.youtube.com/watch?v=oPh0uhdLt64", note: "Je vous recommande de plonger dans la musique microtonale",
     ambiance: "ailleurs", style: "Pop microtonale", annee: 2025, bpm: 90, voix: "chant",
     tags: ["pop", "expérimental", "voix aérienne", "indie"],
     energie: 4, etrange: 8, danse: 4 },
 
   { titre: "HOWWEFLOW", artiste: "GENA", album: "The Pleasure Is Yours",
-    lien: "https://music.youtube.com/watch?v=QmH60FrHzO4", note: "Je suis souvent séduit par les grosses basses, je le concède",
+    lien: "https://music.youtube.com/watch?v=t4Sj8KTIPp4", note: "Je suis souvent séduit par les grosses basses, je le concède",
     ambiance: "bitume", style: "Neo-soul hip-hop", annee: 2025, bpm: 90, voix: "chant",
     tags: ["rnb", "rap", "jazz", "basses"],
     energie: 6, etrange: 6, danse: 6 },
@@ -802,13 +790,7 @@ const MORCEAUX = [
     lien: "https://music.youtube.com/watch?v=unhNDjnm1aI", note: "J'ai la vision pour l'avenir",
     ambiance: "ailleurs", style: "Rap underground", annee: 2023, bpm: 140, voix: "rap",
     tags: ["rap", "france", "expérimental", "glitch"],
-    energie: 6, etrange: 9, danse: 5 },
-
-  { titre: "Sous la pluie", artiste: "Djado Mado", album: "",
-    lien: "https://music.youtube.com/watch?v=9D6xRc5YoZ4", note: "Pour le souvenir",
-    ambiance: "brume", style: "Chanson pop", annee: 2022, bpm: 90, voix: "chant",
-    tags: ["chanson", "pop", "mélancolique"],
-    energie: 4, etrange: 8, danse: 4 },
+    energie: 6, etrange: 10, danse: 5 },
 
   { titre: "We've Only Just Begun", artiste: "Grant Green", album: "Visions",
     lien: "https://music.youtube.com/watch?v=Pc6TLSnhvUY", note: "",
@@ -823,7 +805,7 @@ const MORCEAUX = [
     energie: 3, etrange: 2, danse: 5 },
 
   { titre: "On My Block", artiste: "Scarface", album: "The Fix",
-    lien: "https://music.youtube.com/watch?v=3cVoaF64aco", note: "Dur de choisir une version de cette prod de Kanye mais quand même",
+    lien: "https://music.youtube.com/watch?v=3cVoaF64aco", note: "",
     ambiance: "bitume", style: "Rap sudiste, samples soul", annee: 2002, bpm: 88, voix: "rap",
     tags: ["rap", "sud", "samples soul", "nocturne"],
     energie: 5, etrange: 3, danse: 5 },

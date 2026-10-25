@@ -578,37 +578,6 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .source-choix b { margin-left: 4px; letter-spacing: 0; opacity: .8; }
 .source-choix[aria-pressed="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
 .reglage-nom { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; white-space: nowrap; }
-/* la bande des époques : on règle la radio comme une vraie */
-.cadran { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 10px; }
-.cadran-bande {
-  position: relative; display: grid; grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
-  height: 48px; padding: 0 6px; border-radius: 10px; overflow: hidden;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 calc(100% / 40 - 1px), color-mix(in srgb, var(--lcd-encre) 28%, transparent) calc(100% / 40 - 1px) calc(100% / 40)) left 6px top 7px / calc(100% - 12px) 7px no-repeat,
-    repeating-linear-gradient(90deg, transparent 0 calc(100% / 8 - 1px), color-mix(in srgb, var(--lcd-encre) 55%, transparent) calc(100% / 8 - 1px) calc(100% / 8)) left 6px top 7px / calc(100% - 12px) 12px no-repeat,
-    radial-gradient(120% 140% at 50% 120%, color-mix(in srgb, var(--lcd-encre) 16%, #0c0e12), #07080b 70%);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.06), 0 1px 0 rgba(255,255,255,.5);
-}
-.cadran-bande::after { /* le reflet de la vitre */
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
-  background: linear-gradient(180deg, rgba(255,255,255,.1), transparent 45%);
-}
-.cadran-choix {
-  position: relative; z-index: 1; align-self: end; height: 30px;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; font-weight: 700; letter-spacing: .02em;
-  color: color-mix(in srgb, var(--lcd-encre) 62%, transparent); text-shadow: 0 0 6px var(--lcd-halo); white-space: nowrap;
-  transition: color .2s;
-}
-.cadran-choix:hover { color: var(--lcd-encre); }
-.cadran-choix[aria-checked="true"] { color: var(--lcd-encre); text-shadow: 0 0 10px var(--lcd-halo), 0 0 2px var(--lcd-encre); }
-.cadran-choix:focus-visible { outline: 2px solid var(--lcd-encre); outline-offset: -4px; border-radius: 6px; }
-.cadran-aiguille {
-  position: absolute; z-index: 2; top: 4px; height: 22px; width: 2px; margin-left: -1px; border-radius: 1px; pointer-events: none;
-  left: calc(6px + (100% - 12px) * (var(--pos, 0) + .5) / var(--n, 8));
-  background: #ff4a3d; box-shadow: 0 0 8px 1px rgba(255, 74, 61, .7);
-  transition: left .55s cubic-bezier(.3, 1.4, .5, 1);
-}
-.cadran-aiguille::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -4px; border: 4px solid transparent; border-top: 5px solid #ff4a3d; border-bottom: 0; }
 /* trois réglages, par deux */
 .rails { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
 .reglage { display: grid; gap: 5px; min-width: 0; }
@@ -696,8 +665,8 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .machine-source { margin-top: -14px; font-size: 14px; color: var(--encre-2); text-align: center; }
 
 /* ─────────────────────────────── L'ÉCRAN VIDÉO ───────────────────────────────
-   Une seule vidéo, posée sur la chaîne ; quand on descend lire la suite, elle
-   suit dans un coin (YouTube veut qu'elle reste visible, 200 × 200 px au moins). */
+   Une seule vidéo, posée sur la chaîne ; quand on descend, elle reste à sa place
+   et la musique continue. */
 .ecran-video {
   position: fixed; top: 0; left: 0; z-index: 36;
   overflow: hidden; border-radius: var(--rayon-ecran);
@@ -706,9 +675,6 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 .ecran-video #yt-lecteur, .ecran-video iframe { width: 100%; height: 100%; display: block; border: 0; }
 .ecran-video.cache { visibility: hidden; pointer-events: none; transform: translate(-200vw, 0) !important; width: 320px !important; height: 180px !important; }
-.coin-video { position: fixed; z-index: 30; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: 356px; display: grid; gap: 6px; justify-items: end; }
-.emplacement-coin { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border-radius: 12px; background: #000; box-shadow: 0 16px 34px rgba(0,0,0,.35); }
-.coin-retour { min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--encre); color: var(--fond); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
 
 /* ─────────────────────────────── LE LIVRET (« Plus d'infos ») ───────────────────────────────
    Comme le livret d'un CD : l'album, l'artiste, et où écouter le morceau en entier. */
@@ -871,10 +837,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .avis-appli .lien-bouton { color: inherit; opacity: .75; }
 
 /* ─────────────────────────────── ORDINATEUR ─────────────────────────────── */
-/* tant qu'une vidéo YouTube joue, « Plus d'infos » garde une marge à droite pour la vidéo en coin */
-@media (min-width: 1100px) {
-  body.video-machine .livret-machine { width: min(1100px, calc(100% - 392px)); justify-self: start; }
-}
 @media (max-width: 1200px) { #teintes-facade { display: none; } }
 
 @media (min-width: 1100px) and (max-height: 860px) {
@@ -885,7 +847,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .hifi-commandes { padding-top: 12px; }
   .tuner { padding: 12px 22px 14px; gap: 10px; }
   .tuner-haut { padding-bottom: 8px; }
-  .cadran-bande { height: 44px; }
   .rail-bout { min-height: 40px; }
   .ensuite { min-height: 52px; }
 }
@@ -917,8 +878,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   /* les enceintes s'effacent : la place va au lecteur, l'écran et la vidéo restent côte à côte */
   .hifi { grid-template-columns: minmax(0, 1fr); grid-template-areas: "corps" "tuner"; max-width: 980px; }
   .hifi-enceinte { display: none; }
-  .coin-video { right: 12px; }
-  body.video-coin .ecran-machine { padding-bottom: 260px; }
 }
 @media (max-width: 860px) {
   body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "ecran" "commandes" "trappe"; }
@@ -1016,9 +975,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .tuner-consigne { font-size: 12.5px; flex: 1 1 100%; }
   .sources { margin-left: 0; flex: 1 1 100%; margin-top: 6px; }
   .source-choix { flex: 1; }
-  .cadran { grid-template-columns: minmax(0, 1fr); gap: 5px; }
-  .cadran-bande { padding: 0 2px; }
-  .cadran-choix { font-size: 11px; letter-spacing: 0; }
   .reglage { grid-template-columns: minmax(0, 1fr); gap: 5px; }
   .rail-bout { font-size: 13px; padding: 0 4px; gap: 4px; }
   .ensuite { gap: 10px; padding-left: 10px; flex-wrap: wrap; }
@@ -1029,14 +985,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .ensuite-cap { order: 3; margin-left: 50px; margin-bottom: 2px; }
   .ensuite-indice { display: none; }
 
-  /* quand on descend, la vidéo se range en haut, sous la barre (comme dans l'appli YouTube) :
-     le tuner et « Plus d'infos » défilent dessous, rien n'est caché en bas de l'écran */
-  .coin-video { left: 16px; right: 16px; top: calc(70px + env(safe-area-inset-top)); bottom: auto; width: auto; }
-  .emplacement-coin { aspect-ratio: 16 / 9; min-height: 200px; border-radius: 10px; }
-  .coin-retour { display: none; }
-  body.video-coin .ecran-machine { padding-bottom: 120px; }
-  body.video-coin .toast { top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); }
-  body.video-machine .livret { scroll-margin-top: 290px; }
 
   .livret-album-tete { grid-template-columns: 76px minmax(0, 1fr); gap: 14px; }
   .pochette-livret { width: 76px; }

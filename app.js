@@ -85,8 +85,6 @@ const S = {
   affichage: memoire.lire('md-affichage-v2', 'ecran'), // l'écran LCD, ou le disque qui tourne
   pente: null,            // une direction qui tient : { dir, force, neuf, vise, joues, sol }
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
-  epoque: memoire.lire('md-epoque', 'toutes'),  // la molette d'époque
-  epoqueFinie: false,     // tous les morceaux de l'époque sont passés
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
   aime: new Set(memoire.lire('md-aime', [])),
   aimePas: new Set(memoire.lire('md-aime-pas', [])),
@@ -94,7 +92,8 @@ const S = {
   volume: borner(memoire.lire('md-volume', 60), 0, 100),
   croises: memoire.lire('md-croises', []),
   gardes: memoire.lire('md-gardes', []),
-  injouables: new Set(memoire.lire('md-injouables', [])),
+  // vidéos que YouTube a refusées : on les réessaie au bout de deux jours (un refus n'est pas toujours définitif)
+  injouables: (() => { const v = memoire.lire('md-injouables-v2', {}); const t = Date.now(); return new Map(Object.entries(v).filter(([, d]) => t - d < 2 * 864e5)); })(),
   son: memoire.lire('md-son', 'complet'),
   onglet: 'gardes',
   livrets: { machine: false },
@@ -534,8 +533,8 @@ window.onYouTubeIframeAPIReady = () => {
         const m = parId[S.joue];
         if (!m || S.lecture !== 'yt') return;
         clearTimeout(demarrage);
-        S.injouables.add(m.yt);
-        memoire.ecrire('md-injouables', [...S.injouables]);
+        S.injouables.set(m.yt, Date.now());
+        memoire.ecrire('md-injouables-v2', Object.fromEntries(S.injouables));
         try { lecteur.stopVideo(); } catch (e) {}
         jouerExtraitComplet(m);
       }
@@ -658,21 +657,8 @@ function tempsActuel() {
 /* Règles du lecteur YouTube, respectées ici : la vidéo est toujours visible
    pendant qu'elle joue (jamais de lecture cachée), dans un cadre d'au moins
    200 × 200 pixels, sans rien posé par-dessus. Une seule vidéo, qui se pose
-   sur la chaîne, ou dans un coin de l'écran quand on descend lire la suite. */
-let chaineVue = true;
-if ('IntersectionObserver' in window) {
-  new IntersectionObserver(es => {
-    const e = es[0];
-    const v = e.isIntersecting && e.intersectionRect.height >= Math.min(190, e.boundingClientRect.height * 0.85);
-    if (v === chaineVue) return;
-    chaineVue = v;
-    majVideo();
-  }, { threshold: [0, 0.25, 0.5, 0.75, 0.85, 0.95, 1], rootMargin: `-${($('.facade-haut') || {}).offsetHeight || 64}px 0px 0px 0px` }).observe($('[data-emplacement="machine"]'));
-}
+   sur la chaîne. Quand on descend, elle reste à sa place et la musique continue. */
 function majVideo() {
-  const coin = S.vue === 'machine' && !!S.joue && S.lecture === 'yt' && !chaineVue;
-  $('#coin-video').hidden = !coin;
-  document.body.classList.toggle('video-coin', coin);
   document.body.classList.toggle('video-machine', S.lecture === 'yt' && S.vue === 'machine');
   majGarde();
   placerEcranVideo();
@@ -680,7 +666,7 @@ function majVideo() {
 let suiviRAF = null;
 function emplacementCible() {
   if (!S.joue || S.lecture !== 'yt' || S.vue !== 'machine') return null;
-  return $(chaineVue ? '[data-emplacement="machine"]' : '[data-emplacement="coin"]');
+  return $('[data-emplacement="machine"]');
 }
 function placerEcranVideo() {
   const ev = $('#ecran-video');
@@ -713,7 +699,7 @@ setInterval(() => {
 /* ─────────────────────────────── LA CHAÎNE ET LE TUNER ───────────────────────────────
    La chaîne diffuse ; juste dessous, le tuner l'oriente pendant qu'elle tourne.
    « J'aime bien » attire la suite vers ce morceau, « Pas trop comme ça » l'en éloigne
-   (et passe au suivant), les directions et l'époque choisissent le prochain titre.
+   (et passe au suivant), les directions choisissent le prochain titre.
    Le moteur (moteur.js) compare les fiches de data.js pour que chaque morceau mène
    au plus proche. */
 const SOURCES = {
@@ -721,48 +707,6 @@ const SOURCES = {
   selection: { nom: 'Ma sélection' },
 };
 const nomCap = d => (Moteur.DIRECTIONS[d] || {}).nom || '';
-/* la molette d'époque, façon Radioooooo : on règle la décennie, la radio pioche dedans */
-const EPOQUES = [
-  { k: 'toutes', nom: 'Toutes les époques', court: 'Tout', de: -Infinity, a: Infinity },
-  { k: 'avant', nom: 'Avant 1960', court: '<60', de: -Infinity, a: 1959 },
-  { k: '60', nom: 'Années 60', court: '60', de: 1960, a: 1969 },
-  { k: '70', nom: 'Années 70', court: '70', de: 1970, a: 1979 },
-  { k: '80', nom: 'Années 80', court: '80', de: 1980, a: 1989 },
-  { k: '9000', nom: 'Années 90 et 2000', court: '90·00', de: 1990, a: 2009 },
-  { k: '10', nom: 'Années 2010', court: '10', de: 2010, a: 2019 },
-  { k: '20', nom: 'Années 2020', court: '20', de: 2020, a: Infinity },
-];
-const epoqueDe = k => EPOQUES.find(e => e.k === k) || EPOQUES[0];
-const dansEpoque = (m, k) => { const e = epoqueDe(k); return e.k === 'toutes' || (+m.annee >= e.de && +m.annee <= e.a); };
-// la radio, ramenée à l'époque choisie (ma sélection, elle, garde tout)
-function filtreEpoque(l) {
-  if (S.source === 'selection' || S.epoque === 'toutes') return l;
-  const f = l.filter(m => dansEpoque(m, S.epoque));
-  return f.length ? f : l;
-}
-function choisirEpoque(k) {
-  if (!EPOQUES.some(e => e.k === k)) return;
-  const avant = S.epoque;
-  S.epoque = k; S.epoqueFinie = false; memoire.ecrire('md-epoque', k);
-  gresillement();
-  if (avant === k) return;
-  const cur = parId[S.joue];
-  if (cur) S.suite = construireSuite(cur);
-  rendreTuner(); majAfficheur();
-  signalerEnsuite();
-}
-// le petit souffle de la radio qu'on règle
-function gresillement() {
-  if (S.fidget && S.fidget.bip === false) return;
-  const c = audioCtx(); if (!c) return;
-  try {
-    const n = Math.floor(c.sampleRate * 0.22), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
-    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
-    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1800 + Math.random() * 1200; f.Q.value = 0.9; g.gain.value = 0.06;
-    src.connect(f).connect(g).connect(c.destination); src.start();
-  } catch (e) {}
-}
 function poolSource() {
   const p = S.source === 'selection' ? S.gardes.map(id => parId[id]).filter(Boolean) : BANQUE;
   const ok = p.filter(ecoutable);
@@ -791,12 +735,8 @@ function construireSuite(depuis, n = 6) {
   const recents = new Set(S.historique.slice(-40));
   const versionsRecentes = new Set(S.historique.slice(-12).map(id => parId[id] && parId[id].version));
   const base = poolSource().filter(m => (!depuis || (m.id !== depuis.id && m.version !== depuis.version)) && (selection || !S.aimePas.has(m.id)));
-  const baseE = filtreEpoque(base);
-  let pool = baseE.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version));
-  // fait le tour de l'époque : on le dira, et la molette repasse sur « Tout »
-  if (!pool.length && baseE !== base && depuis) S.epoqueFinie = true;
-  // sur une époque, on épuise d'abord ce qu'on n'a pas encore entendu (quitte à prévoir une suite plus courte)
-  if (pool.length < n && (baseE === base || !pool.length)) pool = baseE;
+  let pool = base.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version));
+  if (pool.length < n) pool = base;
   const suite = [];
   let cur = depuis || hasard(pool);
   if (!depuis && cur) { suite.push(cur.id); pool = pool.filter(m => m !== cur); }
@@ -816,18 +756,8 @@ function construireSuite(depuis, n = 6) {
   }
   return suite;
 }
-// tous les morceaux de l'époque sont passés : on le dit, et la molette repasse sur « Tout »
-function finTourEpoque() {
-  if (!S.epoqueFinie) return;
-  S.epoqueFinie = false;
-  const nom = epoqueDe(S.epoque).nom;
-  S.epoque = 'toutes'; memoire.ecrire('md-epoque', 'toutes');
-  S.suite = construireSuite(parId[S.joue] || null);
-  toast(`Tu as fait le tour : ${nom.charAt(0).toLowerCase() + nom.slice(1)}. La molette repasse sur toutes les époques.`, 4200);
-}
 function rafraichirSuite() {
   S.suite = construireSuite(parId[S.joue] || null);
-  finTourEpoque();
   rendreTuner();
   majAfficheur();
 }
@@ -914,7 +844,6 @@ function jouerRadio(id, { debut = 0 } = {}) {
     if (S.pente.joues >= 6) { toast(`${nomCap(S.pente.dir)} : c'était le sixième. La radio reprend son fil.`, 3200); S.pente = null; }
   }
   S.suite = construireSuite(m);
-  finTourEpoque();
   if (S.pente && S.pente.neuf) S.pente.vise = S.suite[0];
   rendreTuner();
   majMachine();
@@ -992,7 +921,7 @@ function orienter(dir) {
     S.pente.force = Math.min(3, S.pente.force + 1); S.pente.neuf = true; S.pente.joues = 0;
   } else S.pente = { dir, force: 1, neuf: true, vise: null, joues: 0, sol: null };
   // tout au bout de l'échelle : on le dit, et on reste au même niveau plutôt que de refuser
-  const bout = !Moteur.possible(cur, dir, filtreEpoque(poolSource().filter(x => x.id !== cur.id)), val);
+  const bout = !Moteur.possible(cur, dir, (poolSource().filter(x => x.id !== cur.id)), val);
   S.suite = construireSuite(cur);
   S.pente.vise = S.suite[0] || null;
   rendreTuner();
@@ -1029,7 +958,7 @@ function bidouiller(b) {
   clic(...(sons[cle] || [1500, 0.03, 0.05]));
   if (cle === 'vitesse' && !S.enLecture) toast('Lance un morceau pour voir le disque tourner.');
 }
-/* le tuner : ta sélection ou la radio, l'époque, les trois réglages, et ce qui vient ensuite */
+/* le tuner : ta sélection ou la radio, les trois réglages, et ce qui vient ensuite */
 const AXES = [
   ['Énergie', 'calme', 'energique'],
   ['Groovy', 'pose', 'dansant'],
@@ -1037,7 +966,7 @@ const AXES = [
 ];
 function rendreTuner() {
   const m = parId[S.joue];
-  const pool = filtreEpoque(poolSource().filter(x => !m || x.id !== m.id));
+  const pool = (poolSource().filter(x => !m || x.id !== m.id));
   // la radio ou ta sélection : seulement quand ta sélection a au moins deux morceaux
   const so = $('#sources');
   so.hidden = S.gardes.length < 2;
@@ -1054,19 +983,6 @@ function rendreTuner() {
       <span class="reglage-nom">${nom}</span>
       <div class="reglage-paire">${bouton(g, 'g')}${bouton(d, 'd')}</div>
     </div>`).join('');
-  // l'époque : une bande de radio, pour la radio seulement
-  const ca = $('#cadran');
-  ca.hidden = S.source === 'selection';
-  if (!ca.hidden) {
-    const radio = poolSource().filter(x => !S.aimePas.has(x.id));
-    const i = Math.max(0, EPOQUES.findIndex(e => e.k === S.epoque));
-    const nb = k => radio.filter(x => dansEpoque(x, k)).length;
-    ca.innerHTML = `<span class="reglage-nom">Époque</span>
-      <div class="cadran-bande" role="radiogroup" aria-label="Époque" style="--pos:${i};--n:${EPOQUES.length}">
-        <span class="cadran-aiguille" aria-hidden="true"></span>
-        ${EPOQUES.map(e => `<button class="cadran-choix" role="radio" data-action="epoque" data-epoque="${e.k}" aria-checked="${e.k === S.epoque}" aria-label="${E(e.nom)}" title="${E(e.nom)}${e.k === 'toutes' ? '' : ` · ${nb(e.k)} morceau${nb(e.k) > 1 ? 'x' : ''}`}">${E(e.court)}</button>`).join('')}
-      </div>`;
-  }
   rendreEnsuite(parId[S.suite[0]]);
   majPostIt(m);
   majGarde();
@@ -1165,7 +1081,7 @@ function texteLCD(el, texte) {
   requestAnimationFrame(() => { if (el.scrollWidth > boite.clientWidth + 2) boite.classList.remove('fixe'); });
 }
 function majEtiquette(m, active) {
-  $('#etq-piste').textContent = m ? `PISTE ${deux(S.historique.length)} · ${S.source === 'selection' ? 'MA SÉLECTION' : S.epoque === 'toutes' ? 'LA RADIO' : epoqueDe(S.epoque).nom.toUpperCase()}` : 'PISTE --';
+  $('#etq-piste').textContent = m ? `PISTE ${deux(S.historique.length)} · ${S.source === 'selection' ? 'MA SÉLECTION' : 'LA RADIO'}` : 'PISTE --';
   $('#etq-titre').textContent = m ? m.affiche : 'Appuie sur lecture';
   $('#etq-artiste').textContent = m ? m.artiste : '';
   const e = parId[S.suite[0]];
@@ -1357,7 +1273,7 @@ function allumer() {
   // pris parmi ceux que tu n'as encore jamais entendus (puis les moins récents)
   let m = null;
   if (S.source === 'radio') {
-    const pool = filtreEpoque(poolSource());
+    const pool = (poolSource());
     const vus = new Set(S.croises);
     const jamais = pool.filter(x => !vus.has(x.id) && !S.aimePas.has(x.id));
     m = jamais.length ? hasard(jamais) : hasard(pool.filter(x => !S.historique.slice(-40).includes(x.id)));
@@ -1385,10 +1301,8 @@ const ACTIONS = {
   'aime': () => aimer(S.joue),
   'pas-aime': () => pasAime(S.joue),
   'cap': b => orienter(b.dataset.dir),
-  'epoque': b => choisirEpoque(b.dataset.epoque),
   'fidget': b => bidouiller(b),
   'source-chaine': b => choisirSource(b.dataset.source),
-  'retour-morceau': () => window.scrollTo({ top: 0, behavior: doux }),
   'cosmetique': () => basculerCosmetique(),
   'affichage': b => choisirAffichage(b.dataset.val),
   'fermer-livret': () => { const m = parId[S.joue]; S.livrets.machine = false; if (m) rendreLivret('machine', m, { force: true }); clic(1000, 0.04, 0.05); },
@@ -1427,7 +1341,7 @@ document.addEventListener('click', e => {
   if (!a) return;
   e.preventDefault();
   // après un clic de souris, le bouton lâche le focus : Espace mettra en pause au lieu de rappuyer dessus
-  if (e.detail > 0 && b.matches('.rail-bout, .rond, .pilule, .ensuite-passer, .ensuite-morceau, .cadran-choix, .source-choix, .choix-affichage button')) b.blur();
+  if (e.detail > 0 && b.matches('.rail-bout, .rond, .pilule, .ensuite-passer, .ensuite-morceau, .source-choix, .choix-affichage button')) b.blur();
   // une erreur dans une action ne doit jamais figer le reste du site
   try { a(b); } catch (err) { console.error(err); toast('Oups, quelque chose a coincé. Réessaie.'); }
 });
@@ -1437,7 +1351,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
   if (e.ctrlKey || e.metaKey || e.altKey || S.vue !== 'machine' || !S.joue) return;
   const t = e.target;
-  if (t.closest && t.closest('input, textarea, select, [contenteditable="true"], .molette, .cadran-bande')) return;
+  if (t.closest && t.closest('input, textarea, select, [contenteditable="true"], .molette')) return;
   const surBouton = t.closest && t.closest('button, a');
   const touche = e.key.length === 1 ? e.key.toLowerCase() : e.key;
   if (touche === ' ') { if (surBouton) return; e.preventDefault(); basculerLecture(); }
@@ -1534,14 +1448,5 @@ if (S.gardes.length || S.croises.length) {
   pi.addEventListener('pointerup', lacher); pi.addEventListener('pointercancel', lacher);
   pi.addEventListener('dblclick', () => { pi.style.setProperty('--dx', '0px'); pi.style.setProperty('--dy', '0px'); });
 })();
-// la molette au clavier : flèches gauche et droite
-document.addEventListener('keydown', e => {
-  if (!e.target.closest || !e.target.closest('.cadran-bande') || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-  e.preventDefault();
-  const i = EPOQUES.findIndex(x => x.k === S.epoque) + (e.key === 'ArrowRight' ? 1 : -1);
-  if (i < 0 || i >= EPOQUES.length) return;
-  choisirEpoque(EPOQUES[i].k);
-  const b = $(`.cadran-choix[data-epoque="${EPOQUES[i].k}"]`); if (b) b.focus();
-});
 aller('allumage');
 })();

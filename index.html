@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=40">
+  <link rel="stylesheet" href="styles.css?v=41">
   <link rel="stylesheet" href="teintes.css?v=14">
 </head>
 <body>
@@ -212,7 +212,6 @@
             <p class="tuner-consigne">Choisis un réglage pour le prochain titre.</p>
             <div class="sources" id="sources" role="group" aria-label="Ce que joue la chaîne" hidden></div>
           </div>
-          <div class="cadran" id="cadran"></div>
           <div class="rails" id="rails"></div>
           <div class="ensuite" id="ensuite" aria-live="polite"></div>
         </section>
@@ -240,11 +239,6 @@
 
   </main>
 
-  <!-- quand on descend, la vidéo suit dans un coin : la musique continue (YouTube veut la vidéo visible) -->
-  <div class="coin-video" id="coin-video" hidden>
-    <button class="coin-retour" data-action="retour-morceau">↑ Revenir à la chaîne</button>
-    <div class="emplacement-ecran emplacement-coin" data-emplacement="coin"></div>
-  </div>
   <div class="ecran-video" id="ecran-video" hidden><div id="yt-lecteur"></div></div>
 
   <!-- ═════════════ MA SÉLECTION ═════════════ -->
@@ -297,10 +291,10 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=18"></script>
+  <script src="data.js?v=19"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=15"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=41"></script>
+  <script src="app.js?v=42"></script>
 </body>
 </html>
