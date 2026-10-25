@@ -145,6 +145,15 @@
     .v-passe { background: var(--doute-fond); color: #1c1d22; }
     .v-passe small { opacity: .75; }
     .lien-ytm { font-size: 14px; }
+    /* l'effet du pull up : flash, balayage de bobine qui se rembobine, secousse de la carte */
+    .rebobine { position: absolute; inset: 0; pointer-events: none; opacity: 0; display: grid; place-items: center; color: #fff; font: 700 clamp(1.6rem, 6vw, 2.8rem) "Unbounded", sans-serif; letter-spacing: -.03em; text-shadow: 0 0 24px rgba(111,136,255,.9); background: repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0 2px, transparent 2px 6px), radial-gradient(circle, rgba(111,136,255,.55), rgba(111,136,255,.05)); }
+    .ecran.pull .rebobine { animation: rebobine .7s ease-out; }
+    @keyframes rebobine { 0% { opacity: 1; transform: scale(1.06); filter: blur(2px); } 25% { opacity: 1; transform: scale(1); filter: none; } 100% { opacity: 0; transform: scale(.98); } }
+    .ecran.pull { animation: secousse .35s ease-out; }
+    @keyframes secousse { 0%,100% { transform: none; } 20% { transform: translateX(-6px) skewX(-2deg); } 45% { transform: translateX(5px) skewX(2deg); } 70% { transform: translateX(-2px); } }
+    .pullup.boum { animation: boum .5s ease-out; }
+    @keyframes boum { 0% { box-shadow: 0 6px 0 rgba(0,0,0,.25), 0 0 0 0 rgba(111,136,255,.9); } 100% { box-shadow: 0 6px 0 rgba(0,0,0,.25), 0 0 0 28px rgba(111,136,255,0); } }
+    @media (prefers-reduced-motion: reduce) { .ecran.pull, .ecran.pull .rebobine, .pullup.boum { animation: none; } }
     .options { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 14px; color: var(--encre-2); }
     .options label { display: inline-flex; gap: 8px; align-items: center; }
     .lien { text-decoration: underline; text-underline-offset: 4px; font-size: 14px; color: var(--encre-2); }
@@ -297,7 +306,7 @@
 
   <section class="table" id="table" hidden>
     <div class="gauche">
-      <div class="ecran" id="ecran"><div id="yt"></div><div class="verdict-flash" id="flash"></div></div>
+      <div class="ecran" id="ecran"><div id="yt"></div><div class="verdict-flash" id="flash"></div><div class="rebobine" id="rebobine" aria-hidden="true">⏪ PULL UP</div></div>
     </div>
     <div class="frise-bloc" id="frise-bloc">
       <div class="frise-tete"><span>La playlist, morceau par morceau</span><span id="frise-legende"></span></div>
@@ -438,6 +447,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js?v=21"></script>
-<script src="tri.js?v=18"></script>
+<script src="tri.js?v=19"></script>
 </body>
 </html>

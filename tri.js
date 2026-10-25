@@ -855,7 +855,9 @@ $('#v-tard').addEventListener('click', ouiPlusTard);
 function pullUp() {
   if (!courant || !lecteur) return;
   try { lecteur.seekTo(0, true); lecteur.playVideo(); } catch (e) {}
-  vibre(10);
+  vibre([20, 40, 20, 40, 60]);
+  const e = $('#ecran'), b = $('#t-pullup');
+  [[e, 'pull'], [b, 'boum']].forEach(([el, c]) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); setTimeout(() => el.classList.remove(c), 750); });
 }
 $('#t-pullup').addEventListener('click', pullUp);
 $('#t-annuler').addEventListener('click', annuler);
