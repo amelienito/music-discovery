@@ -83,7 +83,11 @@ const S = {
   historique: memoire.lire('md-historique', []).filter(id => parId[id]),
   echecs: 0,              // morceaux qui ne démarrent pas, d'affilée
   affichage: memoire.lire('md-affichage-v2', 'ecran'), // l'écran LCD, ou le disque qui tourne
-  pente: null,            // une direction qui tient : { dir, force, neuf, vise, joues, sol }
+  pile: [],               // les trois disques posés sous la chaîne : [{ m, dir }]
+  choix: 1,               // celui qui passera ensuite (le milieu par défaut)
+  tirage: 0,              // « Autres disques » : combien de fois on a reposé la pile
+  dejaVus: new Set(),     // les disques déjà proposés pour ce morceau
+  axeSuivi: null,         // on a choisi un côté : la pile suivante garde la même échelle
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
   aime: new Set(memoire.lire('md-aime', [])),
@@ -268,7 +272,8 @@ function basculerGarde(id) {
   memoire.ecrire('md-aime', [...S.aime]); memoire.ecrire('md-aime-pas', [...S.aimePas]);
   majGarde();
   if (S.source === 'selection' && S.gardes.length < 2) { choisirSource('radio'); return; }
-  if (S.joue) rafraichirSuite(); else rendreTuner();
+  // la pile reste en place (sauf si ta sélection, qui la remplit, a changé)
+  if (S.joue && S.source === 'selection') rafraichirSuite(); else rendreTuner();
   if (!$('#bac').hidden) rendreBac();
 }
 // le cœur de la chaîne et le compteur de « Ma sélection »
@@ -488,9 +493,8 @@ audioExtrait.addEventListener('error', () => { if (extraitPour) { arreterExtrait
 document.addEventListener('pochette-prete', e => {
   const id = e.detail;
   if (S.joue === id && S.vue === 'machine') majAfficheur();
-  // la pochette du prochain titre arrive dans « Ensuite » (sans refaire toute la ligne)
-  const p = S.suite[0] === id && $('.ensuite-morceau .pochette');
-  if (p) p.outerHTML = Pochettes.html(parId[id], 'pochette-ensuite');
+  // une vraie pochette arrive pour un disque de la pile : on le repose avec
+  if (S.vue === 'machine' && S.pile.some(p => p.m.id === id)) rendreTuner();
 });
 
 /* ─────────────────────────────── LE LECTEUR ─────────────────────────────── */
@@ -697,16 +701,16 @@ setInterval(() => {
 }, 500);
 
 /* ─────────────────────────────── LA CHAÎNE ET LE TUNER ───────────────────────────────
-   La chaîne diffuse ; juste dessous, le tuner l'oriente pendant qu'elle tourne.
-   « J'aime bien » attire la suite vers ce morceau, « Pas trop comme ça » l'en éloigne
-   (et passe au suivant), les directions choisissent le prochain titre.
+   La chaîne diffuse ; juste dessous, trois disques posés : le prochain titre, c'est toi
+   qui le choisis (plus calme / dans la lignée / plus énergique, l'échelle change à chaque
+   morceau). « J'aime bien » attire la suite vers ce morceau, « Pas trop comme ça » l'en
+   éloigne (et passe au suivant).
    Le moteur (moteur.js) compare les fiches de data.js pour que chaque morceau mène
    au plus proche. */
 const SOURCES = {
   radio:     { nom: 'La radio' },
   selection: { nom: 'Ma sélection' },
 };
-const nomCap = d => (Moteur.DIRECTIONS[d] || {}).nom || '';
 function poolSource() {
   const p = S.source === 'selection' ? S.gardes.map(id => parId[id]).filter(Boolean) : BANQUE;
   const ok = p.filter(ecoutable);
@@ -722,12 +726,11 @@ function gout(x) {
 const score = (cur, x) => Moteur.distance(cur, x) + gout(x);
 function parmiDeux(l) { return !l.length ? null : l.length === 1 || Math.random() < 0.72 ? l[0] : l[1]; }
 /* la suite : les six prochains morceaux, calculés depuis celui qui passe.
-   Sans direction, chaque morceau mène au plus proche (ce que tu aimes attire) ;
-   avec une direction, le moteur avance dans ce sens sans sauter d'un univers à l'autre.
-   Ta sélection sans direction passe dans l'ordre qui s'enchaîne le mieux. */
+   Chaque morceau mène au plus proche (ce que tu aimes attire) ;
+   ta sélection passe dans l'ordre qui s'enchaîne le mieux. */
 function construireSuite(depuis, n = 6) {
   const selection = S.source === 'selection';
-  if (selection && !S.pente) {
+  if (selection) {
     const ordre = Moteur.sequencer(poolSource(), { depart: depuis && S.gardes.includes(depuis.id) ? depuis : null }).map(m => m.id);
     const i = depuis ? ordre.indexOf(depuis.id) : -1;
     return [...ordre.slice(i + 1), ...ordre.slice(0, Math.max(0, i))].slice(0, n);
@@ -740,15 +743,8 @@ function construireSuite(depuis, n = 6) {
   const suite = [];
   let cur = depuis || hasard(pool);
   if (!depuis && cur) { suite.push(cur.id); pool = pool.filter(m => m !== cur); }
-  let sol = S.pente ? S.pente.sol : null;
   while (suite.length < n && pool.length) {
-    let x = null;
-    if (cur && S.pente) {
-      const premier = !suite.length && S.pente.neuf;
-      x = Moteur.suivantPente(cur, S.pente.dir, pool, val, { premier, force: S.pente.force, etape: S.pente.joues + suite.length, sol: premier ? null : sol, gout });
-      if (x) sol = Moteur.nouveauSol(S.pente.dir, premier ? null : sol, x, val);
-    }
-    if (!x) x = parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
+    const x = parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
     if (!x) break;
     suite.push(x.id);
     pool = pool.filter(m => m !== x && m.version !== x.version);
@@ -756,10 +752,87 @@ function construireSuite(depuis, n = 6) {
   }
   return suite;
 }
+/* la pile : trois disques posés sous la chaîne, pour choisir le prochain titre.
+   Au milieu, celui qui s'enchaîne le mieux (« dans la lignée ») ; à gauche et à droite,
+   un pas de chaque côté d'une même échelle : énergie, groove ou notoriété. L'échelle
+   change à chaque morceau ; quand tu choisis un côté, la pile suivante garde la même,
+   pour que tu puisses continuer dans ce sens. */
+const AXES = [['calme', 'energique'], ['pose', 'dansant'], ['connu', 'confidentiel']];
+const ETIQUETTES = { calme: 'plus calme', energique: 'plus énergique', pose: 'moins groovy', dansant: 'plus groovy', connu: 'plus mainstream', confidentiel: 'plus confidentiel' };
+const axeDe = dir => AXES.findIndex(a => a.includes(dir));
+function calculerPile(cur) {
+  if (!cur) return [];
+  const selection = S.source === 'selection';
+  const recents = new Set(S.historique.slice(-40));
+  const versionsRecentes = new Set(S.historique.slice(-12).map(id => parId[id] && parId[id].version));
+  const base = poolSource().filter(m => m.id !== cur.id && m.version !== cur.version && (selection || !S.aimePas.has(m.id)));
+  let pool = base.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version) && !S.dejaVus.has(m.id));
+  if (pool.length < 6) pool = base.filter(m => !S.dejaVus.has(m.id) && !recents.has(m.id));
+  if (pool.length < 3) pool = base.filter(m => !S.dejaVus.has(m.id));
+  if (pool.length < 3) pool = base;
+  if (!pool.length) return [];
+  // le milieu : ta sélection garde son ordre, la radio prend le plus proche
+  let milieu = null;
+  if (selection && !S.tirage) milieu = parId[construireSuite(cur, 1)[0]];
+  if (!milieu || !pool.includes(milieu)) milieu = parmiDeux(pool.map(m => [m, score(cur, m)]).sort((a, b) => a[1] - b[1]).map(p => p[0]));
+  const reste = pool.filter(x => x !== milieu && x.version !== milieu.version);
+  const sauf = (l, m) => m ? l.filter(x => x !== m && x.version !== m.version) : l;
+  const depart = (S.axeSuivi !== null ? S.axeSuivi : S.historique.length) + S.tirage;
+  // une échelle où l'on peut aller des deux côtés
+  for (let k = 0; k < 3; k++) {
+    const [g, d] = AXES[(depart + k) % 3];
+    const a = Moteur.versDirection(cur, g, reste, val, { gout });
+    const b = a && Moteur.versDirection(cur, d, sauf(reste, a), val, { gout });
+    if (a && b) return [{ m: a, dir: g }, { m: milieu, dir: null }, { m: b, dir: d }];
+  }
+  // tout au bout d'une échelle : on prend les deux pas possibles, d'où qu'ils viennent
+  const cotes = [];
+  let r = reste;
+  for (let k = 0; k < 3 && cotes.length < 2; k++) for (const dir of AXES[(depart + k) % 3]) {
+    if (cotes.length >= 2) break;
+    const x = Moteur.versDirection(cur, dir, r, val, { gout });
+    if (x) { cotes.push({ m: x, dir }); r = sauf(r, x); }
+  }
+  // et s'il manque encore un disque, un voisin
+  while (cotes.length < 2 && r.length) { const x = r.sort((p, q) => score(cur, p) - score(cur, q))[0]; cotes.push({ m: x, dir: null }); r = sauf(r, x); }
+  return cotes.length === 2 ? [cotes[0], { m: milieu, dir: null }, cotes[1]] : [...cotes, { m: milieu, dir: null }];
+}
+// la pile du morceau qui passe, et la suite qui part du disque choisi
+function poserPile(cur, { garderAxe = true } = {}) {
+  if (!garderAxe) S.axeSuivi = null;
+  S.pile = calculerPile(cur);
+  S.pile.forEach(p => S.dejaVus.add(p.m.id));
+  S.choix = S.pile.length === 3 ? 1 : S.pile.length - 1;
+  appliquerChoix();
+}
+function appliquerChoix() {
+  const p = S.pile[S.choix];
+  if (!p) { S.suite = construireSuite(parId[S.joue] || null); return; }
+  S.suite = [p.m.id, ...construireSuite(p.m, 5).filter(id => id !== S.joue && id !== p.m.id)];
+}
 function rafraichirSuite() {
-  S.suite = construireSuite(parId[S.joue] || null);
+  S.dejaVus = new Set(); S.tirage = 0;
+  poserPile(parId[S.joue] || null);
   rendreTuner();
   majAfficheur();
+}
+// choisir un disque : il passera ensuite ; le rechoisir le lance tout de suite
+function choisirDisque(i) {
+  if (!S.pile[i]) return;
+  if (i === S.choix) { radioSuivant(); return; }
+  S.choix = i;
+  appliquerChoix();
+  clic(900 + i * 300, 0.04, 0.05);
+  rendreTuner(); majAfficheur();
+}
+// « Autres disques » : on repose la pile, avec d'autres morceaux (et une autre échelle)
+function autresDisques() {
+  const cur = parId[S.joue];
+  if (!cur) return;
+  S.tirage++;
+  poserPile(cur);
+  clic(380, 0.12, 0.06);
+  rendreTuner({ repose: true }); majAfficheur();
 }
 
 /* le disque dans le tiroir : la radio (holographique), ma sélection (CD-R) */
@@ -820,7 +893,7 @@ function choisirSource(k) {
   if (S.joue) { const [t] = tempsActuel(); S.reprise[S.source] = { id: S.joue, t: S.lecture === 'yt' && t > 5 ? Math.floor(t) : 0 }; memoire.ecrire('md-reprise', S.reprise); }
   S.source = k;
   memoire.ecrire('md-source', k);
-  S.pente = null;
+  S.axeSuivi = null;
   const r = S.reprise[k];
   const ok = r && parId[r.id] && r.id !== S.joue && (k === 'radio' || S.gardes.includes(r.id));
   chargerTiroir(k);
@@ -837,14 +910,11 @@ function jouerRadio(id, { debut = 0 } = {}) {
   if (S.historique[S.historique.length - 1] !== m.id) S.historique.push(m.id);
   memoire.ecrire('md-historique', S.historique.slice(-60));
   jouerMorceau(m, debut);
-  // la direction : le premier pas est fait quand le morceau visé passe ; elle tient ensuite six morceaux
-  if (S.pente) {
-    if (S.pente.neuf && S.pente.vise === m.id) { S.pente.neuf = false; S.pente.sol = Moteur.nouveauSol(S.pente.dir, null, m, val); }
-    else if (!S.pente.neuf) { S.pente.joues++; S.pente.sol = Moteur.nouveauSol(S.pente.dir, S.pente.sol, m, val); }
-    if (S.pente.joues >= 6) { toast(`${nomCap(S.pente.dir)} : c'était le sixième. La radio reprend son fil.`, 3200); S.pente = null; }
-  }
-  S.suite = construireSuite(m);
-  if (S.pente && S.pente.neuf) S.pente.vise = S.suite[0];
+  // on a choisi un côté de la pile : la suivante garde la même échelle pour continuer dans ce sens
+  const pris = S.pile.find(p => p.m.id === m.id);
+  S.axeSuivi = pris && pris.dir ? axeDe(pris.dir) : null;
+  S.dejaVus = new Set(); S.tirage = 0;
+  poserPile(m);
   rendreTuner();
   majMachine();
 }
@@ -903,33 +973,6 @@ function pasAime(id) {
   S.suite = construireSuite(parId[id]);
   radioSuivant();
 }
-/* orienter : une direction tient sur six morceaux (sans jamais vraiment revenir en arrière).
-   Appuyer encore dessus va plus loin ; le × de la ligne « Ensuite » rend la main à la radio. */
-function orienter(dir) {
-  if (!S.joue) return;
-  const cur = parId[S.joue];
-  if (dir === 'libre') {
-    S.pente = null;
-    rafraichirSuite();
-    signalerEnsuite();
-    clic(1200, 0.03, 0.05);
-    return;
-  }
-  if (!Moteur.DIRECTIONS[dir]) return;
-  if (S.pente && S.pente.dir === dir) {
-    if (S.pente.force >= 3) toast(`${nomCap(dir)}, déjà à fond : la suite va aussi loin que possible.`);
-    S.pente.force = Math.min(3, S.pente.force + 1); S.pente.neuf = true; S.pente.joues = 0;
-  } else S.pente = { dir, force: 1, neuf: true, vise: null, joues: 0, sol: null };
-  // tout au bout de l'échelle : on le dit, et on reste au même niveau plutôt que de refuser
-  const bout = !Moteur.possible(cur, dir, (poolSource().filter(x => x.id !== cur.id)), val);
-  S.suite = construireSuite(cur);
-  S.pente.vise = S.suite[0] || null;
-  rendreTuner();
-  majAfficheur();
-  signalerEnsuite();
-  if (bout) toast('On est déjà tout au bout de ce côté-là : la suite reste à ce niveau.', 3600);
-  clic(1500, 0.03, 0.06);
-}
 /* les petits réglages inutiles : couleur de l'écran, égaliseur, vitesse, loudness */
 function appliquerFidget() {
   const f = S.fidget;
@@ -958,53 +1001,42 @@ function bidouiller(b) {
   clic(...(sons[cle] || [1500, 0.03, 0.05]));
   if (cle === 'vitesse' && !S.enLecture) toast('Lance un morceau pour voir le disque tourner.');
 }
-/* le tuner : ta sélection ou la radio, les trois réglages, et ce qui vient ensuite */
-const AXES = [
-  ['Énergie', 'calme', 'energique'],
-  ['Groovy', 'pose', 'dansant'],
-  ['Notoriété', 'connu', 'confidentiel'],
-];
-function rendreTuner() {
+/* la pile : ta sélection ou la radio, puis les trois disques */
+function rendreTuner({ repose = false } = {}) {
   const m = parId[S.joue];
-  const pool = (poolSource().filter(x => !m || x.id !== m.id));
   // la radio ou ta sélection : seulement quand ta sélection a au moins deux morceaux
   const so = $('#sources');
   so.hidden = S.gardes.length < 2;
   if (!so.hidden) so.innerHTML = Object.entries(SOURCES).map(([k, x]) => `<button class="source-choix" data-action="source-chaine" data-source="${k}" aria-pressed="${S.source === k}">${x.nom}${k === 'selection' ? ` <b>${S.gardes.length}</b>` : ''}</button>`).join('');
-  // les trois réglages, par deux : le bouton choisi se remplit ; au bout de l'échelle, il se grise un peu
-  const bouton = (d, cote) => {
-    const actif = !!S.pente && S.pente.dir === d;
-    const bout = !!m && !actif && !Moteur.possible(m, d, pool, val);
-    const titre = bout ? 'Rien de plus loin dans ce sens par ici : la suite resterait à ce niveau' : actif ? 'Rappuie pour aller encore plus loin' : '';
-    const max = bout ? ' <small class="rail-max">max</small>' : '';
-    return `<button class="rail-bout rail-${cote}${bout ? ' a-bout' : ''}" data-action="cap" data-dir="${d}" aria-pressed="${actif}"${titre ? ` title="${titre}"` : ''}${m ? '' : ' disabled'}>${cote === 'g' ? '<span class="fleche" aria-hidden="true">←</span>' : ''}<span>${E(nomCap(d))}${max}</span>${cote === 'd' ? '<span class="fleche" aria-hidden="true">→</span>' : ''}</button>`;
-  };
-  $('#rails').innerHTML = AXES.map(([nom, g, d]) => `<div class="reglage" role="group" aria-label="${nom}">
-      <span class="reglage-nom">${nom}</span>
-      <div class="reglage-paire">${bouton(g, 'g')}${bouton(d, 'd')}</div>
-    </div>`).join('');
-  rendreEnsuite(parId[S.suite[0]]);
+  const el = $('#pile-disques');
+  $('#pile-autres').hidden = !m || S.pile.length < 2;
+  if (!m || !S.pile.length) {
+    el.innerHTML = `<p class="pile-vide">${m ? 'Plus rien à poser ici : la radio continue toute seule.' : 'Appuie sur lecture : trois disques t\'attendront ici pour choisir la suite.'}</p>`;
+    majPostIt(m); majGarde();
+    return;
+  }
+  el.classList.toggle('repose', repose);
+  el.innerHTML = S.pile.map((p, i) => disquePile(p, i)).join('');
+  if (repose) { void el.offsetWidth; }
   majPostIt(m);
   majGarde();
 }
-// « Ensuite » : le prochain titre, la direction en cours (avec son × pour arrêter), et de quoi y passer tout de suite
-function rendreEnsuite(p) {
-  const el = $('#ensuite');
-  if (!p) { el.innerHTML = ''; return; }
-  const reste = S.pente ? Math.max(1, 6 - S.pente.joues) : 0;
-  const cap = S.pente ? `<span class="ensuite-cap" title="Encore ${reste} morceau${reste > 1 ? 'x' : ''} dans ce sens">${E(nomCap(S.pente.dir))}${S.pente.force > 1 ? ` ×${S.pente.force}` : ''}<button class="ensuite-cap-x" data-action="cap" data-dir="libre" aria-label="Arrêter : la radio reprend son fil" title="Arrêter : la radio reprend son fil">×</button></span>` : '';
-  el.innerHTML = `<span class="ensuite-mot">Ensuite</span>
-    <button class="ensuite-morceau" data-action="jouer-id" data-id="${p.id}" title="L'écouter tout de suite">
-      ${Pochettes.html(p, 'pochette-ensuite')}
-      <span class="ensuite-textes"><span class="ensuite-titre">${E(p.affiche)}</span><span class="ensuite-artiste">${E(p.artiste)}<span class="ensuite-indice"> · ${E(indice(p))}</span></span></span>
+// un disque de la pile : la vraie pochette si on l'a, sinon un CD gravé, le titre écrit au feutre
+function disquePile({ m, dir }, i) {
+  const choisi = i === S.choix;
+  const mot = dir ? ETIQUETTES[dir] : 'dans la lignée';
+  const pochette = Pochettes.html(m, 'pochette-pile');
+  const officielle = /<img/.test(pochette) && !/est-yt/.test(pochette);
+  const penche = [-2.4, 1.2, 2.2][i % 3] + ((hache(m.id) % 5) - 2) * 0.4;
+  return `<div class="disque-pile${choisi ? ' choisi' : ''}" data-id="${m.id}" data-dir="${dir || ''}" style="--penche:${penche.toFixed(1)}deg;--i:${i}">
+    <button class="pile-boite" data-action="choisir-disque" data-i="${i}" role="radio" aria-checked="${choisi}" aria-label="${E(mot)} : ${E(m.affiche)}, ${E(m.artiste)}${choisi ? ' (passe ensuite, rappuie pour l\'écouter maintenant)' : ''}">
+      <span class="pile-scotch" aria-hidden="true">${E(mot)}</span>
+      ${officielle ? pochette : `<span class="cd-grave" aria-hidden="true" style="--h:${hache(m.id) % 360}"><span class="cd-grave-disque"></span><span class="cd-grave-ecrit">${E(m.affiche)}</span><span class="cd-grave-artiste">${E(m.artiste)}</span></span>`}
+      <span class="pile-reflet" aria-hidden="true"></span>
     </button>
-    ${cap}
-    <button class="ensuite-passer" data-action="radio-suivant" title="Passer au suivant (→)"><span class="ensuite-passer-texte">Écouter maintenant</span><span class="icone icone-suiv" aria-hidden="true"></span></button>`;
-}
-// la ligne « Ensuite » s'allume quand un réglage change le prochain titre
-function signalerEnsuite() {
-  const el = $('#ensuite');
-  el.classList.remove('change'); void el.offsetWidth; el.classList.add('change');
+    <p class="pile-morceau"><span class="pile-titre-m">${E(m.affiche)}</span><span class="pile-artiste">${E(m.artiste)}</span></p>
+    ${choisi ? `<button class="pile-maintenant" data-action="radio-suivant" title="Passer au suivant (→)"><span><span class="pile-maintenant-long">Écouter </span>maintenant</span><span class="icone icone-suiv" aria-hidden="true"></span></button>` : ''}
+  </div>`;
 }
 // ton mot sur le morceau : un post-it collé sur l'enceinte de droite (sous la chaîne sur petit écran)
 function majPostIt(m) {
@@ -1300,7 +1332,8 @@ const ACTIONS = {
   'garder': b => basculerGarde(b.dataset.id),
   'aime': () => aimer(S.joue),
   'pas-aime': () => pasAime(S.joue),
-  'cap': b => orienter(b.dataset.dir),
+  'choisir-disque': b => choisirDisque(+b.dataset.i),
+  'autres-disques': () => autresDisques(),
   'fidget': b => bidouiller(b),
   'source-chaine': b => choisirSource(b.dataset.source),
   'cosmetique': () => basculerCosmetique(),
@@ -1341,7 +1374,7 @@ document.addEventListener('click', e => {
   if (!a) return;
   e.preventDefault();
   // après un clic de souris, le bouton lâche le focus : Espace mettra en pause au lieu de rappuyer dessus
-  if (e.detail > 0 && b.matches('.rail-bout, .rond, .pilule, .ensuite-passer, .ensuite-morceau, .source-choix, .choix-affichage button')) b.blur();
+  if (e.detail > 0 && b.matches('.pile-boite, .pile-maintenant, .pile-autres, .rond, .pilule, .source-choix, .choix-affichage button')) b.blur();
   // une erreur dans une action ne doit jamais figer le reste du site
   try { a(b); } catch (err) { console.error(err); toast('Oups, quelque chose a coincé. Réessaie.'); }
 });

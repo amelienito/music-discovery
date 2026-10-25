@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=41">
+  <link rel="stylesheet" href="styles.css?v=42">
   <link rel="stylesheet" href="teintes.css?v=14">
 </head>
 <body>
@@ -205,15 +205,17 @@
           </div>
         </div>
 
-        <!-- le tuner : orienter la suite, juste sous le lecteur -->
-        <section class="tuner" id="tuner" aria-labelledby="tuner-titre">
-          <div class="tuner-haut">
-            <h2 class="tuner-titre" id="tuner-titre">Oriente la suite</h2>
-            <p class="tuner-consigne">Choisis un réglage pour le prochain titre.</p>
+        <!-- la pile : trois disques posés sous la chaîne, pour choisir le prochain titre -->
+        <section class="tuner pile" id="tuner" aria-labelledby="pile-titre">
+          <div class="pile-haut">
+            <h2 class="pile-titre" id="pile-titre">La suite, c'est toi qui la poses</h2>
             <div class="sources" id="sources" role="group" aria-label="Ce que joue la chaîne" hidden></div>
           </div>
-          <div class="rails" id="rails"></div>
-          <div class="ensuite" id="ensuite" aria-live="polite"></div>
+          <div class="pile-disques" id="pile-disques" role="radiogroup" aria-labelledby="pile-titre" aria-live="polite"></div>
+          <div class="pile-pied">
+            <p class="pile-aide">Rien choisi ? Celui du milieu passe tout seul.</p>
+            <button class="pile-autres" id="pile-autres" data-action="autres-disques" hidden>Autres disques</button>
+          </div>
         </section>
 
         <div class="hifi-enceinte hifi-enceinte-d" aria-hidden="true">
@@ -295,6 +297,6 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=15"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=43"></script>
 </body>
 </html>

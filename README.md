@@ -1,6 +1,6 @@
 # Music Discovery
 
-Ma vie, c'est de partager de la musique. Allume la chaîne, oriente-la, garde ce qui te plaît.
+Ma vie, c'est de partager de la musique. Allume la chaîne, choisis la suite, garde ce qui te plaît.
 
 Site en ligne : https://amelienito.github.io/music-discovery/
 
@@ -11,7 +11,7 @@ Site en ligne : https://amelienito.github.io/music-discovery/
 - **Le carton d'entrée** : on règle le volume (la molette se tourne comme une vraie), puis **Commencer**. Pas de compte : tes choix restent dans ton navigateur. Ouvert depuis Instagram, TikTok, Messenger…, un bandeau propose d'ouvrir la page dans le vrai navigateur.
 - **La chaîne** : une micro-chaîne CD des années 2000, entre deux enceintes.
   - **Le lecteur** : l'écran à cristaux liquides (ou, au choix, le disque qui tourne derrière son hublot, avec la pochette imprimée dessus), la vidéo, les commandes, **♥ J'aime bien** (le morceau part dans ta sélection et la suite va dans ce sens) et **Pas trop comme ça** (on passe au suivant et on s'éloigne de ce genre-là), le volume.
-  - **Le tuner, juste dessous : « Oriente la suite »**. La bande des époques (Tout, avant 60, 60, 70, 80, 90-2000, 2010, 2020), trois réglages par deux (**Plus calme / Plus énergique**, **Moins groovy / Plus groovy**, **Plus mainstream / Plus confidentiel**), et l'afficheur **Ensuite** : le prochain titre, la direction en cours (avec son × pour arrêter) et **Écouter maintenant**. Une direction tient six morceaux ; rappuyer va plus loin ; au bout de l'échelle, le bouton affiche « max ». À partir de deux coups de cœur, le tuner propose aussi d'écouter **Ma sélection** (où les directions marchent aussi).
+  - **La pile, juste dessous : « La suite, c'est toi qui la poses »**. Trois disques posés sur l'étagère : au milieu celui qui s'enchaîne le mieux (**dans la lignée**), à gauche et à droite un pas de chaque côté d'une échelle (**plus calme / plus énergique**, **moins groovy / plus groovy** ou **plus mainstream / plus confidentiel**), qui change à chaque morceau. Cliquer un disque le met **ensuite** ; le recliquer (ou **Écouter maintenant**) le lance tout de suite ; sans choix, celui du milieu passe. Quand tu choisis un côté, la pile suivante garde la même échelle pour continuer dans ce sens. **Autres disques** repose la pile. Sans vraie pochette, le disque est un CD gravé, le titre écrit au feutre. À partir de deux coups de cœur, on peut aussi écouter **Ma sélection** (la pile pioche dedans).
   - **Ton mot** sur le morceau arrive en post-it, collé sur l'enceinte de droite (on peut le décoller).
   - **Cosmétique** (en haut de la chaîne) : des petits réglages inutiles, couleur de l'écran, égaliseur, vitesse du disque, rétroéclairage, lumières et grilles des enceintes, loudness, bip des touches. Toucher l'écran change aussi sa couleur ; les haut-parleurs répondent quand on tape dessus.
 - **Quand on descend** lire « Plus d'infos », la vidéo suit dans un coin (YouTube veut qu'elle reste visible) ; « Revenir à la chaîne » remonte.
@@ -60,7 +60,7 @@ Chaque morceau a une fiche dans `data.js` (ambiance, style, année, tempo, voix,
 | `data.js` | Ta banque de morceaux et tes textes | **Oui, c'est le tien** |
 | `moteur.js` | Les ambiances et la façon de passer d'un morceau à l'autre (directions comprises) | Rarement |
 | `teintes.css` | Les couleurs et polices de chaque teinte | Si tu veux créer une teinte |
-| `styles.css` | La forme des objets (chaîne, tuner, livret, panneaux) | Rarement |
+| `styles.css` | La forme des objets (chaîne, pile de disques, livret, panneaux) | Rarement |
 | `app.js` | Le fonctionnement | Non |
 | `pochettes.js` | Va chercher pochettes, extraits, et la fiche de l'album (date, label, titres) | Non |
 | `infos.js` | Va chercher les fiches Wikipédia de l'artiste et de l'album | Non |
