@@ -91,6 +91,7 @@ const S = {
   auto: memoire.lire('md-auto', false), // « Flemme de choisir » : la radio enchaîne toute seule
   autoDir: null, autoPas: 0, // le pilote automatique glisse doucement dans un sens, puis change
   pub: false,             // une pub YouTube semble passer avant le morceau
+  joues: 0,               // morceaux lancés depuis l'arrivée sur la page
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
   aime: new Set(memoire.lire('md-aime', [])),
@@ -718,6 +719,7 @@ setInterval(() => {
   if (S.vue !== 'machine' || !S.joue || !S.lecture) return;
   const [t] = tempsActuel();
   $('#lcd-temps').textContent = $('#etq-temps').textContent = `${deux(t / 60)}:${deux(t % 60)}`;
+  if (t >= 40 && S.enLecture) montrerAide();
 }, 500);
 
 /* ─────────────────────────────── LA CHAÎNE ET LE TUNER ───────────────────────────────
@@ -959,6 +961,7 @@ function jouerRadio(id, { debut = 0 } = {}) {
   if (S.historique[S.historique.length - 1] !== m.id) S.historique.push(m.id);
   memoire.ecrire('md-historique', S.historique.slice(-60));
   jouerMorceau(m, debut);
+  if (++S.joues >= 2) setTimeout(montrerAide, 4000);
   // on a choisi un côté de la pile : la suivante garde la même échelle pour continuer dans ce sens
   const pris = S.pile.find(p => p.m.id === m.id);
   S.axeSuivi = pris && pris.dir ? axeDe(pris.dir) : null;
@@ -1092,7 +1095,7 @@ function pochetteMaison(m) {
   const artiste = Pochettes.artistePrincipal(m.artiste);
   // la taille du titre : le mot le plus long doit tenir sur une ligne, et le tout sur trois lignes
   const mots = Math.max(...titre.split(/\s+/).map(w => w.length));
-  const t = Math.max(5, Math.min(15, 84 / mots, 250 / titre.length)).toFixed(2);   // capitales larges
+  const t = Math.max(5, Math.min(15, 74 / mots, 240 / titre.length)).toFixed(2);   // capitales larges
   const tb = Math.max(5.5, Math.min(12, 118 / mots, 340 / titre.length)).toFixed(2); // texte courant
   const photo = m.yt ? `<img class="maison-photo" src="https://i.ytimg.com/vi/${E(m.yt)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">` : '';
   return `<span class="maison maison-${modele}" aria-hidden="true" style="--h:${h % 360};--t:${t};--tb:${tb}">
@@ -1376,24 +1379,22 @@ function toast(msg, duree = 2800) {
 }
 
 /* ─────────────────────────────── commencer ─────────────────────────────── */
-// la toute première fois : une petite fiche « comment ça marche », la musique part quand on la ferme
-function allumer() {
-  if (!memoire.lire('md-aide-vue', false)) {
-    audioCtx();
-    $('#aide').hidden = false;
-    requestAnimationFrame(() => $('#aide').classList.add('ouverte'));
-    setTimeout(() => $('#aide .gros-bouton').focus(), 60);
-    return;
-  }
-  lancer();
+// une seule fois, après un peu d'écoute : l'astuce de « Ma sélection » (rien d'autre, le reste se voit)
+let aideMontree = false;
+function montrerAide() {
+  if (aideMontree || memoire.lire('md-aide-vue', false) || S.vue !== 'machine') return;
+  aideMontree = true;
+  $('#aide').hidden = false;
+  requestAnimationFrame(() => $('#aide').classList.add('ouverte'));
+  const b = $('#radio-garder'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
 }
 function fermerAide() {
   if ($('#aide').hidden) return;
   memoire.ecrire('md-aide-vue', true);
-  $('#aide').hidden = true; $('#aide').classList.remove('ouverte');
-  if (!demarre()) lancer();
+  $('#aide').classList.remove('ouverte');
+  setTimeout(() => { $('#aide').hidden = true; }, 250);
 }
-function lancer() {
+function allumer() {
   audioCtx();
   clic(220, 0.12, 0.12);
   setTimeout(() => clic(2600, 0.02, 0.04), 140);

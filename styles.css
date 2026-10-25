@@ -699,8 +699,10 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
   .post-it { width: 196px; }
   .hifi > .post-it { cursor: grab; touch-action: none; user-select: none; }
 }
+/* écran moyen ou petit : le post-it se colle au bas de la chaîne, juste avant les disques */
 @media (max-width: 1239px) {
-  .hifi .post-it { position: relative; right: auto; top: auto; grid-column: 1 / -1; justify-self: center; width: auto; max-width: min(420px, 92%); margin-top: 8px; }
+  .hifi { grid-template-areas: "g corps d" "g postit d" "g tuner d"; }
+  .hifi .post-it { grid-area: postit; position: relative; z-index: 5; right: auto; top: auto; justify-self: end; width: auto; max-width: min(380px, 86%); margin: -26px 6% 0 0; }
 }
 
 /* ─── sous la chaîne : « Des pubs ? » une fois, et l'extrait quand YouTube refuse ─── */
@@ -923,7 +925,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 /* ─────────────────────────────── TABLETTE ─────────────────────────────── */
 @media (max-width: 1099px) {
   /* les enceintes s'effacent : la place va au lecteur, l'écran et la vidéo restent côte à côte */
-  .hifi { grid-template-columns: minmax(0, 1fr); grid-template-areas: "corps" "tuner"; max-width: 980px; }
+  .hifi { grid-template-columns: minmax(0, 1fr); grid-template-areas: "corps" "postit" "tuner"; max-width: 980px; }
   .hifi-enceinte { display: none; }
 }
 @media (max-width: 860px) {
@@ -1055,24 +1057,24 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .lcd-defile span { display: inline; padding-left: 0; animation: none; }
 }
 
-/* ─── la toute première fois : « Comment ça marche » ─── */
-.aide { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: rgba(10, 10, 14, .45); opacity: 0; transition: opacity .25s; }
-.aide.ouverte { opacity: 1; }
-.aide-carte {
-  width: min(460px, 100%); display: grid; gap: 16px; padding: 26px 26px 22px; border-radius: 18px;
-  background: var(--fond); color: var(--encre); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5);
-  transform: translateY(12px) scale(.98); transition: transform .3s cubic-bezier(.2,.9,.3,1.2);
+/* ─── une seule fois, après un peu d'écoute : l'astuce de « Ma sélection » (jamais par-dessus la vidéo) ─── */
+.aide {
+  position: fixed; z-index: 60; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom)); width: min(340px, calc(100vw - 32px));
+  display: grid; gap: 12px; padding: 18px 18px 16px; border-radius: 16px;
+  background: var(--fond); color: var(--encre); box-shadow: 0 24px 50px -16px rgba(0,0,0,.45), 0 0 0 1px var(--trait);
+  opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
 }
-.aide.ouverte .aide-carte { transform: none; }
-.aide-titre { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 18px; letter-spacing: .02em; }
-.aide-liste { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; counter-reset: aide; }
-.aide-liste li { position: relative; padding-left: 40px; font-size: 15px; line-height: 1.45; color: var(--encre-2); counter-increment: aide; }
+.aide.ouverte { opacity: 1; transform: none; }
+.aide-titre { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 14px; letter-spacing: .02em; }
+.aide-liste { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; counter-reset: aide; }
+.aide-liste li { position: relative; padding-left: 34px; font-size: 14.5px; line-height: 1.42; color: var(--encre-2); counter-increment: aide; }
 .aide-liste li b { color: var(--encre); }
 .aide-liste li::before {
-  content: counter(aide); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
-  font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 13px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
+  content: counter(aide); position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 12px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
 }
-.aide .gros-bouton { justify-self: start; }
+.aide .gros-bouton { justify-self: start; min-height: 38px; padding: 0 18px; font-size: 14px; }
+@media (max-width: 640px) { .aide { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; } }
 /* « Réglages » brille doucement tant qu'on ne l'a jamais ouvert */
 .bouton-reglages.brille { animation: brille 2.6s ease-in-out infinite; }
 @keyframes brille {
@@ -1080,3 +1082,5 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--aiguille) 35%, transparent), 0 0 22px 4px color-mix(in srgb, var(--aiguille) 45%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) { .bouton-reglages.brille { animation: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--aiguille) 45%, transparent); } }
+/* l'astuce apparaît : « J'aime bien » s'allume trois fois */
+#radio-garder.pulse { animation: brille 1.3s ease-in-out 3; }

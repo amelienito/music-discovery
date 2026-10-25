@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=43">
+  <link rel="stylesheet" href="styles.css?v=44">
   <link rel="stylesheet" href="teintes.css?v=14">
 </head>
 <body>
@@ -246,18 +246,15 @@
   <!-- ═════════════ MA SÉLECTION ═════════════ -->
   <div class="voile" id="voile" data-action="fermer-panneaux" hidden></div>
 
-  <!-- la toute première fois : comment ça marche (la musique démarre en fermant) -->
-  <div class="aide" id="aide" role="dialog" aria-modal="true" aria-labelledby="aide-titre" hidden>
-    <div class="aide-carte">
-      <p class="aide-titre" id="aide-titre">Comment ça marche</p>
-      <ol class="aide-liste">
-        <li><b>Choisis la suite.</b> Sous la chaîne, trois disques : clique celui que tu veux entendre ensuite. Flemme&nbsp;? La radio peut enchaîner toute seule.</li>
-        <li><b>Fais ta sélection.</b> Un morceau te plaît&nbsp;? « J'aime bien » le garde dans ta sélection.</li>
-        <li><b>Écoute-la.</b> Dès deux morceaux gardés, tu peux n'écouter que ta sélection, et continuer à y ajouter des titres.</li>
-      </ol>
-      <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">C'est parti</button>
-    </div>
-  </div>
+  <!-- une seule fois, après un peu d'écoute : l'astuce de « Ma sélection » -->
+  <aside class="aide" id="aide" role="status" aria-labelledby="aide-titre" hidden>
+    <p class="aide-titre" id="aide-titre">Petite astuce</p>
+    <ol class="aide-liste">
+      <li>Un morceau te plaît&nbsp;? <b>« J'aime bien »</b> le garde dans ta sélection.</li>
+      <li>Dès deux morceaux gardés, tu peux <b>n'écouter que ta sélection</b>, et continuer à y ajouter des titres.</li>
+    </ol>
+    <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">Compris</button>
+  </aside>
   <aside class="bac" id="bac" aria-label="Ma sélection" hidden>
     <div class="bac-tete">
       <div>
@@ -310,6 +307,6 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=15"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=44"></script>
+  <script src="app.js?v=45"></script>
 </body>
 </html>
