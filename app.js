@@ -55,6 +55,10 @@ const BANQUE = (typeof MORCEAUX !== 'undefined' ? MORCEAUX : []).map((m, i) => {
     yt: idYouTube(m.lien),
     energie, etrange: num(m.etrange, 5), danse: num(m.danse, 5),
     note: (m.note || '').trim(),
+    notePrincipale: (m.note || '').trim(),
+    // une version « bonus » en priorité (ex. Azucar avec son intro alternative), et la version classique en secours, avec son propre commentaire
+    secours: m.secours && idYouTube(m.secours.lien) ? { yt: idYouTube(m.secours.lien), note: String(m.secours.note || '').trim() } : null,
+    ytPrincipal: idYouTube(m.lien),
     // deux versions d'un même morceau (radio edit, version longue…) ne s'enchaînent jamais
     version: Pochettes.normaliser(Pochettes.artistePrincipal(m.artiste)) + '|' + Pochettes.normaliser(String(m.titre).replace(/\s*[([].*?[)\]]\s*/g, ' ')),
     // les morceaux qui cognent sont joués un peu moins fort, pour ne pas surprendre
@@ -544,6 +548,7 @@ window.onYouTubeIframeAPIReady = () => {
         S.injouables.set(m.yt, Date.now());
         memoire.ecrire('md-injouables-v2', Object.fromEntries(S.injouables));
         try { lecteur.stopVideo(); } catch (e) {}
+        if (basculerSecours(m)) { jouerMorceau(m); return; }
         jouerExtraitComplet(m);
       }
     }
@@ -581,7 +586,22 @@ function surveillerDemarrage(m) {
   };
   demarrage = setTimeout(verif, 9000);
 }
+// la version bonus ne passe pas (supprimée, intégration refusée…) : on prend la version classique et le commentaire qui va avec
+function basculerSecours(m) {
+  if (!m.secours || m.yt === m.secours.yt) return false;
+  m.yt = m.secours.yt;
+  return true;
+}
+function bonCommentaire(m, classique) {
+  if (!m.secours) return;
+  const note = classique || m.yt === m.secours.yt ? (m.secours.note || m.notePrincipale) : m.notePrincipale;
+  if (note === m.note) return;
+  m.note = note;
+  const el = $('#post-it'); if (el) delete el.dataset.id;
+  if (S.joue === m.id) majPostIt(m);
+}
 function jouerMorceau(m, debut = 0) {
+  if (m.secours && S.injouables.has(m.yt)) basculerSecours(m);
   arreterExtrait();
   clearTimeout(demarrage);
   S.joue = m.id;
@@ -591,6 +611,7 @@ function jouerMorceau(m, debut = 0) {
   S.aJoue = false;
   audioLecture.pause();
   if (!jouable(m)) { jouerExtraitComplet(m); return; }
+  bonCommentaire(m, false);
   S.lecture = 'yt';
   S.enLecture = false;
   $('#ecran-video').hidden = false;
@@ -605,6 +626,7 @@ function jouerMorceau(m, debut = 0) {
 function jouerExtraitComplet(m, essai = 0) {
   if (lecteur && lecteurPret) { try { lecteur.stopVideo(); } catch (e) {} }
   clearTimeout(demarrage);
+  bonCommentaire(m, true); // l'extrait vient des plateformes : c'est la version classique
   S.lecture = 'extrait'; S.erreur = false; S.enLecture = false;
   majVideo(); majEtat();
   Pochettes.extraitFrais(m).then(url => {

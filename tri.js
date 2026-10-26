@@ -54,9 +54,29 @@ majTheme();
 const MORC = typeof MORCEAUX !== 'undefined' ? MORCEAUX : [];
 const idDe = lien => { const r = (lien || '').match(/[?&]v=([\w-]{11})/) || (lien || '').match(/youtu\.be\/([\w-]{11})/); return r && r[1]; };
 // morceaux déjà présents sur le site, et le texte qu'ils ont déjà
+// (les versions de secours comptent aussi, et les morceaux retirés exprès ne reviennent pas)
 const DEJA = new Set(MORC.map(m => idDe(m.lien)).filter(Boolean));
 const NOTE_SITE = {};
-MORC.forEach(m => { const id = idDe(m.lien); if (id) NOTE_SITE[id] = (m.note || '').trim(); });
+MORC.forEach(m => {
+  const id = idDe(m.lien); if (id) NOTE_SITE[id] = (m.note || '').trim();
+  const s = m.secours && idDe(m.secours.lien); if (s) { DEJA.add(s); NOTE_SITE[s] = (m.secours.note || '').trim(); }
+});
+const RETIRES_IDS = new Set((typeof RETIRES !== 'undefined' ? RETIRES : []).map(idDe).filter(Boolean));
+const traite = id => DEJA.has(id) || RETIRES_IDS.has(id);
+// le site fait foi : quand Claude a repris (et parfois corrigé) tes commentaires, la table de tri s'aligne dessus.
+// L'ancien texte est gardé de côté (T.notesAvant), au cas où.
+(() => {
+  const premier = !T.siteVu, vu = T.siteVu || {};
+  const plat = x => String(x || '').replace(/\s+/g, ' ').trim();
+  for (const [id, n] of Object.entries(NOTE_SITE)) {
+    if (!premier && vu[id] === n) continue;
+    if (T.notes[id] !== undefined && plat(T.notes[id]) !== plat(n)) { T.notesAvant = T.notesAvant || {}; T.notesAvant[id] = T.notes[id]; }
+    delete T.notes[id];
+    if (plat(n)) delete T.tard[id];
+  }
+  T.siteVu = Object.assign({}, NOTE_SITE);
+  sauver();
+})();
 // tout ce qui a déjà reçu un oui ou un non, toutes playlists confondues
 function dejaTries() {
   const g = {};
@@ -291,7 +311,7 @@ function prochain() {
   for (const id of l.ids) {
     if (l.decisions[id]) continue;
     if (T.active !== SITE) {
-      if (DEJA.has(id)) { l.decisions[id] = 'deja'; continue; }
+      if (traite(id)) { l.decisions[id] = 'deja'; continue; }
       if (vus[id]) { l.decisions[id] = 'vu'; continue; }
     }
     restants.push(id);
@@ -604,7 +624,8 @@ const apports = id => {
 };
 function lesOui() {
   const l = L();
-  return l.ids.filter(id => l.decisions[id] === 'oui').map(id => ({ id, ...(l.infos[id] || {}) }));
+  // hors liste du site : ce qui est déjà sur le site (ou retiré exprès) n'est plus renvoyé à Claude
+  return l.ids.filter(id => l.decisions[id] === 'oui' && (T.active === SITE || !traite(id))).map(id => ({ id, ...(l.infos[id] || {}) }));
 }
 function lesNon() {
   const l = L();
