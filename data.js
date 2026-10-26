@@ -371,9 +371,9 @@ const MORCEAUX = [
     tags: ["electro", "hyperpop", "expérimental", "pop"],
     energie: 7, etrange: 8, danse: 6 },
 
-  { titre: "Gingerbread Boy", artiste: "Miles Davis", album: "",
+  { titre: "Gingerbread Boy", artiste: "Miles Davis", album: "Miles Smiles",
     lien: "https://music.youtube.com/watch?v=fVndRGAF8Gg", note: "",
-    ambiance: "ailleurs", style: "Jazz post-bop", annee: 1966, bpm: 200, voix: "instru",
+    ambiance: "ailleurs", style: "Jazz post-bop", annee: 1967, bpm: 200, voix: "instru",
     tags: ["jazz", "cuivres", "rapide", "expérimental"],
     energie: 7, etrange: 6, danse: 3 },
 
@@ -677,9 +677,9 @@ const MORCEAUX = [
     tags: ["indie", "pop", "guitares", "mélancolique"],
     energie: 2, etrange: 2, danse: 2 },
 
-  { titre: "BEST INTEREST", artiste: "Tyler, The Creator", album: "",
+  { titre: "BEST INTEREST", artiste: "Tyler, The Creator", album: "BEST INTEREST",
     lien: "https://music.youtube.com/watch?v=37kWL6Qowq4", note: "",
-    ambiance: "soleil", style: "Rap néo-soul", annee: 2024, bpm: 90, voix: "rap",
+    ambiance: "soleil", style: "Rap néo-soul", annee: 2019, bpm: 90, voix: "rap",
     tags: ["rap", "soul", "rnb", "solaire"],
     energie: 4, etrange: 3, danse: 5 },
 
