@@ -948,6 +948,30 @@ const MORCEAUX = [
     tags: ["rap", "g-funk", "los angeles", "samples soul"],
     energie: 5, etrange: 2, danse: 6 },
 
+  { titre: "Lithonia", artiste: "Childish Gambino", album: "Bando Stone & the New World",
+    lien: "https://music.youtube.com/watch?v=_7GVjIF08_c", note: "S/o Flo",
+    ambiance: "electrique", style: "Rock alternatif, soul", annee: 2024, bpm: 95, voix: "chant",
+    tags: ["rock", "soul", "guitares", "grunge"],
+    energie: 7, etrange: 4, danse: 4 },
+
+  { titre: "Life Goes On", artiste: "Chihiro Yamanaka", album: "",
+    lien: "https://music.youtube.com/watch?v=XjzQpGcG_Uw", note: "Le piano, meilleur instrument ?", coeur: true,
+    ambiance: "brume", style: "Jazz, trio piano japonais", bpm: 120, voix: "instru",
+    tags: ["jazz", "piano", "japon", "trio"],
+    energie: 5, etrange: 3, danse: 4 },
+
+  { titre: "Stranger to Love", artiste: "Dexter in the Newsagent", album: "",
+    lien: "https://music.youtube.com/watch?v=eQGdrWCt0F8", note: "Ça sur un vélo la nuit avec des écouteurs filaires",
+    ambiance: "brume", style: "Pop indie, acoustique", bpm: 100, voix: "chant",
+    tags: ["indie", "pop", "nocturne", "acoustique"],
+    energie: 4, etrange: 4, danse: 4 },
+
+  { titre: "Tiny Desk Concert", artiste: "Ca7riel & Paco Amoroso", album: "",
+    lien: "https://music.youtube.com/watch?v=9kqnsoY94L8", note: "Le meilleur Tiny Desk ?",
+    ambiance: "piste", style: "Funk, rap et rock argentins, en live", annee: 2024, bpm: 110, voix: "chant",
+    tags: ["argentine", "live", "funk", "rap"],
+    energie: 7, etrange: 6, danse: 7 },
+
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri

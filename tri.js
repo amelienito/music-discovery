@@ -882,26 +882,36 @@ function pullUp() {
   [[e, 'pull'], [b, 'boum']].forEach(([el, c]) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); setTimeout(() => el.classList.remove(c), 750); });
 }
 $('#t-pullup').addEventListener('click', pullUp);
+document.addEventListener('pointerdown', () => { try { if ($('#opt-son').checked) chargerKlaxon(); } catch (e) {} }, { once: true });
 $('#opt-son').checked = (() => { try { return localStorage.getItem('md-tri-son') !== '0'; } catch (e) { return true; } })();
 $('#opt-son').addEventListener('change', () => { try { localStorage.setItem('md-tri-son', $('#opt-son').checked ? '1' : '0'); } catch (e) {} });
-// le bruit d'un disque qu'on ramène en arrière : un scratch, puis un sifflement de rembobinage (fabriqué sur place, pas de fichier)
-let ctxSon = null;
+// le klaxon du pull up, trois fois comme dans les memes : deux coups brefs, puis le long
+let ctxSon = null, klaxon = null, klaxonCharge = null;
+function chargerKlaxon() {
+  if (klaxonCharge) return klaxonCharge;
+  ctxSon = ctxSon || new (window.AudioContext || window.webkitAudioContext)();
+  klaxonCharge = fetch('son/klaxon.mp3').then(r => r.arrayBuffer())
+    .then(b => new Promise((ok, ko) => ctxSon.decodeAudioData(b, ok, ko)))
+    .then(buf => (klaxon = buf)).catch(() => (klaxonCharge = null));
+  return klaxonCharge;
+}
 function bruitScratch() {
   if (!$('#opt-son').checked) return;
   try {
-    ctxSon = ctxSon || new (window.AudioContext || window.webkitAudioContext)();
-    const c = ctxSon, t = c.currentTime;
-    const n = c.createBuffer(1, c.sampleRate * 0.6, c.sampleRate), d = n.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const src = c.createBufferSource(); src.buffer = n;
-    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 3;
-    f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(3200, t + 0.12);
-    f.frequency.exponentialRampToValueAtTime(500, t + 0.24); f.frequency.exponentialRampToValueAtTime(4200, t + 0.34);
-    const g = c.createGain(); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-    const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.45);
-    const go = c.createGain(); go.gain.setValueAtTime(0.08, t); go.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-    src.connect(f); f.connect(g); g.connect(c.destination); o.connect(go); go.connect(c.destination);
-    src.start(t); src.stop(t + 0.6); o.start(t); o.stop(t + 0.5);
+    chargerKlaxon();
+    if (ctxSon.state === 'suspended') ctxSon.resume();
+    const jouer = () => {
+      if (!klaxon) return;
+      const t = ctxSon.currentTime + 0.02;
+      [[0, 0.26], [0.34, 0.26], [0.68, null]].forEach(([dec, duree]) => {
+        const s = ctxSon.createBufferSource(); s.buffer = klaxon;
+        const g = ctxSon.createGain(); g.gain.value = 0.7;
+        if (duree) { g.gain.setValueAtTime(0.7, t + dec + duree - 0.03); g.gain.linearRampToValueAtTime(0, t + dec + duree); }
+        s.connect(g); g.connect(ctxSon.destination);
+        s.start(t + dec); if (duree) s.stop(t + dec + duree + 0.01);
+      });
+    };
+    klaxon ? jouer() : chargerKlaxon().then(jouer);
   } catch (e) {}
 }
 function grandEffet() {
