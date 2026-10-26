@@ -112,12 +112,17 @@
     .refus a { color: inherit; }
 
     /* le commentaire : il part avec le morceau sur le site */
-    .mot { display: grid; gap: 8px; }
     .mot-ligne { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .mot label { font-weight: 600; font-size: 14px; }
-    .mot textarea { width: 100%; min-height: 64px; max-height: 220px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--trait); background: var(--champ); color: var(--encre); font: inherit; font-size: 16px; resize: none; }
-    .mot textarea::placeholder { color: var(--encre-2); }
-    .mot textarea:focus-visible { outline-offset: 1px; }
+    /* le commentaire : volontairement très visible, même écran au minimum */
+    :root { --mot-fond: #fff6cc; --mot-bord: #e0a800; --mot-lueur: rgba(224,168,0,.35); --mot-titre: #8a5a00; --mot-champ: #fffdf3; --mot-encre: #1c1d22; --mot-indice: #8a6d2a; }
+    [data-theme="sombre"] { --mot-fond: #2b2408; --mot-bord: #ffd23f; --mot-lueur: rgba(255,210,63,.45); --mot-titre: #ffd23f; --mot-champ: #15130a; --mot-encre: #fffbea; --mot-indice: #d9c27a; }
+    .mot { display: grid; gap: 10px; padding: 14px; border-radius: 18px; background: var(--mot-fond); box-shadow: inset 0 0 0 2px var(--mot-bord), 0 0 24px var(--mot-lueur); }
+    .mot label { font: 700 15px "Unbounded", sans-serif; letter-spacing: -.01em; color: var(--mot-titre); }
+    .mot label::before { content: "✎ "; }
+    .mot textarea { width: 100%; min-height: 84px; max-height: 260px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--mot-bord); background: var(--mot-champ); color: var(--mot-encre); font: inherit; font-size: 18px; line-height: 1.45; resize: none; caret-color: var(--mot-bord); }
+    .mot textarea::placeholder { color: var(--mot-indice); opacity: 1; }
+    .mot textarea:focus { outline: none; box-shadow: 0 0 0 4px var(--mot-lueur), 0 0 30px var(--mot-lueur); }
+    .mot .ressenti, .mot .ressenti summary { color: var(--mot-indice); }
     .coeur { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); font-weight: 600; font-size: 14px; }
     .coeur[aria-pressed="true"] { background: var(--coeur-fond); color: var(--coeur); box-shadow: inset 0 0 0 1.5px var(--coeur); }
     .ressenti { font-size: 14px; color: var(--encre-2); }
@@ -266,7 +271,7 @@
     body.revision .revision-raccourcis { display: block; }
     body.revision .revision-barre, body.revision .revision-nav { display: grid; }
     body.revision .revision-options { display: flex; }
-    body.revision .mot textarea { min-height: 120px; font-size: 17px; }
+    body.revision .mot textarea { min-height: 130px; font-size: 19px; }
     body.revision .tete .sous { display: none; }
     body.revision #ouvrir-revision { background: var(--klein); color: var(--sur-klein); }
     .v-suiv.fin { background: var(--oui); }
