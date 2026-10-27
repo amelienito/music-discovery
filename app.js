@@ -602,6 +602,8 @@ function bonCommentaire(m, classique) {
 }
 function jouerMorceau(m, debut = 0) {
   if (m.secours && S.injouables.has(m.yt)) basculerSecours(m);
+  // certaines vidéos démarrent plus loin (ex. endlessly de Chanpan à 0:25)
+  if (!debut && m.debut && m.yt === m.ytPrincipal) debut = num(m.debut, 0);
   arreterExtrait();
   clearTimeout(demarrage);
   S.joue = m.id;

@@ -26,6 +26,9 @@
               ne le sont pas (Mozart, Zelda…) : il ira côté « mainstream ».
      coeur    true pour un coup de cœur (la table de tri le coche pour toi).
      long     true pour un morceau de 20 minutes et plus (simple repère).
+     debut    en secondes, si la vidéo doit démarrer plus loin (ex. 25).
+     secours  { lien, note } : une autre version si la première ne passe
+              pas, avec son propre commentaire.
      bandcamp le lien Bandcamp du morceau, s'il y est. Il apparaît dans
               « Écouter en entier sur » (sans pub, et l'artiste touche plus).
               Ex : bandcamp: "https://artiste.bandcamp.com/track/morceau"
@@ -498,7 +501,7 @@ const MORCEAUX = [
     energie: 6, etrange: 8, danse: 4 },
 
   { titre: "I Miss You (Part 1)", artiste: "David Ruffin", album: "David Ruffin",
-    lien: "https://music.youtube.com/watch?v=sbNioahCQlA", note: "",
+    lien: "https://music.youtube.com/watch?v=sbNioahCQlA", note: "Bring back yearning music",
     ambiance: "soleil", style: "Soul seventies", annee: 1973, bpm: 80, voix: "chant",
     tags: ["soul", "ballade", "cordes", "nocturne"],
     energie: 3, etrange: 3, danse: 3 },
@@ -972,6 +975,426 @@ const MORCEAUX = [
     tags: ["argentine", "live", "funk", "rap"],
     energie: 7, etrange: 6, danse: 7 },
 
+  { titre: "Yussef Dayes in Japan (film)", artiste: "Yussef Dayes", album: "",
+    lien: "https://music.youtube.com/watch?v=BEcJNcLTAkw", note: "Vous pouvez toujours vous poser devant ou avancer aux parties musicales", long: true,
+    ambiance: "ailleurs", style: "Jazz, film documentaire", bpm: 95, voix: "instru",
+    tags: ["jazz", "batterie", "japon", "live", "film"],
+    energie: 5, etrange: 6, danse: 4 },
+
+  { titre: "F*** You", artiste: "The LOX", album: "",
+    lien: "https://music.youtube.com/watch?v=YN9uBK2M0Uw", note: "Tout est dans le titre",
+    ambiance: "bitume", style: "Rap new-yorkais", bpm: 92, voix: "rap",
+    tags: ["rap", "new york", "boom bap"],
+    energie: 7, etrange: 3, danse: 5 },
+
+  { titre: "Plover", artiste: "Yorushika", album: "",
+    lien: "https://music.youtube.com/watch?v=YLG1yiWkZM0", note: "La ligne entre passionné et fétichiste me paraît poreuse",
+    ambiance: "electrique", style: "J-rock, pop rock japonaise", bpm: 150, voix: "chant",
+    tags: ["japon", "rock", "guitares", "pop"],
+    energie: 6, etrange: 4, danse: 4 },
+
+  { titre: "Common Man", artiste: "David Ruffin", album: "",
+    lien: "https://music.youtube.com/watch?v=VN4RsPongvI", note: "Ça fait bcp de David Ruffin mais joli sample",
+    ambiance: "soleil", style: "Soul seventies", bpm: 90, voix: "chant",
+    tags: ["soul", "samples", "cordes"],
+    energie: 4, etrange: 3, danse: 4 },
+
+  { titre: "How Can You Mend a Broken Heart", artiste: "Al Green", album: "Let's Stay Together",
+    lien: "https://music.youtube.com/watch?v=SuQJZp2yWc0", note: "Répondez-lui pitié", connu: true,
+    ambiance: "soleil", style: "Soul de Memphis", annee: 1972, bpm: 64, voix: "chant",
+    tags: ["soul", "memphis", "ballade", "cordes"],
+    energie: 3, etrange: 2, danse: 3 },
+
+  { titre: "So in Love", artiste: "Curtis Mayfield", album: "There's No Place Like America Today",
+    lien: "https://music.youtube.com/watch?v=mx8_dhQpzzg", note: "Bakary dans 20 ans il lui ressemble je pense",
+    ambiance: "soleil", style: "Soul, funk de Chicago", annee: 1975, bpm: 80, voix: "chant",
+    tags: ["soul", "chicago", "doux", "groove"],
+    energie: 3, etrange: 3, danse: 4 },
+
+  { titre: "Pernambuco", artiste: "Luiz Bonfá", album: "",
+    lien: "https://music.youtube.com/watch?v=pEm8pFlF0d4", note: "Il suffit d'une guitare (ou plus)",
+    ambiance: "soleil", style: "Guitare brésilienne", bpm: 120, voix: "instru",
+    tags: ["bresil", "guitare", "bossa", "acoustique"],
+    energie: 4, etrange: 4, danse: 4 },
+
+  { titre: "The Alien", artiste: "Dream Theater", album: "A View from the Top of the World",
+    lien: "https://music.youtube.com/watch?v=B84ms7dz3tQ", note: "Tw metal mais la façon dont les temps sont décomposés, c'est ahurissant",
+    ambiance: "electrique", style: "Metal progressif", annee: 2021, bpm: 130, voix: "chant",
+    tags: ["metal", "progressif", "guitares", "virtuose"],
+    energie: 9, etrange: 5, danse: 2 },
+
+  { titre: "Klops Jol", artiste: "Robin Fassie", album: "",
+    lien: "https://music.youtube.com/watch?v=bBm0x-2G9iw", note: "Entre le moment où je l'ai écouté et aujourd'hui, y'a eu un Grammy… #influenceur",
+    ambiance: "piste", style: "Amapiano, afro-house", bpm: 112, voix: "chant",
+    tags: ["amapiano", "afrique du sud", "house", "club"],
+    energie: 6, etrange: 5, danse: 8 },
+
+  { titre: "Change for the World", artiste: "Charles Bradley", album: "Changes",
+    lien: "https://music.youtube.com/watch?v=WWWx4g9QKsE", note: "Merci Barry pour la passe D",
+    ambiance: "soleil", style: "Soul", annee: 2016, bpm: 78, voix: "chant",
+    tags: ["soul", "daptone", "cuivres", "voix"],
+    energie: 5, etrange: 3, danse: 4 },
+
+  { titre: "endlessly", artiste: "Chanpan", album: "",
+    lien: "https://music.youtube.com/watch?v=vrnFatmWtPU", note: "Je remarque que j'ai un truc pour les drums frénétiques", debut: 25, secours: { lien: "https://music.youtube.com/watch?v=D_g4udDanNM", note: "Je remarque que j'ai un truc pour les drums frénétiques" },
+    ambiance: "piste", style: "Électro, drums frénétiques", bpm: 170, voix: "chant",
+    tags: ["électro", "breakbeat", "drums", "intense"],
+    energie: 8, etrange: 6, danse: 7 },
+
+  { titre: "旅行的意義 (Travel is Meaningful)", artiste: "Cheer Chen", album: "華麗的冒險",
+    lien: "https://music.youtube.com/watch?v=KTQGxaSY-AE", note: "« Un classique incontournable de la Mandopop » d'après Internet (et moi)",
+    ambiance: "brume", style: "Mandopop, folk", annee: 2004, bpm: 80, voix: "chant",
+    tags: ["mandopop", "taïwan", "folk", "guitare"],
+    energie: 3, etrange: 4, danse: 3 },
+
+  { titre: "APTX", artiste: "Tattletale", album: "",
+    lien: "https://music.youtube.com/watch?v=HW52njxOW0s", note: "Faut imaginer la colère qui monte petit à petit",
+    ambiance: "electrique", style: "Rock, montée en colère", bpm: 120, voix: "chant",
+    tags: ["rock", "colère", "montée", "guitares"],
+    energie: 7, etrange: 6, danse: 3 },
+
+  { titre: "Assumptions", artiste: "Sam Gellaitry", album: "Viewfinder Vol. 3: Assumptions",
+    lien: "https://music.youtube.com/watch?v=Z28jtA4Cjvw", note: "Parce que pourquoi pas ?",
+    ambiance: "piste", style: "Électro, funk", annee: 2019, bpm: 104, voix: "chant",
+    tags: ["électro", "funk", "synthés", "groove"],
+    energie: 6, etrange: 4, danse: 7 },
+
+  { titre: "Burguesinha", artiste: "Seu Jorge", album: "América Brasil o Disco",
+    lien: "https://music.youtube.com/watch?v=bWSn9jL1g7I", note: "Amélieniño (avec l'accent)",
+    ambiance: "soleil", style: "Samba-funk", annee: 2007, bpm: 112, voix: "chant",
+    tags: ["bresil", "samba", "funk", "fête"],
+    energie: 6, etrange: 3, danse: 8 },
+
+  { titre: "Medley: Intro", artiste: "JAŸ-Z", album: "",
+    lien: "https://music.youtube.com/watch?v=6zE7uHz7d4E", note: "Auto-persuadé que le refrain dit Amélien",
+    ambiance: "bitume", style: "Rap, mashup", bpm: 90, voix: "rap",
+    tags: ["rap", "mashup", "samples"],
+    energie: 5, etrange: 6, danse: 5 },
+
+  { titre: "Day & Night (feat. Holybrune)", artiste: "Dabeull", album: "",
+    lien: "https://music.youtube.com/watch?v=rDVOqLGZgW0", note: "Le son de mon bar à cocktails",
+    ambiance: "piste", style: "Funk, boogie français", bpm: 110, voix: "chant",
+    tags: ["funk", "boogie", "talkbox", "france"],
+    energie: 6, etrange: 4, danse: 8 },
+
+  { titre: "タリオのテーマ", artiste: "Hitomitoi", album: "",
+    lien: "https://music.youtube.com/watch?v=87zf34lHEbs", note: "En mode protagoniste du générique",
+    ambiance: "piste", style: "City pop japonaise", bpm: 115, voix: "chant",
+    tags: ["citypop", "japon", "synthés", "générique"],
+    energie: 6, etrange: 5, danse: 7 },
+
+  { titre: "Genkidama (bande originale)", artiste: "Dragon Ball GT", album: "",
+    lien: "https://music.youtube.com/watch?v=xkcUFEfbrQc", note: "J'avais ça dans ma playlist « concentration »",
+    ambiance: "epopee", style: "BO d'anime", bpm: 90, voix: "instru",
+    tags: ["anime", "ost", "épique", "concentration"],
+    energie: 5, etrange: 3, danse: 2 },
+
+  { titre: "Palco", artiste: "Gilberto Gil", album: "Luar (A Gente Precisa Ver o Luar)",
+    lien: "https://music.youtube.com/watch?v=PVyArpY0Vp0", note: "Je te remercierai jamais assez Pela",
+    ambiance: "soleil", style: "MPB, funk brésilien", annee: 1981, bpm: 118, voix: "chant",
+    tags: ["bresil", "mpb", "funk", "fête"],
+    energie: 7, etrange: 3, danse: 8 },
+
+  { titre: "My Foolish Heart", artiste: "Bill Evans Trio", album: "Waltz for Debby",
+    lien: "https://music.youtube.com/watch?v=Bkn5bMo-VCQ", note: "C'est beau le jazz",
+    ambiance: "brume", style: "Jazz, trio piano", annee: 1961, bpm: 60, voix: "instru",
+    tags: ["jazz", "piano", "ballade", "trio"],
+    energie: 1, etrange: 2, danse: 1 },
+
+  { titre: "Lovely Day", artiste: "Bill Withers", album: "Menagerie",
+    lien: "https://music.youtube.com/watch?v=QCgeitX5xg0", note: "Allez c'est cadeau", connu: true,
+    ambiance: "soleil", style: "Soul", annee: 1977, bpm: 98, voix: "chant",
+    tags: ["soul", "classique", "optimiste", "groove"],
+    energie: 5, etrange: 1, danse: 6 },
+
+  { titre: "I Don't Smoke / Class of 2013 (Audiotree Live)", artiste: "Mitski", album: "Mitski on Audiotree Live",
+    lien: "https://music.youtube.com/watch?v=fL6srzfRwgo", note: "Cette version me donne des frissons à chaque fois",
+    ambiance: "brume", style: "Indie rock, live", bpm: 90, voix: "chant",
+    tags: ["indie", "live", "guitare", "émotion"],
+    energie: 4, etrange: 5, danse: 3 },
+
+  { titre: "Quand ça se disperse", artiste: "Akhenaton", album: "",
+    lien: "https://music.youtube.com/watch?v=4KGPw-8iz08", note: "De ceux qui restent",
+    ambiance: "bitume", style: "Rap marseillais", bpm: 88, voix: "rap",
+    tags: ["rap", "france", "marseille", "boom bap"],
+    energie: 5, etrange: 3, danse: 4 },
+
+  { titre: "Hifi-Mes Rimes Sortent du Coeur", artiste: "Ma3FoisPlusEfficace", album: "",
+    lien: "https://music.youtube.com/watch?v=mXK3qFRWWf0", note: "Écoutez comment il rebondit",
+    ambiance: "bitume", style: "Rap français", bpm: 92, voix: "rap",
+    tags: ["rap", "france", "flow"],
+    energie: 6, etrange: 5, danse: 5 },
+
+  { titre: "Je t'ai tatoué (La chanson de Louis)", artiste: "Amélien", album: "",
+    lien: "https://music.youtube.com/watch?v=TrNwn-pXOjs", note: "Coucou",
+    ambiance: "brume", style: "Chanson", bpm: 90, voix: "chant",
+    tags: ["chanson", "perso"],
+    energie: 4, etrange: 7, danse: 3 },
+
+  { titre: "(They Long to Be) Close to You", artiste: "Carpenters", album: "Close to You",
+    lien: "https://music.youtube.com/watch?v=M268Csnue9I", note: "Affilié aux Simpsons pour toujours ✨", connu: true,
+    ambiance: "brume", style: "Pop douce", annee: 1970, bpm: 88, voix: "chant",
+    tags: ["pop", "douceur", "seventies", "simpsons"],
+    energie: 2, etrange: 1, danse: 3 },
+
+  { titre: "喫茶aori", artiste: "Shin Rizumu", album: "",
+    lien: "https://music.youtube.com/watch?v=aYMC_4EycVw", note: "Mon chouchou",
+    ambiance: "soleil", style: "City pop, funk japonais", bpm: 110, voix: "chant",
+    tags: ["citypop", "japon", "funk", "groove"],
+    energie: 5, etrange: 6, danse: 6 },
+
+  { titre: "Every Nigger Is a Star", artiste: "Boris Gardner", album: "Every Nigger Is a Star (bande originale)",
+    lien: "https://music.youtube.com/watch?v=3y56omFve_4", note: "Bah alors vous pouvez pas chanter ?",
+    ambiance: "soleil", style: "Soul jamaïcaine", annee: 1973, bpm: 80, voix: "chant",
+    tags: ["soul", "jamaïque", "samples", "bo"],
+    energie: 4, etrange: 4, danse: 4 },
+
+  { titre: "T.A.R (TORA AURA RARE)", artiste: "Tora Meishi", album: "",
+    lien: "https://music.youtube.com/watch?v=CR-xLa2M7bM", note: "Dans mon viseur en tout cas",
+    ambiance: "bitume", style: "Rap", bpm: 140, voix: "rap",
+    tags: ["rap", "underground"],
+    energie: 7, etrange: 6, danse: 6 },
+
+  { titre: "Orchids and Roses", artiste: "The Symphonia Orchestra", album: "",
+    lien: "https://music.youtube.com/watch?v=By6epz3PseA", note: "M'accompagneriez-vous pour une dernière danse ?",
+    ambiance: "brume", style: "Easy listening, cordes", bpm: 80, voix: "instru",
+    tags: ["easy listening", "cordes", "slow", "vintage"],
+    energie: 2, etrange: 4, danse: 3 },
+
+  { titre: "Clock Town (Day 1, Day 2, Day 3 & Final Hours)", artiste: "The Legend of Zelda: Majora's Mask", album: "",
+    lien: "https://music.youtube.com/watch?v=K0kXVfqPrLs", note: "Ça va monter en mode « stress » au fil de l'écoute si jamais (j'adore)",
+    ambiance: "epopee", style: "BO de jeu vidéo", annee: 2000, bpm: 125, voix: "instru",
+    tags: ["jeux vidéo", "zelda", "nintendo", "stress"],
+    energie: 5, etrange: 4, danse: 3 },
+
+  { titre: "The NTS Guide to… Legend of Zelda Soundtracks", artiste: "NTS", album: "",
+    lien: "https://music.youtube.com/watch?v=1rOt7repQek", note: "Si jamais vous voulez 1h de musique de Zelda", long: true,
+    ambiance: "epopee", style: "Mix de BO de jeux vidéo", bpm: 100, voix: "instru",
+    tags: ["jeux vidéo", "zelda", "mix", "nintendo"],
+    energie: 4, etrange: 4, danse: 3 },
+
+  { titre: "I Just Want to Spend the Night With You", artiste: "Ace Spectrum", album: "",
+    lien: "https://music.youtube.com/watch?v=g_p2Wtd2-oQ", note: "Trop aigu pour les karaokés, pas pour ma douche",
+    ambiance: "soleil", style: "Soul seventies", bpm: 95, voix: "chant",
+    tags: ["soul", "falsetto", "seventies", "groove"],
+    energie: 5, etrange: 4, danse: 6 },
+
+  { titre: "Spiked", artiste: "Bilk", album: "",
+    lien: "https://music.youtube.com/watch?v=umWKBcVTYIQ", note: "Je suis supra fan des 20 premières secondes, un peu moins le reste",
+    ambiance: "electrique", style: "Indie punk britannique", bpm: 160, voix: "chant",
+    tags: ["punk", "indie", "guitares", "uk"],
+    energie: 8, etrange: 4, danse: 4 },
+
+  { titre: "B.O.R. (Birth of Rap)", artiste: "Lil B", album: "",
+    lien: "https://music.youtube.com/watch?v=KIHzPgX1aEw", note: "",
+    ambiance: "bitume", style: "Rap, cloud rap", bpm: 80, voix: "rap",
+    tags: ["rap", "based", "cloud rap"],
+    energie: 4, etrange: 6, danse: 4 },
+
+  { titre: "Love in São Paulo", artiste: "Yuji Ohno Trio", album: "",
+    lien: "https://music.youtube.com/watch?v=OkvZZuLyLf8", note: "Parfois c'est juste bien",
+    ambiance: "brume", style: "Jazz japonais", bpm: 110, voix: "instru",
+    tags: ["jazz", "japon", "piano", "trio"],
+    energie: 4, etrange: 4, danse: 4 },
+
+  { titre: "Dakishimete Jitterbug (Careless Whisper)", artiste: "Hideki Saijo", album: "",
+    lien: "https://music.youtube.com/watch?v=pQtHl7SYinU", note: "Pourquoi écouter Careless Whisper en anglais ?",
+    ambiance: "brume", style: "Kayōkyoku, reprise", annee: 1984, bpm: 76, voix: "chant",
+    tags: ["japon", "reprise", "slow", "eighties"],
+    energie: 3, etrange: 6, danse: 4 },
+
+  { titre: "DROPPING SEEDS", artiste: "Carly Gibert", album: "",
+    lien: "https://music.youtube.com/watch?v=ejamlNAYHmY", note: "Elle a des clips sublimes si jamais",
+    ambiance: "brume", style: "R&B alternatif", bpm: 90, voix: "chant",
+    tags: ["rnb", "alternatif", "doux"],
+    energie: 4, etrange: 6, danse: 4 },
+
+  { titre: "Broke", artiste: "Prince Waly", album: "",
+    lien: "https://music.youtube.com/watch?v=ZT-UAsTZcdY", note: "Allah y Rahmo, grand homme",
+    ambiance: "bitume", style: "Rap français, boom bap", bpm: 90, voix: "rap",
+    tags: ["rap", "france", "boom bap"],
+    energie: 5, etrange: 4, danse: 5 },
+
+  { titre: "Minimum", artiste: "Release", album: "",
+    lien: "https://music.youtube.com/watch?v=oKjN_WrbbWA", note: "C'était sympa Seta",
+    ambiance: "bitume", style: "Rap français", bpm: 95, voix: "rap",
+    tags: ["rap", "france"],
+    energie: 5, etrange: 5, danse: 5 },
+
+  { titre: "Buddies", artiste: "Quelle Chris", album: "",
+    lien: "https://music.youtube.com/watch?v=29AuPDvKnxU", note: "Perso je m'aime trop donc j'aime beaucoup",
+    ambiance: "bitume", style: "Rap abstrait", bpm: 88, voix: "rap",
+    tags: ["rap", "abstrait", "detroit"],
+    energie: 4, etrange: 6, danse: 4 },
+
+  { titre: "Parque Laje", artiste: "Egberto Gismonti", album: "",
+    lien: "https://music.youtube.com/watch?v=gFi37mlgqpk", note: "J'ai que des samples merveilleux à vous faire écouter en fait",
+    ambiance: "ailleurs", style: "Jazz brésilien, samples", bpm: 100, voix: "instru",
+    tags: ["bresil", "jazz", "samples", "piano"],
+    energie: 4, etrange: 6, danse: 3 },
+
+  { titre: "Stormy", artiste: "The Third Wave", album: "",
+    lien: "https://music.youtube.com/watch?v=6EpVQmWC514", note: "Va y avoir bientôt plus de jazz/soul que de rap", secours: { lien: "https://music.youtube.com/watch?v=ToDZ_iFcCvA", note: "Va y avoir bientôt plus de jazz/soul que de rap" },
+    ambiance: "soleil", style: "Soul jazz, pop vocale", bpm: 90, voix: "chant",
+    tags: ["soul", "jazz", "sixties", "samples"],
+    energie: 3, etrange: 4, danse: 4 },
+
+  { titre: "En se prenant par la main", artiste: "Jean Claudric", album: "Escapade",
+    lien: "https://music.youtube.com/watch?v=kdred0hJOO0", note: "Le sample du son le plus horrible à écrire d'Action Bronson",
+    ambiance: "brume", style: "Library music française", annee: 1974, bpm: 90, voix: "instru",
+    tags: ["library music", "samples", "cordes", "france"],
+    energie: 3, etrange: 6, danse: 3 },
+
+  { titre: "Detronomicon L'Archive (Detroit Thug Rap Mix)", artiste: "Zetray", album: "",
+    lien: "https://music.youtube.com/watch?v=x3Bo48TYD-0", note: "Que les gens qui sentent bons passent leurs routes, on est savoureurs/savoureuses de Detroit Rap", long: true,
+    ambiance: "bitume", style: "Mix de rap de Detroit", bpm: 95, voix: "rap",
+    tags: ["rap", "detroit", "mix", "street"],
+    energie: 7, etrange: 6, danse: 5 },
+
+  { titre: "gwYn", artiste: "Isaac Thursday", album: "",
+    lien: "https://music.youtube.com/watch?v=rjsrgnxxUHc", note: "J'avais lancé pour la cover à la base",
+    ambiance: "ailleurs", style: "Électronique expérimentale", bpm: 100, voix: "instru",
+    tags: ["électro", "expérimental", "texture"],
+    energie: 4, etrange: 7, danse: 4 },
+
+  { titre: "Embarcadero", artiste: "Paul Desmond", album: "",
+    lien: "https://music.youtube.com/watch?v=k4uvlHw_AMg", note: "Le saxophone est pour moi ex æquo avec le piano",
+    ambiance: "brume", style: "Jazz, saxophone", bpm: 110, voix: "instru",
+    tags: ["jazz", "saxophone", "cool jazz"],
+    energie: 3, etrange: 3, danse: 3 },
+
+  { titre: "Can't Go Wrong", artiste: "O.C.", album: "Jewelz",
+    lien: "https://music.youtube.com/watch?v=gjBUb4hY7H4", note: "Que de souvenirs à QB… enfin Queensbridge (comme ça vous comprenez aussi)",
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 1997, bpm: 90, voix: "rap",
+    tags: ["rap", "new york", "boom bap", "samples"],
+    energie: 5, etrange: 4, danse: 5 },
+
+  { titre: "Ain't No Sunshine", artiste: "Bill Withers", album: "Just As I Am",
+    lien: "https://music.youtube.com/watch?v=CICIOJqEb5c", note: "Les fondamentaux", connu: true,
+    ambiance: "soleil", style: "Soul folk", annee: 1971, bpm: 78, voix: "chant",
+    tags: ["soul", "folk", "classique", "guitare"],
+    energie: 3, etrange: 1, danse: 3 },
+
+  { titre: "Come Wander With Me", artiste: "Bonnie Beecher", album: "",
+    lien: "https://music.youtube.com/watch?v=lVdIf8BJME8", note: "Encore un sample évidemment…",
+    ambiance: "ailleurs", style: "Folk, bande de série", annee: 1964, bpm: 70, voix: "chant",
+    tags: ["folk", "samples", "twilight zone", "étrange"],
+    energie: 2, etrange: 7, danse: 1 },
+
+  { titre: "Body Count", artiste: "Mozzy", album: "",
+    lien: "https://music.youtube.com/watch?v=uE9rwGpR-Qk", note: "Ça a plus de gueule que vos débats nuls",
+    ambiance: "bitume", style: "Rap de Sacramento", bpm: 85, voix: "rap",
+    tags: ["rap", "west coast", "street"],
+    energie: 7, etrange: 4, danse: 5 },
+
+  { titre: "Dancing in My Room", artiste: "347aidan", album: "",
+    lien: "https://music.youtube.com/watch?v=MRwXrdGYOC8", note: "Envie de relancer Roblox",
+    ambiance: "brume", style: "Pop lo-fi", bpm: 120, voix: "chant",
+    tags: ["pop", "lo-fi", "chambre"],
+    energie: 5, etrange: 4, danse: 6 },
+
+  { titre: "For Me", artiste: "Chase B feat. OMB Bloodbath & KenTheMan", album: "",
+    lien: "https://music.youtube.com/watch?v=Gz6Wgz3HOpM", note: "Bwaap Bwaap Bwaap Bwaap Bwaap Bwaap (je fais la basse)",
+    ambiance: "bitume", style: "Rap de Houston", annee: 2020, bpm: 150, voix: "rap",
+    tags: ["rap", "houston", "trap", "basse"],
+    energie: 7, etrange: 4, danse: 7 },
+
+  { titre: "Return of the Mack", artiste: "Mark Morrison", album: "Return of the Mack",
+    lien: "https://music.youtube.com/watch?v=1ZfjB5P7RS0", note: "Quand ça me passe les écouteurs en soirée (Merci Master of None)", connu: true,
+    ambiance: "piste", style: "R&B britannique", annee: 1996, bpm: 96, voix: "chant",
+    tags: ["rnb", "nineties", "soirée", "uk"],
+    energie: 6, etrange: 1, danse: 7 },
+
+  { titre: "B.M.F. (Blowin' Money Fast)", artiste: "Rick Ross feat. Styles P", album: "Teflon Don",
+    lien: "https://music.youtube.com/watch?v=bdTAlbL72W8", note: "Pourquoi se priver ?",
+    ambiance: "bitume", style: "Rap de Miami", annee: 2010, bpm: 80, voix: "rap",
+    tags: ["rap", "miami", "trap", "lourd"],
+    energie: 8, etrange: 2, danse: 6 },
+
+  { titre: "Inédit", artiste: "Booba", album: "",
+    lien: "https://music.youtube.com/watch?v=_Vdt0ThfC_s", note: "Temps Mort est son meilleur album (ou celui sur lequel il est le + en maîtrise)",
+    ambiance: "bitume", style: "Rap français", bpm: 90, voix: "rap",
+    tags: ["rap", "france", "boom bap"],
+    energie: 6, etrange: 3, danse: 5 },
+
+  { titre: "If Only", artiste: "Raveena", album: "Lucid",
+    lien: "https://music.youtube.com/watch?v=hCMuvYSrMuY", note: "Écouteurs dans les transports, visage impassible #bonhomme",
+    ambiance: "brume", style: "R&B, soul douce", annee: 2019, bpm: 80, voix: "chant",
+    tags: ["rnb", "soul", "doux", "transports"],
+    energie: 3, etrange: 4, danse: 4 },
+
+  { titre: "Thank You!!", artiste: "Home Made Kazoku", album: "",
+    lien: "https://music.youtube.com/watch?v=43AwELcIZ-w", note: "Morceau super et ending de Bleach (youhou)",
+    ambiance: "soleil", style: "Rap japonais, soul", bpm: 95, voix: "rap",
+    tags: ["japon", "rap", "anime", "bleach"],
+    energie: 6, etrange: 4, danse: 6 },
+
+  { titre: "Mas, Que Nada!", artiste: "Jorge Ben", album: "Samba Esquema Novo",
+    lien: "https://music.youtube.com/watch?v=hg0XftC43Zo", note: "Très belle version à ne pas sous-estimer",
+    ambiance: "soleil", style: "Samba, bossa", annee: 1963, bpm: 118, voix: "chant",
+    tags: ["bresil", "samba", "classique", "fête"],
+    energie: 6, etrange: 2, danse: 7 },
+
+  { titre: "100 Bars & Gunnin'", artiste: "Ramirez", album: "",
+    lien: "https://music.youtube.com/watch?v=sI_ySt_bdi4", note: "Vu que c'est une radio, autant y aller",
+    ambiance: "bitume", style: "Rap, phonk de Memphis", bpm: 130, voix: "rap",
+    tags: ["rap", "memphis", "phonk", "sombre"],
+    energie: 8, etrange: 6, danse: 5 },
+
+  { titre: "Haruka Kanata", artiste: "Asian Kung-Fu Generation", album: "",
+    lien: "https://music.youtube.com/watch?v=wCqpacYI6b0", note: "J'ai toujours été ce weeb…",
+    ambiance: "electrique", style: "J-rock", annee: 2003, bpm: 180, voix: "chant",
+    tags: ["japon", "rock", "anime", "naruto"],
+    energie: 8, etrange: 3, danse: 4 },
+
+  { titre: "Beautiful", artiste: "Eminem", album: "Relapse",
+    lien: "https://music.youtube.com/watch?v=F4yb0CBd4I4", note: "Je pourrais jamais le détester à 100 % par respect du moi ado qui l'écoutait bcp",
+    ambiance: "bitume", style: "Rap, introspectif", annee: 2009, bpm: 76, voix: "rap",
+    tags: ["rap", "introspectif", "samples"],
+    energie: 5, etrange: 2, danse: 3 },
+
+  { titre: "reflection eternal", artiste: "Nujabes", album: "Modal Soul",
+    lien: "https://music.youtube.com/watch?v=0n7iUJL-Eiw", note: "Je crois bien qu'Hakim avait rappé sur ça y'a genre un peu moins de 10 ans",
+    ambiance: "brume", style: "Hip-hop jazz instrumental", annee: 2005, bpm: 88, voix: "instru",
+    tags: ["jazz", "hip-hop", "japon", "piano"],
+    energie: 3, etrange: 3, danse: 4 },
+
+  { titre: "Confiture d'orties", artiste: "Lucio Bukowski", album: "",
+    lien: "https://music.youtube.com/watch?v=eozd1FdeSUs", note: "",
+    ambiance: "bitume", style: "Rap lyonnais, boom bap", bpm: 88, voix: "rap",
+    tags: ["rap", "france", "lyon", "boom bap"],
+    energie: 5, etrange: 5, danse: 4 },
+
+  { titre: "Life Goes On", artiste: "2Pac", album: "All Eyez on Me",
+    lien: "https://music.youtube.com/watch?v=k11iUIQ5XbY", note: "À l'époque je voulais ça comme son d'enterrement, aujourd'hui un petit clair de lune", connu: true,
+    ambiance: "bitume", style: "Rap West Coast", annee: 1996, bpm: 90, voix: "rap",
+    tags: ["rap", "west coast", "nineties"],
+    energie: 5, etrange: 1, danse: 5 },
+
+  { titre: "Saleté de rap", artiste: "Georgio", album: "",
+    lien: "https://music.youtube.com/watch?v=f9GTm7kAJTQ", note: "Dites-vous que Zlatan venait d'arriver à Paris (ça date)",
+    ambiance: "bitume", style: "Rap français", bpm: 90, voix: "rap",
+    tags: ["rap", "france", "paris"],
+    energie: 6, etrange: 4, danse: 4 },
+
+  { titre: "Bang Bang", artiste: "MANI", album: "",
+    lien: "https://music.youtube.com/watch?v=Et3xz3Ltm2c", note: "C'était un banger",
+    ambiance: "bitume", style: "Rap", bpm: 140, voix: "rap",
+    tags: ["rap", "banger"],
+    energie: 7, etrange: 5, danse: 6 },
+
+  { titre: "Funky Rhytms", artiste: "DJ Logilo", album: "",
+    lien: "https://music.youtube.com/watch?v=QFR1Io4T8Rk", note: "Fun fact : j'étais allé retrouver la face B d'un freestyle de Nekfeu qui aujourd'hui n'a que 2000 vues",
+    ambiance: "bitume", style: "Instru boom bap", bpm: 90, voix: "instru",
+    tags: ["boom bap", "instru", "samples", "funk"],
+    energie: 5, etrange: 6, danse: 5 },
+
+  { titre: "Max B (feat. Starring Max B)", artiste: "Ateyaba", album: "",
+    lien: "https://music.youtube.com/watch?v=hCwT8-HbBf8", note: "Tokyo>Kyoto",
+    ambiance: "bitume", style: "Rap français", bpm: 80, voix: "rap",
+    tags: ["rap", "france", "cloud"],
+    energie: 5, etrange: 5, danse: 4 },
+
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
@@ -982,4 +1405,5 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=beO3qViOUiQ", // The Weekend (Original 12 Inch Mix)
   "https://music.youtube.com/watch?v=VwgTm70Njs8", // Casiopea, Sailing Alone
   "https://music.youtube.com/watch?v=9D6xRc5YoZ4", // Sous la pluie
+  "https://music.youtube.com/watch?v=SEpJx322NIc", // David Ruffin, I Miss You (Part 1), autre version (le site garde l'autre)
 ];

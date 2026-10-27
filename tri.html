@@ -124,6 +124,8 @@
     .mot textarea:focus { outline: none; box-shadow: 0 0 0 4px var(--mot-lueur), 0 0 30px var(--mot-lueur); }
     .mot .ressenti, .mot .ressenti summary { color: var(--mot-indice); }
     .coeur { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); font-weight: 600; font-size: 14px; }
+    .mot-boutons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .coeur.reecoute[aria-pressed="true"] { background: var(--klein); color: var(--sur-klein); box-shadow: none; }
     .coeur[aria-pressed="true"] { background: var(--coeur-fond); color: var(--coeur); box-shadow: inset 0 0 0 1.5px var(--coeur); }
     .ressenti { font-size: 14px; color: var(--encre-2); }
     .ressenti summary { cursor: pointer; padding: 4px 0; }
@@ -356,7 +358,10 @@
       <div class="mot">
         <div class="mot-ligne">
           <label for="note">Ton commentaire sur ce morceau</label>
-          <button class="coeur" id="coeur" aria-pressed="false" title="Pour les morceaux que tu veux mettre en avant (touche C)">☆ Coup de cœur</button>
+          <span class="mot-boutons">
+            <button class="coeur reecoute" id="reecoute" aria-pressed="false" title="Ta liste perso à réécouter, en plus du oui ou du non (touche R)">♫ À réécouter</button>
+            <button class="coeur" id="coeur" aria-pressed="false" title="Pour les morceaux que tu veux mettre en avant (touche C)">☆ Coup de cœur</button>
+          </span>
         </div>
         <textarea id="note" rows="2" placeholder="Un mot, une phrase, un souvenir. Facultatif : il apparaîtra sur la fiche du morceau."></textarea>
         <details class="ressenti" id="ressenti">
@@ -399,7 +404,7 @@
         <label><input type="checkbox" id="opt-son" checked> Klaxon du pull up</label>
         <label><input type="checkbox" id="opt-bilan" checked> Bilan toutes les 10 écoutes</label>
       </div>
-      <p class="raccourcis">Clavier : <kbd>→</kbd> oui, <kbd>←</kbd> non, <kbd>↓</kbd> pas sûr, <kbd>T</kbd> oui + commentaire plus tard, <kbd>P</kbd> pull up, <kbd>C</kbd> coup de cœur, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s, <kbd>Z</kbd> annuler, <kbd>Échap</kbd> sort du commentaire. Sur téléphone ou à la souris, fais glisser la carte à droite (oui) ou à gauche (non).</p>
+      <p class="raccourcis">Clavier : <kbd>→</kbd> oui, <kbd>←</kbd> non, <kbd>↓</kbd> pas sûr, <kbd>T</kbd> oui + commentaire plus tard, <kbd>P</kbd> pull up, <kbd>R</kbd> à réécouter, <kbd>C</kbd> coup de cœur, <kbd>Espace</kbd> pause, <kbd>↑</kbd> +30 s, <kbd>Z</kbd> annuler, <kbd>Échap</kbd> sort du commentaire. Sur téléphone ou à la souris, fais glisser la carte à droite (oui) ou à gauche (non).</p>
     </div>
   </section>
 
@@ -434,6 +439,7 @@
       <button class="bouton" id="copier">Copier pour Claude</button>
       <button class="bouton bouton-clair" id="copier-code">Copier au format data.js</button>
       <button class="bouton bouton-clair" id="telecharger">Télécharger la liste</button>
+      <button class="bouton bouton-clair" id="ouvrir-reecoute" hidden>♫ Ma liste à réécouter sur YouTube</button>
       <button class="bouton bouton-clair" id="ecrire-tard" hidden>Écrire les commentaires en attente</button>
       <button class="lien" id="revoir-passes">Revoir les « pas sûr »</button>
     </div>
@@ -457,6 +463,7 @@
       <p><strong>Sauvegarde</strong></p>
       <p class="petit">Un seul fichier avec tous tes choix, commentaires, coups de cœur et réglages. Utile pour changer d'appareil ou ne rien perdre si tu vides ton navigateur.</p>
       <div class="ligne" style="margin-top:10px">
+        <button class="bouton bouton-clair" id="revue-reecoute">♫ Ma liste à réécouter sur YouTube</button>
         <button class="bouton bouton-clair" id="sauvegarder">Télécharger la sauvegarde</button>
         <button class="bouton bouton-clair" id="restaurer-2">Restaurer une sauvegarde</button>
       </div>
@@ -467,7 +474,7 @@
 <div class="pull-fx" id="pull-fx" aria-hidden="true"><b>PULL UP</b></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data.js?v=26"></script>
-<script src="tri.js?v=22"></script>
+<script src="data.js?v=27"></script>
+<script src="tri.js?v=23"></script>
 </body>
 </html>

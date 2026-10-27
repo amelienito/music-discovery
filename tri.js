@@ -24,7 +24,8 @@ T.active = T.active || null;
 T.notes = T.notes || {};        // commentaire par morceau (identifiant YouTube)
 T.coeurs = T.coeurs || {};      // coups de cœur
 T.ressentis = T.ressentis || {};// énergie / étrange / danse, quand tu les as réglés
-T.tard = T.tard || {};          // « oui, mais commentaire plus tard »
+T.tard = T.tard || {};
+T.reecouter = T.reecouter || {}; // « à réécouter » : ta liste perso, en plus du oui ou du non          // « oui, mais commentaire plus tard »
 T.jours = T.jours || {};        // nombre de morceaux jugés par jour
 T.objectif = T.objectif || 30;
 T.duree = T.duree || { ms: 0, n: 0 }; // temps moyen passé par morceau
@@ -414,7 +415,31 @@ function majMot() {
   });
 }
 function ajusterNote() { const n = $('#note'); n.style.height = 'auto'; n.style.height = Math.min(220, Math.max(64, n.scrollHeight + 2)) + 'px'; }
+function majReecoute() {
+  const on = !!(courant && T.reecouter[courant]);
+  $('#reecoute').setAttribute('aria-pressed', on);
+  $('#reecoute').textContent = (on ? '♫ Dans ma liste' : '♫ À réécouter');
+}
+function basculerReecoute() {
+  if (!courant) return;
+  if (T.reecouter[courant]) delete T.reecouter[courant]; else { T.reecouter[courant] = true; vibre(8); }
+  sauver(); majReecoute(); if (L()) rendreExport();
+}
+// ta liste à réécouter s'ouvre sur YouTube comme une playlist (50 morceaux par lien, la limite de YouTube)
+function liensReecoute() {
+  const ids = Object.keys(T.reecouter);
+  const liens = [];
+  for (let k = 0; k < ids.length; k += 50) liens.push('https://www.youtube.com/watch_videos?video_ids=' + ids.slice(k, k + 50).join(','));
+  return liens;
+}
+function ouvrirReecoute() {
+  const liens = liensReecoute();
+  if (!liens.length) return toast('Ta liste à réécouter est vide : touche « ♫ À réécouter » sur un morceau.');
+  window.open(liens[0], '_blank', 'noopener');
+  if (liens.length > 1) toast(`Liste ouverte avec les 50 premiers (YouTube n'en prend pas plus d'un coup).`);
+}
 function majCoeur() {
+  majReecoute();
   const on = !!T.coeurs[courant];
   $('#coeur').setAttribute('aria-pressed', on);
   $('#coeur').textContent = (on ? '★' : '☆') + ' Coup de cœur';
@@ -433,6 +458,7 @@ $('#note').addEventListener('focus', () => document.body.classList.add('ecrit'))
 $('#note').addEventListener('blur', () => document.body.classList.remove('ecrit'));
 $('#note').addEventListener('keydown', e => { if (e.key === 'Escape') $('#note').blur(); });
 $('#coeur').addEventListener('click', basculerCoeur);
+$('#reecoute').addEventListener('click', basculerReecoute);
 function basculerCoeur() {
   if (!courant) return;
   if (T.coeurs[courant]) delete T.coeurs[courant]; else { T.coeurs[courant] = true; vibre(8); }
@@ -679,6 +705,9 @@ function rendreExport() {
     : 'Clique sur « Copier pour Claude », puis colle le texte dans la conversation : Claude les ajoute au site avec tes commentaires et règle leur énergie, leur étrangeté et leur côté dansant. « Format data.js » donne les blocs prêts à coller dans le fichier.';
   $('#copier-code').hidden = site ? !chg.length : false;
   $('#liste-oui').innerHTML = (site ? lesNon() : liste).map(m => `<li>${esc(m.artiste || '?')}, ${esc(m.titre || m.brut || m.id)}${T.coeurs[m.id] ? ' ★' : ''}${m.officiel === false ? ' <span class="petit">(chaîne à vérifier)</span>' : ''}${aplati(T.notes[m.id]) ? ` <span class="petit">« ${esc(aplati(T.notes[m.id]))} »</span>` : ''}</li>`).join('');
+  const nRe = Object.keys(T.reecouter).length;
+  $('#ouvrir-reecoute').hidden = !nRe;
+  $('#ouvrir-reecoute').textContent = `♫ Ma liste à réécouter sur YouTube (${nRe})`;
   const nTard = Object.keys(T.tard).filter(id => !aplati(T.notes[id])).length;
   $('#ecrire-tard').hidden = !nTard;
   $('#ecrire-tard').textContent = `Écrire les commentaires en attente (${nTard})`;
@@ -701,7 +730,7 @@ function rendreListes() {
 
 /* ─────────── la revue : tout ce qui est jugé, modifiable ─────────── */
 let filtre = 'tous', revueMax = 60;
-const FILTRES = [['tous', 'Tout'], ['oui', 'Oui'], ['non', 'Non'], ['passe', 'À revoir'], ['coeur', '★'], ['note', 'Avec un mot'], ['tard', 'À commenter']];
+const FILTRES = [['tous', 'Tout'], ['oui', 'Oui'], ['non', 'Non'], ['passe', 'À revoir'], ['coeur', '★'], ['reecoute', '♫'], ['note', 'Avec un mot'], ['tard', 'À commenter']];
 function ordreRevue() {
   const l = L();
   const vus = new Set(), ordre = [];
@@ -748,6 +777,7 @@ function rendreRevue(garder) {
   if (filtre === 'coeur') ids = ids.filter(id => T.coeurs[id]);
   if (filtre === 'note') ids = ids.filter(id => aplati(T.notes[id]));
   if (filtre === 'tard') ids = ids.filter(id => T.tard[id]);
+  if (filtre === 'reecoute') ids = ids.filter(id => T.reecouter[id]);
   const montres = ids.slice(0, revueMax);
   $('#plus-revue').hidden = ids.length <= revueMax;
   cible.innerHTML = montres.length ? montres.map(id => {
@@ -836,7 +866,7 @@ $('#fichier-sauvegarde').addEventListener('change', async e => {
       for (const [id, inf] of Object.entries(lj.infos || {})) if (!ici.infos[id]) ici.infos[id] = inf;
       ici.historique = (ici.historique || []).concat((lj.historique || []).filter(h => !ici.historique.some(x => (x.id || x) === (h.id || h))));
     }
-    for (const cle of ['notes', 'coeurs', 'ressentis', 'tard']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) T[cle][id] = v;
+    for (const cle of ['notes', 'coeurs', 'ressentis', 'tard', 'reecouter']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) T[cle][id] = v;
     for (const [j, n] of Object.entries(J.jours || {})) T.jours[j] = Math.max(T.jours[j] || 0, n);
     T.active = T.active && T.listes[T.active] ? T.active : (J.active && T.listes[J.active] ? J.active : null);
     sauver(); rendreListes(); majObjectif();
@@ -946,6 +976,8 @@ $('#copier-code').addEventListener('click', async () => {
 $('#telecharger').addEventListener('click', () => {
   telecharger(T.active === SITE ? 'music-discovery-a-retirer.txt' : 'music-discovery-oui.txt', texteExport() + (T.active === SITE ? '' : '\n\n--- format data.js ---\n' + codeExport()));
 });
+$('#ouvrir-reecoute').addEventListener('click', ouvrirReecoute);
+$('#revue-reecoute').addEventListener('click', ouvrirReecoute);
 $('#ecrire-tard').addEventListener('click', () => { R.source = 'oui'; R.filtre = 'tard'; sauverR(); if (!R.actif) entrerRevision(); });
 $('#revoir-passes').addEventListener('click', () => {
   const l = L();
@@ -967,6 +999,7 @@ document.addEventListener('keydown', e => {
     else if (k === 'c' || k === 'C') { e.preventDefault(); basculerCoeur(); majRevisionBarre(); }
     else if (k === ' ') { e.preventDefault(); $('#t-lecture').click(); }
     else if (k === 'p' || k === 'P') { e.preventDefault(); pullUp(); }
+    else if (k === 'r' || k === 'R') { e.preventDefault(); basculerReecoute(); }
     else if (k === 'ArrowUp') { e.preventDefault(); $('#t-avance').click(); }
     return;
   }
@@ -977,6 +1010,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'ArrowDown') { e.preventDefault(); decider('passe'); }
   else if (k === 't' || k === 'T') { e.preventDefault(); ouiPlusTard(); }
   else if (k === 'p' || k === 'P') { e.preventDefault(); pullUp(); }
+  else if (k === 'r' || k === 'R') { e.preventDefault(); basculerReecoute(); }
   else if (k === 'ArrowUp') { e.preventDefault(); $('#t-avance').click(); }
   else if (k === 'c' || k === 'C') { e.preventDefault(); basculerCoeur(); }
   else if (k === ' ') { e.preventDefault(); $('#t-lecture').click(); }
