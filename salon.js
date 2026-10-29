@@ -142,27 +142,30 @@ const Salon = (() => {
       <g class="salon-fauteuil">
         <path d="M884 150 Q888 128 920 126 Q962 124 970 152 L978 300 L878 300 Z" fill="url(#salon-cuir-${id})"/>
         <path d="M900 140 Q925 132 956 142" fill="none" stroke="#d48a4c" stroke-width="2" opacity=".6"/>
-        <!-- la personne : pull bleu Klein, adossée, les yeux fermés -->
+        <!-- la personne : afro, lunettes rondes noires, moustache, manteau sombre, chemise blanche et cravate orange -->
         <g class="salon-personne">
-          <path d="M836 180 Q866 164 900 174 Q914 210 914 252 L828 254 Q826 214 836 180 Z" fill="#2440b8"/>
-          <path d="M846 186 Q870 178 892 182" fill="none" stroke="#3a58d0" stroke-width="3" opacity=".6"/>
+          <path d="M834 180 Q866 162 902 174 Q916 210 916 252 L826 254 Q824 214 834 180 Z" fill="#1d2233"/>
+          <path d="M856 172 L866 196 L876 172 Z" fill="#f4f1ea"/>
+          <path d="M864 178 L868 178 L871 214 L866 222 L861 214 Z" fill="#d06a32"/><circle cx="866" cy="190" r="1.3" fill="#f0b07a"/><circle cx="867" cy="202" r="1.3" fill="#f0b07a"/>
+          <path d="M850 176 L862 200" stroke="#151a28" stroke-width="3"/><path d="M882 176 L872 200" stroke="#151a28" stroke-width="3"/>
           <g class="salon-tete" style="--o:868px 172px">
-            <rect x="858" y="156" width="17" height="22" rx="7" fill="#56321f"/>
+            <rect x="859" y="154" width="15" height="24" rx="6" fill="#7e5034"/>
             <!-- l'afro, derrière le visage -->
-            <g class="afro" fill="#15100d">
-              <circle cx="878" cy="128" r="30"/><circle cx="860" cy="114" r="18"/><circle cx="872" cy="100" r="16"/><circle cx="891" cy="108" r="17"/>
-              <circle cx="902" cy="128" r="16"/><circle cx="898" cy="148" r="14"/><circle cx="848" cy="124" r="11"/>
+            <g class="afro" fill="#2e1c14">
+              <circle cx="874" cy="120" r="37"/><circle cx="911.0" cy="120.0" r="4.2"/><circle cx="910.4" cy="126.8" r="5.1"/><circle cx="908.5" cy="133.4" r="6.0"/><circle cx="905.5" cy="139.5" r="4.2"/><circle cx="901.3" cy="144.9" r="5.1"/><circle cx="896.3" cy="149.5" r="6.0"/><circle cx="890.5" cy="153.1" r="4.2"/><circle cx="884.1" cy="155.6" r="5.1"/><circle cx="877.4" cy="156.8" r="6.0"/><circle cx="870.6" cy="156.8" r="4.2"/><circle cx="863.9" cy="155.6" r="5.1"/><circle cx="857.5" cy="153.1" r="6.0"/><circle cx="851.7" cy="149.5" r="4.2"/><circle cx="846.7" cy="144.9" r="5.1"/><circle cx="842.5" cy="139.5" r="6.0"/><circle cx="839.5" cy="133.4" r="4.2"/><circle cx="837.6" cy="126.8" r="5.1"/><circle cx="837.0" cy="120.0" r="6.0"/><circle cx="837.6" cy="113.2" r="4.2"/><circle cx="839.5" cy="106.6" r="5.1"/><circle cx="842.5" cy="100.5" r="6.0"/><circle cx="846.7" cy="95.1" r="4.2"/><circle cx="851.7" cy="90.5" r="5.1"/><circle cx="857.5" cy="86.9" r="6.0"/><circle cx="863.9" cy="84.4" r="4.2"/><circle cx="870.6" cy="83.2" r="5.1"/><circle cx="877.4" cy="83.2" r="6.0"/><circle cx="884.1" cy="84.4" r="4.2"/><circle cx="890.5" cy="86.9" r="5.1"/><circle cx="896.3" cy="90.5" r="6.0"/><circle cx="901.3" cy="95.1" r="4.2"/><circle cx="905.5" cy="100.5" r="5.1"/><circle cx="908.5" cy="106.6" r="6.0"/><circle cx="910.4" cy="113.2" r="4.2"/>
             </g>
-            <circle cx="866" cy="142" r="21" fill="#6e4330"/>
-            <path d="M845 136 Q846 120 862 118 Q852 126 851 136 Z" fill="#15100d"/>
-            <path d="M846 145 l-8 6 l8 2" fill="#6e4330"/>
-            <path class="oeil" d="M850 140 q4.5 3.5 9 0" fill="none" stroke="#120c0a" stroke-width="2" stroke-linecap="round"/>
-            <path d="M849 156 q4 2.5 9 .5" fill="none" stroke="#3a1f16" stroke-width="1.8" stroke-linecap="round"/>
-            <ellipse cx="875" cy="145" rx="4.5" ry="6.5" fill="#56321f"/>
-            <!-- les lunettes rondes, monture fine -->
-            <g class="lunettes" fill="none" stroke="#d6b25a" stroke-width="1.4">
-              <circle cx="853" cy="140" r="6.5" fill="rgba(255,255,255,.08)"/>
-              <path d="M846.5 140 l-3 1"/><path d="M859.5 139.5 L873 142"/>
+            <ellipse cx="864" cy="142" rx="18.5" ry="21.5" fill="#9a6646"/>
+            <path d="M846 127 Q850 116 864 114 Q852 122 848 132 Z" fill="#2e1c14"/>
+            <path d="M846 143 l-8 7 l9 2" fill="#9a6646"/>
+            <path class="oeil" d="M849 138 q4.5 -3 9 0" fill="none" stroke="#1a100b" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M843 152 q6 -3 12 1" fill="none" stroke="#1a100b" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M845 156.5 q6 4.5 12 -.5" fill="#f4efe6" stroke="#3b1d14" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M847 162 q4 4 9 1 l-1 4 q-4 2 -8 -1 z" fill="#1a100b"/>
+            <ellipse cx="876" cy="144" rx="4.5" ry="6.5" fill="#7e5034"/><circle cx="876.5" cy="151.5" r="1.4" fill="#e3c06a"/>
+            <!-- les lunettes rondes, monture noire -->
+            <g class="lunettes" fill="none" stroke="#121010" stroke-width="2.3">
+              <circle cx="852.5" cy="139" r="6.8" fill="rgba(255,255,255,.06)"/>
+              <path d="M845.7 139 l-3 1.2"/><path d="M859.3 138 L874 141"/>
             </g>
           </g>
         </g>
@@ -173,9 +176,9 @@ const Salon = (() => {
         <rect x="782" y="300" width="10" height="26" rx="2" fill="#3b2316"/><rect x="944" y="300" width="10" height="26" rx="2" fill="#3b2316"/>
         <rect x="776" y="294" width="190" height="10" rx="4" fill="#6e3518"/>
         <!-- le bras posé sur l'accoudoir, le verre à la main -->
-        <path d="M848 190 L832 222" stroke="#2440b8" stroke-width="20" stroke-linecap="round"/>
-        <path d="M832 222 L810 213" stroke="#2440b8" stroke-width="17" stroke-linecap="round"/>
-        <ellipse cx="801" cy="211" rx="9" ry="7" fill="#6e4330"/>
+        <path d="M848 190 L832 222" stroke="#1d2233" stroke-width="20" stroke-linecap="round"/>
+        <path d="M832 222 L810 213" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/><path d="M812 214 l-3 -1" stroke="#f4f1ea" stroke-width="15" stroke-linecap="round"/>
+        <ellipse cx="801" cy="211" rx="9" ry="7" fill="#9a6646"/>
         <path d="M793 207 l2 -17 h11 l2 17z" fill="#f4efe6" opacity=".9"/><rect x="795" y="197" width="11" height="8" fill="#c8a24a" opacity=".9"/>
         <!-- les jambes croisées : celle qui reste au sol, puis celle qui bat la mesure -->
         <path d="M772 236 L744 318" stroke="#2a2c35" stroke-width="23" stroke-linecap="round"/>
