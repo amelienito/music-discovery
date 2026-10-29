@@ -147,13 +147,13 @@ const Salon = (() => {
           <path d="M836 180 Q866 164 900 174 Q914 210 914 252 L828 254 Q826 214 836 180 Z" fill="#2440b8"/>
           <path d="M846 186 Q870 178 892 182" fill="none" stroke="#3a58d0" stroke-width="3" opacity=".6"/>
           <g class="salon-tete" style="--o:868px 172px">
-            <rect x="858" y="156" width="17" height="22" rx="7" fill="#c48965"/>
-            <circle cx="866" cy="142" r="21" fill="#d9a27c"/>
-            <path d="M845 142 Q842 114 870 114 Q895 116 891 144 Q887 128 873 127 Q860 128 857 140 Z" fill="#2a1d17"/>
-            <path d="M846 145 l-8 6 l8 2" fill="#d9a27c"/>
-            <path class="oeil" d="M850 140 q4.5 3.5 9 0" fill="none" stroke="#2a1d17" stroke-width="2" stroke-linecap="round"/>
-            <path d="M849 156 q4 2.5 9 .5" fill="none" stroke="#8a4a3a" stroke-width="1.8" stroke-linecap="round"/>
-            <ellipse cx="875" cy="145" rx="4.5" ry="6.5" fill="#c48965"/>
+            <rect x="858" y="156" width="17" height="22" rx="7" fill="#56321f"/>
+            <circle cx="866" cy="142" r="21" fill="#6e4330"/>
+            <path d="M845 142 Q842 114 870 114 Q895 116 891 144 Q887 128 873 127 Q860 128 857 140 Z" fill="#120c0a"/>
+            <path d="M846 145 l-8 6 l8 2" fill="#6e4330"/>
+            <path class="oeil" d="M850 140 q4.5 3.5 9 0" fill="none" stroke="#120c0a" stroke-width="2" stroke-linecap="round"/>
+            <path d="M849 156 q4 2.5 9 .5" fill="none" stroke="#3a1f16" stroke-width="1.8" stroke-linecap="round"/>
+            <ellipse cx="875" cy="145" rx="4.5" ry="6.5" fill="#56321f"/>
           </g>
         </g>
         <!-- l'accoudoir, devant -->
@@ -165,7 +165,7 @@ const Salon = (() => {
         <!-- le bras posé sur l'accoudoir, le verre à la main -->
         <path d="M848 190 L832 222" stroke="#2440b8" stroke-width="20" stroke-linecap="round"/>
         <path d="M832 222 L810 213" stroke="#2440b8" stroke-width="17" stroke-linecap="round"/>
-        <ellipse cx="801" cy="211" rx="9" ry="7" fill="#d9a27c"/>
+        <ellipse cx="801" cy="211" rx="9" ry="7" fill="#6e4330"/>
         <path d="M793 207 l2 -17 h11 l2 17z" fill="#f4efe6" opacity=".9"/><rect x="795" y="197" width="11" height="8" fill="#c8a24a" opacity=".9"/>
         <!-- les jambes croisées : celle qui reste au sol, puis celle qui bat la mesure -->
         <path d="M772 236 L744 318" stroke="#2a2c35" stroke-width="23" stroke-linecap="round"/>

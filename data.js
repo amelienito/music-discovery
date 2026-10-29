@@ -471,12 +471,6 @@ const MORCEAUX = [
     tags: ["orchestre", "lounge", "cordes", "chanson"],
     energie: 2, etrange: 4, danse: 2 },
 
-  { titre: "Bi Kelma Menak", artiste: "Sherine", album: "Batamenak",
-    lien: "https://music.youtube.com/watch?v=BSHhX8nypcY", note: "",
-    ambiance: "ailleurs", style: "Pop égyptienne", annee: 2008, bpm: 95, voix: "chant",
-    tags: ["monde", "arabe", "pop", "cordes"],
-    energie: 4, etrange: 5, danse: 5 },
-
   { titre: "Raubíri", artiste: "Marcel Gidote's Holy Crab", album: "Felvidék (OST)",
     lien: "https://music.youtube.com/watch?v=CA1ZmK3DC8o", note: "Ça peut être hongrois/slovaque, mon cœur ne suit que la batterie",
     ambiance: "ailleurs", style: "Rock psyché-jazz tchèque", annee: 2024, bpm: 110, voix: "instru",
@@ -1181,7 +1175,7 @@ const MORCEAUX = [
     energie: 5, etrange: 4, danse: 5 },
 
   { titre: "Minimum", artiste: "Release", album: "",
-    lien: "https://music.youtube.com/watch?v=oKjN_WrbbWA", note: "C'était sympa Seta",
+    lien: "https://music.youtube.com/watch?v=xALMCY0s6B4", note: "C'était sympa Seta",
     ambiance: "bitume", style: "Rap français", bpm: 95, voix: "rap",
     tags: ["rap", "france"],
     energie: 5, etrange: 5, danse: 5 },
@@ -1389,5 +1383,7 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=ejamlNAYHmY", // DROPPING SEEDS (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=Gz6Wgz3HOpM", // For Me (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=29AuPDvKnxU", // Buddies (audio, remplacé par le clip)
+  "https://music.youtube.com/watch?v=BSHhX8nypcY", // Sherine, Bi Kelma Menak
+  "https://music.youtube.com/watch?v=oKjN_WrbbWA", // Release, Minimum (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=SEpJx322NIc", // David Ruffin, I Miss You (Part 1), autre version (le site garde l'autre)
 ];
