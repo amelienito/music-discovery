@@ -17,7 +17,7 @@ body {
   background-image: var(--fond-image, none);
   color: var(--encre);
   font-family: var(--texte);
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -124,7 +124,7 @@ body.sans-selection .bouton-trouvailles { display: none; }
 
 /* ─────────────────────────────── LE CARTON D'ENTRÉE ─────────────────────────────── */
 .ecran-allumage { display: grid; place-content: center; justify-items: center; gap: 34px; text-align: center; }
-.allumage-texte h1 { font-size: clamp(2.8rem, 7vw, 6.2rem); line-height: .95; max-width: none; margin: 0 auto; text-wrap: balance; }
+.allumage-texte h1 { font-size: clamp(2.5rem, 6vw, 5.2rem); line-height: .95; max-width: none; margin: 0 auto; text-wrap: balance; }
 .allumage-texte h1 .ligne { display: inline-block; text-wrap: balance; }
 .allumage-texte .surtitre { margin-bottom: 18px; font-size: 13.65px; }
 .surtitre { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--encre-2); }
@@ -426,7 +426,7 @@ body[data-vitesse="hypno"] .plateau-reflet { opacity: .8; animation-duration: 9s
 /* l'étiquette imprimée sur la façade, à côté du disque */
 .etiquette { display: grid; gap: 6px; align-content: center; min-width: 0; color: var(--hifi-encre); }
 .etiquette-haut { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: .14em; opacity: .55; font-variant-numeric: tabular-nums; }
-.etiquette-titre { font-family: var(--display); font-weight: var(--display-poids, 700); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.3rem, 2.1vw, 2rem); line-height: 1.06; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-wrap: balance; }
+.etiquette-titre { font-family: var(--display); font-weight: var(--display-poids, 700); letter-spacing: var(--display-interlettre, -0.02em); font-size: clamp(1.2rem, 1.9vw, 1.75rem); line-height: 1.06; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-wrap: balance; }
 .etiquette-artiste { font-size: clamp(.95rem, 1.2vw, 1.1rem); font-weight: 500; opacity: .8; overflow-wrap: anywhere; }
 .etiquette-ensuite { font-size: 13px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
 /* l'écran à cristaux liquides (on le touche : il change de couleur) */
@@ -689,8 +689,8 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 .post-it-scotch { position: absolute; top: 7px; left: 50%; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%;   /* la punaise */
   background: radial-gradient(circle at 35% 30%, #ff8f73, #c8361f 55%, #7d1c0e); box-shadow: 0 3px 4px rgba(0,0,0,.35); }
-.post-it-texte { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 23px; line-height: 1.16; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
-.post-it.long .post-it-texte { font-size: 19px; }
+.post-it-texte { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 20px; line-height: 1.16; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
+.post-it.long .post-it-texte { font-size: 17px; }
 .post-it-signe { display: none; }
 .post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
 @keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
@@ -1088,6 +1088,10 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .salon { position: relative; width: 100%; max-width: 1100px; margin: 0 auto; aspect-ratio: 1200 / 360; min-height: 170px; border-radius: 18px; overflow: hidden;
   background: #2a2420; box-shadow: var(--relief-fort); --jour: .5; --battement: .62s; --amplitude: 5deg; }
 .salon-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.salon .couche { will-change: transform; }
+.salon .couche-fond { transform: translate(calc(var(--px, 0) * -6px), calc(var(--py, 0) * -3px)); }
+.salon .couche-milieu { transform: translate(calc(var(--px, 0) * -13px), calc(var(--py, 0) * -5px)); }
+.salon .couche-avant { transform: translate(calc(var(--px, 0) * -24px), calc(var(--py, 0) * -8px)); }
 .salon * { transform-box: view-box; }
 .salon-nuit { opacity: calc((1 - var(--jour)) * .66); transition: opacity 2s; }
 .salon-rayon { opacity: calc(var(--jour) * .12); mix-blend-mode: screen; }

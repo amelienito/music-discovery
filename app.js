@@ -691,7 +691,10 @@ setInterval(() => {
 function majSalon() {
   if (typeof Salon === 'undefined') return;
   const m = parId[S.joue];
-  const im = m && Pochettes.image(m);
+  // au mur : la pochette du morceau qui passe, sinon celle du dernier écouté (ou d'un morceau au hasard)
+  const affiche = m || parId[S.historique[S.historique.length - 1]] || (majSalon.hasard = majSalon.hasard || hasard(BANQUE));
+  const im = affiche && Pochettes.image(affiche);
+  if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
   Salon.maj({ joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null });
 }
 function majEtat() {

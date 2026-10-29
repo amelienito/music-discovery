@@ -48,9 +48,10 @@ const Salon = (() => {
       immeubles += `<rect x="${x}" y="${233 - hh}" width="${w}" height="${hh}"/>`;
       for (let yy = 233 - hh + 8; yy < 228; yy += 11) for (let xx = x + 5; xx < x + w - 5; xx += 9) if ((xx * 7 + yy * 3 + i) % 5 < 2) fenetres += `<rect x="${xx}" y="${yy}" width="4" height="5"/>`;
     });
+    // le parquet en perspective : les lames fuient vers le fond de la pièce
     let planches = '';
-    for (let y = 298; y < 360; y += 12) planches += `<line x1="0" y1="${y}" x2="1200" y2="${y}"/>`;
-    for (let k = 0; k < 18; k++) { const y = 298 + (k % 5) * 12; planches += `<line x1="${(k * 137) % 1200}" y1="${y}" x2="${(k * 137) % 1200}" y2="${y + 12}"/>`; }
+    for (let xb = -360; xb <= 1560; xb += 64) planches += `<line x1="${(600 + (xb - 600) * .34).toFixed(1)}" y1="293" x2="${xb}" y2="360"/>`;
+    for (let k = 1; k <= 5; k++) { const y = 293 + 67 * Math.pow(k / 5.4, 1.5); planches += `<line x1="-60" y1="${y.toFixed(1)}" x2="1260" y2="${y.toFixed(1)}"/>`; }
     let poussieres = '';
     for (let k = 0; k < 9; k++) poussieres += `<circle class="poussiere" cx="${850 + (k * 37) % 120}" cy="${110 + (k * 53) % 130}" r="${1 + (k % 3) * .6}" style="--i:${k}"/>`;
 
@@ -65,14 +66,16 @@ const Salon = (() => {
         <linearGradient id="salon-rideau-${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5f2420"/><stop offset=".3" stop-color="#8a3a30"/><stop offset=".55" stop-color="#6a2a24"/><stop offset=".8" stop-color="#8f3d33"/><stop offset="1" stop-color="#5a221e"/></linearGradient>
         <radialGradient id="salon-lampe-${id}" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(950 118) scale(250 190)"><stop offset="0" stop-color="#ffd59a" stop-opacity=".95"/><stop offset=".35" stop-color="#ffb066" stop-opacity=".45"/><stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/></radialGradient>
         <radialGradient id="salon-chaleur-${id}" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(760 230) scale(620 300)"><stop offset="0" stop-color="#ff9442" stop-opacity=".9"/><stop offset="1" stop-color="#ff7a2e" stop-opacity="0"/></radialGradient>
+        <linearGradient id="salon-reflet-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
         <clipPath id="salon-vitre-${id}"><rect x="312" y="72" width="216" height="161"/></clipPath>
       </defs>
 
+      <g class="couche couche-fond">
       <!-- le mur et le sol -->
-      <rect width="1200" height="300" fill="url(#salon-mur-${id})"/>
-      <rect y="292" width="1200" height="68" fill="#7a4a2a"/>
+      <rect x="-60" y="-20" width="1320" height="320" fill="url(#salon-mur-${id})"/>
+      <rect x="-60" y="292" width="1320" height="90" fill="#7a4a2a"/>
       <g class="salon-planches" stroke="#5e381f" stroke-width="1.2" opacity=".55">${planches}</g>
-      <rect y="284" width="1200" height="9" fill="#f3ece0"/><rect y="292" width="1200" height="2" fill="#c9bba4"/>
+      <rect x="-60" y="284" width="1320" height="9" fill="#f3ece0"/><rect x="-60" y="292" width="1320" height="2" fill="#c9bba4"/>
 
       <!-- l'étagère à disques -->
       <g class="salon-etagere">
@@ -101,6 +104,16 @@ const Salon = (() => {
       <path d="M544 38 h44 q-8 66 2 126 q-10 66 -2 126 h-50 q12 -52 2 -112 q10 -70 4 -140z" fill="url(#salon-rideau-${id})"/>
       <polygon class="salon-rayon" points="312,233 528,233 690,330 380,330" fill="#fff6dc"/>
 
+      <!-- au mur : la pochette du morceau qui passe, en grand -->
+      <g class="salon-cadre">
+        <rect x="590" y="78" width="104" height="104" fill="#1f1a15"/><rect x="595" y="83" width="94" height="94" fill="#efe7d8"/>
+        <rect class="cadre-vide" x="601" y="89" width="82" height="82" fill="#c8572f"/><circle class="cadre-vide" cx="642" cy="130" r="23" fill="#1d1c22"/><circle class="cadre-vide" cx="642" cy="130" r="4" fill="#efe7d8"/>
+        <image class="cadre-pochette" x="601" y="89" width="82" height="82" preserveAspectRatio="xMidYMid slice"/>
+        <rect x="601" y="89" width="82" height="82" fill="url(#salon-reflet-${id})"/>
+      </g>
+
+      </g>
+      <g class="couche couche-milieu">
       <!-- le meuble et la platine -->
       <g class="salon-meuble">
         <rect x="574" y="256" width="150" height="70" rx="3" fill="#5a3520"/>
@@ -114,13 +127,6 @@ const Salon = (() => {
       </g>
       <g class="salon-ondes" fill="none" stroke="#c87a3e" stroke-width="2" stroke-linecap="round">
         <path class="onde" d="M612 224 q20 -14 40 0" style="--i:0"/><path class="onde" d="M604 214 q28 -20 56 0" style="--i:1"/><path class="onde" d="M596 204 q36 -26 72 0" style="--i:2"/>
-      </g>
-
-      <!-- au mur : la pochette du morceau qui passe -->
-      <g class="salon-cadre">
-        <rect x="604" y="96" width="74" height="74" fill="#1f1a15"/><rect x="608" y="100" width="66" height="66" fill="#efe7d8"/>
-        <rect class="cadre-vide" x="612" y="104" width="58" height="58" fill="#c8572f"/><circle class="cadre-vide" cx="641" cy="133" r="16" fill="#1d1c22"/><circle class="cadre-vide" cx="641" cy="133" r="3" fill="#efe7d8"/>
-        <image class="cadre-pochette" x="612" y="104" width="58" height="58" preserveAspectRatio="xMidYMid slice"/>
       </g>
 
       <!-- le tapis, la table basse -->
@@ -138,9 +144,15 @@ const Salon = (() => {
         <ellipse class="ampoule" cx="950" cy="112" rx="38" ry="5" fill="#ffe2a6"/>
       </g>
 
-      <!-- le fauteuil club et la personne -->
+      </g>
+      <g class="couche couche-avant">
       <!-- le fauteuil club, vu de face, et Amélien assis dedans -->
       <g class="salon-fauteuil">
+        <!-- le flanc droit du fauteuil (la profondeur) -->
+        <path d="M932 162 Q944 160 954 172 L954 244 L932 250 Z" fill="#6e3518"/>
+        <path d="M952 210 Q964 206 972 216 L972 292 L952 300 Z" fill="#6a3317"/>
+        <path d="M948 268 L968 270 L968 296 L948 302 Z" fill="#5c2c14"/>
+        <rect x="962" y="292" width="7" height="20" rx="2" fill="#2e1b10"/>
         <!-- le dossier -->
         <path d="M786 250 L786 168 Q786 136 822 134 L898 134 Q934 136 934 168 L934 250 Z" fill="url(#salon-cuir-${id})"/>
         <path d="M800 160 Q860 146 920 160" fill="none" stroke="#d48a4c" stroke-width="2" opacity=".55"/>
@@ -149,9 +161,9 @@ const Salon = (() => {
           <g class="salon-buste" style="--o:860px 250px">
             <!-- le corps : manteau sombre, chemise blanche, cravate orange -->
             <path d="M826 186 Q860 174 894 186 L900 252 L820 252 Z" fill="#1d2233"/>
-            <path d="M851 178 L860 206 L869 178 Z" fill="#f4f1ea"/>
-            <path d="M858 184 L862 184 L865 222 L860 230 L855 222 Z" fill="#d06a32"/><circle cx="860" cy="196" r="1.3" fill="#f0b07a"/><circle cx="860.6" cy="209" r="1.3" fill="#f0b07a"/>
-            <path d="M846 180 L856 206" stroke="#151a28" stroke-width="3"/><path d="M874 180 L864 206" stroke="#151a28" stroke-width="3"/>
+            <path d="M846 178 L855 206 L864 178 Z" fill="#f4f1ea"/>
+            <path d="M853 184 L857 184 L860 222 L855 230 L850 222 Z" fill="#d06a32"/><circle cx="855" cy="196" r="1.3" fill="#f0b07a"/><circle cx="855.6" cy="209" r="1.3" fill="#f0b07a"/>
+            <path d="M841 180 L851 206" stroke="#151a28" stroke-width="3"/><path d="M871 180 L859 206" stroke="#151a28" stroke-width="3"/><path d="M890 190 Q900 220 900 252 L892 252 Q892 222 884 194 Z" fill="#141826"/>
             <!-- les bras, selon l'humeur : posés, un livre, derrière la tête -->
             <g class="bras bras-poses">
               <path d="M830 192 L808 226" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/><path d="M890 192 L912 226" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/>
@@ -174,18 +186,18 @@ const Salon = (() => {
             <g class="salon-tete" style="--o:860px 176px">
               <rect x="853" y="160" width="14" height="22" rx="6" fill="#7e5034"/>
               <g class="afro" fill="#2e1c14"><circle cx="860" cy="128" r="35"/><circle cx="895.0" cy="128.0" r="4.2"/><circle cx="894.5" cy="134.1" r="5.1"/><circle cx="892.9" cy="140.0" r="6.0"/><circle cx="890.3" cy="145.5" r="4.2"/><circle cx="886.8" cy="150.5" r="5.1"/><circle cx="882.5" cy="154.8" r="6.0"/><circle cx="877.5" cy="158.3" r="4.2"/><circle cx="872.0" cy="160.9" r="5.1"/><circle cx="866.1" cy="162.5" r="6.0"/><circle cx="860.0" cy="163.0" r="4.2"/><circle cx="853.9" cy="162.5" r="5.1"/><circle cx="848.0" cy="160.9" r="6.0"/><circle cx="842.5" cy="158.3" r="4.2"/><circle cx="837.5" cy="154.8" r="5.1"/><circle cx="833.2" cy="150.5" r="6.0"/><circle cx="829.7" cy="145.5" r="4.2"/><circle cx="827.1" cy="140.0" r="5.1"/><circle cx="825.5" cy="134.1" r="6.0"/><circle cx="825.0" cy="128.0" r="4.2"/><circle cx="825.5" cy="121.9" r="5.1"/><circle cx="827.1" cy="116.0" r="6.0"/><circle cx="829.7" cy="110.5" r="4.2"/><circle cx="833.2" cy="105.5" r="5.1"/><circle cx="837.5" cy="101.2" r="6.0"/><circle cx="842.5" cy="97.7" r="4.2"/><circle cx="848.0" cy="95.1" r="5.1"/><circle cx="853.9" cy="93.5" r="6.0"/><circle cx="860.0" cy="93.0" r="4.2"/><circle cx="866.1" cy="93.5" r="5.1"/><circle cx="872.0" cy="95.1" r="6.0"/><circle cx="877.5" cy="97.7" r="4.2"/><circle cx="882.5" cy="101.2" r="5.1"/><circle cx="886.8" cy="105.5" r="6.0"/><circle cx="890.3" cy="110.5" r="4.2"/><circle cx="892.9" cy="116.0" r="5.1"/><circle cx="894.5" cy="121.9" r="6.0"/></g>
-              <ellipse cx="843" cy="153" rx="3.5" ry="5.5" fill="#7e5034"/><ellipse cx="877" cy="153" rx="3.5" ry="5.5" fill="#7e5034"/>
+              <ellipse cx="877" cy="153" rx="4" ry="6" fill="#7e5034"/>
               <circle cx="877" cy="160" r="1.4" fill="#e3c06a"/>
               <ellipse cx="860" cy="151" rx="16" ry="19.5" fill="#9a6646"/>
-              <path d="M845 140 Q860 128 875 140 Q868 133 860 133 Q852 133 845 140 Z" fill="#2e1c14"/>
-              <path class="oeil" d="M849 149 q4 -3 8 0 M863 149 q4 -3 8 0" fill="none" stroke="#1a100b" stroke-width="1.7" stroke-linecap="round"/>
-              <path d="M860 151 l-2 8 h4" fill="none" stroke="#7e5034" stroke-width="1.6" stroke-linecap="round"/>
-              <path d="M851 162 q9 -5 18 0" fill="none" stroke="#1a100b" stroke-width="3.2" stroke-linecap="round"/>
-              <path d="M853 164.5 q7 5 14 0" fill="#f4efe6" stroke="#3b1d14" stroke-width="1.3"/>
-              <path d="M855 170 q5 3 10 0 l-1 3 q-4 2 -8 0 z" fill="#1a100b"/>
+              <path d="M845 140 Q858 127 876 139 Q868 133 858 133 Q851 133 845 140 Z" fill="#2e1c14"/>
+              <path class="oeil" d="M846 149 q3.5 -3 7 0 M859 149 q4 -3 8 0" fill="none" stroke="#1a100b" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M855 150 l-4 9 h5" fill="none" stroke="#7e5034" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M847 162 q8 -5 16 0" fill="none" stroke="#1a100b" stroke-width="3.2" stroke-linecap="round"/>
+              <path d="M849 164.5 q6 5 12 0" fill="#f4efe6" stroke="#3b1d14" stroke-width="1.3"/>
+              <path d="M851 170 q5 3 9 0 l-1 3 q-4 2 -7 0 z" fill="#1a100b"/>
               <g class="lunettes" fill="rgba(255,255,255,.06)" stroke="#121010" stroke-width="2.2">
-                <circle cx="852.5" cy="149" r="6.2"/><circle cx="867.5" cy="149" r="6.2"/><path d="M858.7 148.5 q1.3 -1.5 2.6 0" fill="none"/>
-                <path d="M846.3 148 l-3 -1 M873.7 148 l3 -1" fill="none"/>
+                <ellipse cx="849.5" cy="149" rx="5.2" ry="6.2"/><circle cx="863.5" cy="149" r="6.4"/><path d="M854.7 148.5 q1.6 -1.5 2.4 0" fill="none"/>
+                <path d="M869.9 148 L877 150" fill="none"/>
               </g>
             </g>
           </g>
@@ -223,6 +235,7 @@ const Salon = (() => {
         <path d="M1118 292 Q1162 246 1186 244 Q1158 270 1118 292" fill="#3a6e44"/><path d="M1118 292 Q1104 250 1112 210 Q1126 254 1118 292" fill="#5aa064"/>
       </g>
 
+      </g>
       <!-- la lumière : la nuit, la lampe, la chaleur de la musique -->
       <rect class="salon-nuit" width="1200" height="360" fill="#0b0f22"/>
       <rect class="salon-halo" width="1200" height="360" fill="url(#salon-lampe-${id})"/>
@@ -284,10 +297,24 @@ const Salon = (() => {
       el.style.setProperty('--battement', (60 / b).toFixed(3) + 's');
       el.style.setProperty('--amplitude', (2.5 + Math.min(10, energie) * .55).toFixed(2) + 'deg');
       const im = el.querySelector('.cadre-pochette');
-      if (pochette) { if (im.getAttribute('href') !== pochette) im.setAttribute('href', pochette); el.classList.add('avec-pochette'); }
+      if (pochette) { if (im.getAttribute('href') !== pochette) { im.setAttribute('href', pochette); im.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', pochette); } el.classList.add('avec-pochette'); }
       else { im.removeAttribute('href'); el.classList.remove('avec-pochette'); }
     });
   }
+
+  // la profondeur : le fond bouge peu, le fauteuil beaucoup. À la souris sur ordinateur,
+  // tout seul et lentement sur téléphone (et pas du tout si l'on a demandé moins d'animations)
+  const calme = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let px = 0, py = 0, cx = 0, cy = 0, souris = false, boucle = null;
+  addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; souris = true; px = e.clientX / innerWidth * 2 - 1; py = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+  function bouger(t) {
+    if (!souris) { px = Math.sin(t / 4200) * .8; py = Math.sin(t / 6100) * .4; }
+    cx += (px - cx) * .06; cy += (py - cy) * .06;
+    salons.forEach(el => { el.style.setProperty('--px', cx.toFixed(3)); el.style.setProperty('--py', cy.toFixed(3)); });
+    boucle = requestAnimationFrame(bouger);
+  }
+  if (!calme) boucle = requestAnimationFrame(bouger);
+  document.addEventListener('visibilitychange', () => { cancelAnimationFrame(boucle); if (!document.hidden && !calme) boucle = requestAnimationFrame(bouger); });
 
   return { monter, maj, heure };
 })();
