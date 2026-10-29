@@ -26,6 +26,7 @@
               ne le sont pas (Mozart, Zelda…) : il ira côté « mainstream ».
      coeur    true pour un coup de cœur (la table de tri le coche pour toi).
      long     true pour un morceau de 20 minutes et plus (simple repère).
+     pochette 'maison' si la pochette trouvée en ligne est fausse.
      debut    en secondes, si la vidéo doit démarrer plus loin (ex. 25).
      secours  { lien, note } : une autre version si la première ne passe
               pas, avec son propre commentaire.
@@ -81,7 +82,7 @@ const MORCEAUX = [
     energie: 8, etrange: 2, danse: 6 },
 
   { titre: "What We Do", artiste: "Freeway feat. JAY-Z & Beanie Sigel", album: "Philadelphia Freeway",
-    lien: "https://music.youtube.com/watch?v=ITSVEXkuadk", note: "Morceau emblématique de Philadelphia, y'a tout dans ce morceau.",
+    lien: "https://music.youtube.com/watch?v=ITSVEXkuadk", note: "Morceau emblématique de Philadelphie, y'a tout dans ce titre",
     ambiance: "bitume", style: "Rap de Philadelphie", annee: 2003, bpm: 90, voix: "rap",
     tags: ["rap", "boom bap", "samples soul", "philly"],
     energie: 5, etrange: 2, danse: 4 },
@@ -105,16 +106,10 @@ const MORCEAUX = [
     energie: 4, etrange: 9, danse: 3 },
 
   { titre: "Got to Be Real", artiste: "Cheryl Lynn", album: "Cheryl Lynn",
-    lien: "https://music.youtube.com/watch?v=SxW1I0diFqI", note: "Le fait que le son est à la fois dans une vidéo de The Great Review et dans L'Impasse de De Palma",
+    lien: "https://music.youtube.com/watch?v=SxW1I0diFqI", note: "Le fait que le son soit à la fois dans un film de Brian De Palma et dans une vidéo The Great Review",
     ambiance: "piste", style: "Disco", annee: 1978, bpm: 118, voix: "chant",
     tags: ["disco", "funk", "cuivres", "solaire"],
     energie: 8, etrange: 1, danse: 10 },
-
-  { titre: "Judy", artiste: "Al Green", album: "Let's Stay Together",
-    lien: "https://music.youtube.com/watch?v=lcwGFZQLD9Q", note: "Super album pour vos dimanches",
-    ambiance: "soleil", style: "Soul de Memphis", annee: 1972, bpm: 90, voix: "chant",
-    tags: ["soul", "memphis", "cuivres", "ballade"],
-    energie: 3, etrange: 3, danse: 5 },
 
   { titre: "Quiet Storm", artiste: "Smokey Robinson", album: "A Quiet Storm",
     lien: "https://music.youtube.com/watch?v=c52DagmSTdI", note: "La naissance d'un sous-genre éponyme que j'aimais trop pour ne pas placer",
@@ -242,12 +237,6 @@ const MORCEAUX = [
     tags: ["funk", "soul", "psyché", "cuivres"],
     energie: 6, etrange: 5, danse: 7 },
 
-  { titre: "You Ought To Know Me", artiste: "David Ruffin", album: "",
-    lien: "https://music.youtube.com/watch?v=q7LXyZse14I", note: "",
-    ambiance: "soleil", style: "Soul seventies", annee: 1975, bpm: 100, voix: "chant",
-    tags: ["soul", "motown", "cordes", "solaire"],
-    energie: 5, etrange: 3, danse: 6 },
-
   { titre: "Les matins d'hiver", artiste: "Gérard Lenorman", album: "",
     lien: "https://music.youtube.com/watch?v=ELF91NCD_-I", note: "",
     ambiance: "soleil", style: "Chanson seventies", annee: 1977, bpm: 90, voix: "chant",
@@ -255,13 +244,13 @@ const MORCEAUX = [
     energie: 2, etrange: 3, danse: 1 },
 
   { titre: "(v)oOOOOOOooo", artiste: "⣎⡇ꉺლ༽இ•̛)ྀ◞ ༎ຶ ༽ৣৢ؞ৢ؞ؖ ꉺლ", album: "",
-    lien: "https://music.youtube.com/watch?v=29Sh3yEaBP8", note: "",
+    lien: "https://music.youtube.com/watch?v=29Sh3yEaBP8", note: "Performatif mais pas que",
     ambiance: "ailleurs", style: "Ambient d'internet", annee: 2018, bpm: 70, voix: "instru",
     tags: ["ambient", "vaporwave", "expérimental", "glitch"],
     energie: 2, etrange: 9, danse: 1 },
 
   { titre: "err:log", artiste: "cast heal", album: "err:log",
-    lien: "https://music.youtube.com/watch?v=DCcAlLqOM8E", note: "",
+    lien: "https://music.youtube.com/watch?v=DCcAlLqOM8E", note: "J'ai une passion inexpliquée pour certains titres",
     ambiance: "ailleurs", style: "Électronique glitch", annee: 2023, bpm: 90, voix: "instru",
     tags: ["electro", "glitch", "expérimental", "ambient"],
     energie: 4, etrange: 8, danse: 3 },
@@ -279,13 +268,13 @@ const MORCEAUX = [
     energie: 1, etrange: 3, danse: 0 },
 
   { titre: "Great Fairy's Fountain", artiste: "Sleeping Phoenix", album: "Great Fairy's Fountain (From \"The Legend of Zelda - Ocarina of Time\")",
-    lien: "https://music.youtube.com/watch?v=O5HGP6yf0GA", note: "",
+    lien: "https://music.youtube.com/watch?v=O5HGP6yf0GA", note: "La super grande fontaine de furry",
     ambiance: "brume", style: "Jeu vidéo en douceur", annee: 2020, bpm: 70, voix: "instru",
     tags: ["bo", "ambient", "piano", "berceuse"],
     energie: 1, etrange: 4, danse: 0 },
 
   { titre: "The Flight of the Bumble-bee", artiste: "Rimsky-Korsakov, Neeme Järvi", album: "",
-    lien: "https://music.youtube.com/watch?v=kh6gSLInIXo", note: "", connu: true,
+    lien: "https://music.youtube.com/watch?v=kh6gSLInIXo", note: "Tachycardie land", connu: true,
     ambiance: "epopee", style: "Virtuosité orchestrale", annee: 1900, bpm: 170, voix: "instru",
     tags: ["classique", "orchestre", "virtuose", "rapide"],
     energie: 8, etrange: 3, danse: 1 },
@@ -297,7 +286,7 @@ const MORCEAUX = [
     energie: 8, etrange: 6, danse: 9 },
 
   { titre: "夜に駆ける", artiste: "YOASOBI", album: "夜に駆ける",
-    lien: "https://music.youtube.com/watch?v=by4SYYWlhEs", note: "",
+    lien: "https://music.youtube.com/watch?v=by4SYYWlhEs", note: "La montée en intensité, miam",
     ambiance: "electrique", style: "J-pop", annee: 2019, bpm: 130, voix: "chant",
     tags: ["pop", "japon", "piano", "rapide"],
     energie: 8, etrange: 3, danse: 6 },
@@ -309,19 +298,19 @@ const MORCEAUX = [
     energie: 2, etrange: 2, danse: 3 },
 
   { titre: "Walking With Ice Cream", artiste: "Tupperwave", album: "Grocery Store Sunset",
-    lien: "https://music.youtube.com/watch?v=7Uv3P8-rhB8", note: "",
+    lien: "https://music.youtube.com/watch?v=7Uv3P8-rhB8", note: "L'effet des loops sur mon cerveau",
     ambiance: "brume", style: "Vaporwave douce", annee: 2017, bpm: 95, voix: "instru",
     tags: ["vaporwave", "ambient", "funk", "synthés"],
     energie: 3, etrange: 6, danse: 4 },
 
   { titre: "At Doom's Gate", artiste: "Mick Gordon", album: "DOOM (Original Game Soundtrack)",
-    lien: "https://music.youtube.com/watch?v=Lp-TdtDYGAA", note: "",
+    lien: "https://music.youtube.com/watch?v=Lp-TdtDYGAA", note: "DOOM 2016 m'a fait changer mon regard sur ce handicap qu'est le metal",
     ambiance: "epopee", style: "Metal de jeu vidéo", annee: 2016, bpm: 140, voix: "instru",
     tags: ["metal", "bo", "guitares", "synthés"],
     energie: 10, etrange: 5, danse: 2 },
 
   { titre: "Have It All (feat. Pharrell)", artiste: "Gucci Mane", album: "",
-    lien: "https://music.youtube.com/watch?v=RdAAAUPYti4", note: "",
+    lien: "https://music.youtube.com/watch?v=RdAAAUPYti4", note: "Pharrell, t'étais pas obligé de te forcer à poser",
     ambiance: "bitume", style: "Trap", annee: 2020, bpm: 75, voix: "rap",
     tags: ["rap", "trap", "sud", "solaire"],
     energie: 5, etrange: 3, danse: 6 },
@@ -386,12 +375,6 @@ const MORCEAUX = [
     tags: ["jazz", "lounge", "library", "cordes"],
     energie: 3, etrange: 5, danse: 4 },
 
-  { titre: "I See Your Face Before Me", artiste: "Miles Davis", album: "",
-    lien: "https://music.youtube.com/watch?v=0us-KJG6UIM", note: "",
-    ambiance: "brume", style: "Jazz ballade", annee: 1958, bpm: 60, voix: "instru",
-    tags: ["jazz", "ballade", "cuivres", "nocturne"],
-    energie: 1, etrange: 3, danse: 1 },
-
   { titre: "Funky Fanfare", artiste: "Keith Mansfield", album: "",
     lien: "https://music.youtube.com/watch?v=tUFwQjOpqJM", note: "On dirait presque le générique des Boondocks",
     ambiance: "soleil", style: "Funk de librairie", annee: 1968, bpm: 110, voix: "instru",
@@ -435,7 +418,7 @@ const MORCEAUX = [
     energie: 4, etrange: 2, danse: 5 },
 
   { titre: "Out Of The Picture", artiste: "Tavares", album: "Love Storm",
-    lien: "https://music.youtube.com/watch?v=w_VZD6RcQI4", note: "",
+    lien: "https://music.youtube.com/watch?v=w_VZD6RcQI4", note: "Many men…",
     ambiance: "soleil", style: "Soul seventies", annee: 1975, bpm: 108, voix: "chant",
     tags: ["soul", "disco", "cordes", "solaire"],
     energie: 5, etrange: 3, danse: 6 },
@@ -447,7 +430,7 @@ const MORCEAUX = [
     energie: 7, etrange: 5, danse: 8 },
 
   { titre: "Overjoyed", artiste: "Stevie Wonder", album: "In Square Circle",
-    lien: "https://music.youtube.com/watch?v=678STgx-Esw", note: "",
+    lien: "https://music.youtube.com/watch?v=678STgx-Esw", note: "J'y crois à la théorie qu'il est pas vraiment aveugle",
     ambiance: "soleil", style: "Soul ballade", annee: 1985, bpm: 72, voix: "chant",
     tags: ["soul", "ballade", "piano", "motown"],
     energie: 2, etrange: 2, danse: 2 },
@@ -471,13 +454,13 @@ const MORCEAUX = [
     energie: 4, etrange: 2, danse: 7 },
 
   { titre: "Come Outside", artiste: "ScarLip", album: "Come Outside",
-    lien: "https://music.youtube.com/watch?v=q34xnPe-C1g", note: "",
+    lien: "https://music.youtube.com/watch?v=q34xnPe-C1g", note: "Les fous et les folles sauveront le rap",
     ambiance: "bitume", style: "Drill new-yorkaise", annee: 2022, bpm: 140, voix: "rap",
     tags: ["rap", "drill", "new york", "nocturne"],
     energie: 8, etrange: 5, danse: 6 },
 
   { titre: "MINISKIRT", artiste: "Aliyah's Interlude", album: "MINISKIRT",
-    lien: "https://music.youtube.com/watch?v=WZKXguICxUo", note: "",
+    lien: "https://music.youtube.com/watch?v=fUTpvxkgA80", note: "",
     ambiance: "piste", style: "Rap house-pop", annee: 2025, bpm: 125, voix: "rap",
     tags: ["rap", "house", "club", "pop"],
     energie: 7, etrange: 5, danse: 8 },
@@ -495,7 +478,7 @@ const MORCEAUX = [
     energie: 4, etrange: 5, danse: 5 },
 
   { titre: "Raubíri", artiste: "Marcel Gidote's Holy Crab", album: "Felvidék (OST)",
-    lien: "https://music.youtube.com/watch?v=CA1ZmK3DC8o", note: "",
+    lien: "https://music.youtube.com/watch?v=CA1ZmK3DC8o", note: "Ça peut être hongrois/slovaque, mon cœur ne suit que la batterie",
     ambiance: "ailleurs", style: "Rock psyché-jazz tchèque", annee: 2024, bpm: 110, voix: "instru",
     tags: ["rock", "jazz", "psyché", "expérimental"],
     energie: 6, etrange: 8, danse: 4 },
@@ -507,19 +490,19 @@ const MORCEAUX = [
     energie: 3, etrange: 3, danse: 3 },
 
   { titre: "Walk Away From Love", artiste: "David Ruffin", album: "Who I Am",
-    lien: "https://music.youtube.com/watch?v=34yv3D8oYBI", note: "",
+    lien: "https://music.youtube.com/watch?v=34yv3D8oYBI", note: "Le meilleur des Ruffin",
     ambiance: "soleil", style: "Soul disco", annee: 1975, bpm: 115, voix: "chant",
     tags: ["soul", "disco", "cordes", "solaire"],
     energie: 6, etrange: 2, danse: 8 },
 
   { titre: "Through the Fire (A COLORS SHOW)", artiste: "Chaka Khan", album: "",
-    lien: "https://music.youtube.com/watch?v=1DqzwJlvX-0", note: "",
+    lien: "https://music.youtube.com/watch?v=HiEz8agZmnM", note: "",
     ambiance: "soleil", style: "Soul ballade, en live", annee: 2023, bpm: 70, voix: "chant",
     tags: ["soul", "rnb", "ballade", "piano"],
     energie: 3, etrange: 2, danse: 2 },
 
   { titre: "Jōdo", artiste: "Hiroshi Sato", album: "Time",
-    lien: "https://music.youtube.com/watch?v=xCJIDvmyKO8", note: "",
+    lien: "https://music.youtube.com/watch?v=xCJIDvmyKO8", note: "Faut être patient",
     ambiance: "brume", style: "Ambient japonais", annee: 1977, bpm: 80, voix: "instru",
     tags: ["ambient", "japon", "synthés", "jazz"],
     energie: 2, etrange: 6, danse: 2 },
@@ -531,7 +514,7 @@ const MORCEAUX = [
     energie: 5, etrange: 5, danse: 6 },
 
   { titre: "Symphonie n° 1 : I. Allegro (molto moderato)", artiste: "Bruckner, Orchestre Métropolitain", album: "",
-    lien: "https://music.youtube.com/watch?v=_Ak0zpy-ICU", note: "", connu: true,
+    lien: "https://music.youtube.com/watch?v=_Ak0zpy-ICU", note: "Posez-vous un quart d'heure…", connu: true,
     ambiance: "epopee", style: "Symphonie romantique", annee: 1866, bpm: 100, voix: "instru",
     tags: ["classique", "orchestre", "cuivres", "romantique"],
     energie: 7, etrange: 4, danse: 1 },
@@ -555,7 +538,7 @@ const MORCEAUX = [
     energie: 6, etrange: 2, danse: 6 },
 
   { titre: "The Weekend (Radio Edit)", artiste: "Michael Gray", album: "The Weekend",
-    lien: "https://music.youtube.com/watch?v=uDGJ9DyF25I", note: "",
+    lien: "https://music.youtube.com/watch?v=uDGJ9DyF25I", note: "Juste, j'adore ce son",
     ambiance: "piste", style: "House disco", annee: 2004, bpm: 127, voix: "chant",
     tags: ["house", "disco", "club", "solaire"],
     energie: 8, etrange: 2, danse: 9 },
@@ -567,19 +550,19 @@ const MORCEAUX = [
     energie: 10, etrange: 6, danse: 2 },
 
   { titre: "Reasons", artiste: "Earth, Wind & Fire", album: "That's the Way of the World",
-    lien: "https://music.youtube.com/watch?v=zTeD3RWvE6A", note: "",
+    lien: "https://music.youtube.com/watch?v=zTeD3RWvE6A", note: "Bisous à Cam'ron",
     ambiance: "soleil", style: "Soul ballade", annee: 1975, bpm: 68, voix: "chant",
     tags: ["soul", "ballade", "cuivres", "nocturne"],
     energie: 2, etrange: 2, danse: 2 },
 
   { titre: "ANTIOXYDANT", artiste: "Mairo", album: "BLISS",
-    lien: "https://music.youtube.com/watch?v=fYky_uuCzVE", note: "",
+    lien: "https://music.youtube.com/watch?v=fYky_uuCzVE", note: "J'ai vraiment un truc pour les saxos",
     ambiance: "bitume", style: "Rap français", annee: 2023, bpm: 90, voix: "rap",
     tags: ["rap", "boom bap", "france", "samples soul"],
     energie: 6, etrange: 5, danse: 5 },
 
   { titre: "Can't Take My Eyes Off You (Original Extended Version)", artiste: "Boys Town Gang", album: "Disc Charge",
-    lien: "https://music.youtube.com/watch?v=i0iD4KzoIqk", note: "",
+    lien: "https://music.youtube.com/watch?v=i0iD4KzoIqk", note: "Si je veux mettre la version 9 minutes, vous allez faire quoi ?", debut: 23,
     ambiance: "piste", style: "Hi-NRG disco", annee: 1982, bpm: 130, voix: "chant",
     tags: ["disco", "club", "cuivres", "solaire"],
     energie: 8, etrange: 3, danse: 10 },
@@ -591,7 +574,7 @@ const MORCEAUX = [
     energie: 6, etrange: 4, danse: 8 },
 
   { titre: "Mutant", artiste: "Arca", album: "Mutant",
-    lien: "https://music.youtube.com/watch?v=pW4I_y56DC0", note: "",
+    lien: "https://music.youtube.com/watch?v=pW4I_y56DC0", note: "Franchement, dites rien, je sais",
     ambiance: "ailleurs", style: "Électronique expérimentale", annee: 2015, bpm: 90, voix: "instru",
     tags: ["electro", "expérimental", "glitch", "nocturne"],
     energie: 6, etrange: 9, danse: 2 },
@@ -609,7 +592,7 @@ const MORCEAUX = [
     energie: 7, etrange: 6, danse: 6 },
 
   { titre: "STOPLIGHT", artiste: "SUMIN", album: "MINISERIES 2",
-    lien: "https://music.youtube.com/watch?v=Ox3uJaLsXgI", note: "",
+    lien: "https://music.youtube.com/watch?v=Ox3uJaLsXgI", note: "Je suis tellement en propagande",
     ambiance: "piste", style: "R&B électronique coréen", annee: 2024, bpm: 110, voix: "chant",
     tags: ["rnb", "electro", "pop", "club"],
     energie: 5, etrange: 5, danse: 6 },
@@ -626,20 +609,14 @@ const MORCEAUX = [
     tags: ["pop", "expérimental", "france", "chanson"],
     energie: 4, etrange: 7, danse: 3 },
 
-  { titre: "all-american bitch", artiste: "Olivia Rodrigo", album: "GUTS",
-    lien: "https://music.youtube.com/watch?v=jPzKKSzqYzk", note: "",
-    ambiance: "electrique", style: "Pop-rock", annee: 2023, bpm: 130, voix: "chant",
-    tags: ["rock", "pop", "guitares", "rapide"],
-    energie: 7, etrange: 2, danse: 4 },
-
   { titre: "honeybee", artiste: "Olivia Rodrigo", album: "you seem pretty sad for a girl so in love",
-    lien: "https://music.youtube.com/watch?v=OrNTGMmSpz0", note: "",
+    lien: "https://music.youtube.com/watch?v=OrNTGMmSpz0", note: "J'ai pas encore mentionné mon obsession pour les chœurs",
     ambiance: "electrique", style: "Pop", annee: 2025, bpm: 100, voix: "chant",
     tags: ["pop", "guitares", "ballade", "indie"],
     energie: 3, etrange: 2, danse: 3 },
 
   { titre: "264bpm Song", artiste: "Andrew Baena", album: "264bpm Song",
-    lien: "https://music.youtube.com/watch?v=kSF0hIIDofM", note: "",
+    lien: "https://music.youtube.com/watch?v=kSF0hIIDofM", note: "264 bpm, c'est assez pour vous ?",
     ambiance: "electrique", style: "Metal à 264 bpm", annee: 2020, bpm: 264, voix: "instru",
     tags: ["metal", "guitares", "rapide", "expérimental"],
     energie: 10, etrange: 8, danse: 3 },
@@ -649,12 +626,6 @@ const MORCEAUX = [
     ambiance: "electrique", style: "Crossover thrash", annee: 1987, bpm: 200, voix: "chant",
     tags: ["punk", "metal", "guitares", "rapide"],
     energie: 10, etrange: 5, danse: 3 },
-
-  { titre: "Bird Call (feat. Lil Wayne & Cam'Ron)", artiste: "JR Writer", album: "History in the Making",
-    lien: "https://music.youtube.com/watch?v=jYb-B1j4ul8", note: "",
-    ambiance: "bitume", style: "Rap new-yorkais de mixtape", annee: 2006, bpm: 90, voix: "rap",
-    tags: ["rap", "new york", "boom bap", "samples soul"],
-    energie: 7, etrange: 4, danse: 5 },
 
   { titre: "Private Valet", artiste: "Larry June", album: "Spaceships on the Blade",
     lien: "https://music.youtube.com/watch?v=TIBbr_u9gBc", note: "",
@@ -675,7 +646,7 @@ const MORCEAUX = [
     energie: 2, etrange: 2, danse: 2 },
 
   { titre: "we fell in love in october", artiste: "girl in red", album: "we fell in love in october / forget her",
-    lien: "https://music.youtube.com/watch?v=FJX0JPXD2nM", note: "",
+    lien: "https://music.youtube.com/watch?v=FJX0JPXD2nM", note: "Vu que je suis une Tumblr Girl apparemment",
     ambiance: "electrique", style: "Bedroom pop", annee: 2018, bpm: 105, voix: "chant",
     tags: ["indie", "pop", "guitares", "mélancolique"],
     energie: 2, etrange: 2, danse: 2 },
@@ -687,7 +658,7 @@ const MORCEAUX = [
     energie: 4, etrange: 3, danse: 5 },
 
   { titre: "A Lot Has Changed (Rough Trade Session)", artiste: "Weyes Blood", album: "Rough Trade Session",
-    lien: "https://music.youtube.com/watch?v=NmFqLz6tyLA", note: "",
+    lien: "https://music.youtube.com/watch?v=NmFqLz6tyLA", note: "Miam",
     ambiance: "brume", style: "Folk baroque", annee: 2019, bpm: 70, voix: "chant",
     tags: ["indie", "folk", "piano", "cordes"],
     energie: 2, etrange: 4, danse: 1 },
@@ -784,7 +755,7 @@ const MORCEAUX = [
     energie: 6, etrange: 6, danse: 6 },
 
   { titre: "Me and Mrs. Jones (Single Version)", artiste: "Billy Paul", album: "360 Degrees of Billy Paul",
-    lien: "https://music.youtube.com/watch?v=mhDsz2HSKwU", note: "Purée la gestion de sa voix",
+    lien: "https://music.youtube.com/watch?v=mhDsz2HSKwU", note: "Pour moi c'est un peu le T-Pain de la soul",
     ambiance: "soleil", style: "Philly soul", annee: 1972, bpm: 66, voix: "chant",
     tags: ["soul", "philly", "ballade", "cordes"],
     energie: 2, etrange: 2, danse: 3 },
@@ -794,12 +765,6 @@ const MORCEAUX = [
     ambiance: "ailleurs", style: "Rap underground", annee: 2023, bpm: 140, voix: "rap",
     tags: ["rap", "france", "expérimental", "glitch"],
     energie: 6, etrange: 10, danse: 5 },
-
-  { titre: "We've Only Just Begun", artiste: "Grant Green", album: "Visions",
-    lien: "https://music.youtube.com/watch?v=Pc6TLSnhvUY", note: "",
-    ambiance: "soleil", style: "Soul jazz, reprise des Carpenters", annee: 1971, bpm: 100, voix: "instru",
-    tags: ["jazz", "soul", "guitares", "orgue"],
-    energie: 4, etrange: 4, danse: 5 },
 
   { titre: "Chega De Saudade", artiste: "Antonio Carlos Jobim", album: "Inédito",
     lien: "https://music.youtube.com/watch?v=tlp8iY4g--4", note: "Incontournable",
@@ -988,7 +953,7 @@ const MORCEAUX = [
     energie: 7, etrange: 3, danse: 5 },
 
   { titre: "Plover", artiste: "Yorushika", album: "",
-    lien: "https://music.youtube.com/watch?v=YLG1yiWkZM0", note: "La ligne entre passionné et fétichiste me paraît poreuse",
+    lien: "https://music.youtube.com/watch?v=YLG1yiWkZM0", note: "Avec du recul, la ligne entre passionné et fétichiste me paraît poreuse",
     ambiance: "electrique", style: "J-rock, pop rock japonaise", bpm: 150, voix: "chant",
     tags: ["japon", "rock", "guitares", "pop"],
     energie: 6, etrange: 4, danse: 4 },
@@ -1126,7 +1091,7 @@ const MORCEAUX = [
     energie: 6, etrange: 5, danse: 5 },
 
   { titre: "Je t'ai tatoué (La chanson de Louis)", artiste: "Amélien", album: "",
-    lien: "https://music.youtube.com/watch?v=TrNwn-pXOjs", note: "Coucou",
+    lien: "https://music.youtube.com/watch?v=TrNwn-pXOjs", note: "Déjà un classique de la musique contemporaine",
     ambiance: "brume", style: "Chanson", bpm: 90, voix: "chant",
     tags: ["chanson", "perso"],
     energie: 4, etrange: 7, danse: 3 },
@@ -1138,7 +1103,7 @@ const MORCEAUX = [
     energie: 2, etrange: 1, danse: 3 },
 
   { titre: "喫茶aori", artiste: "Shin Rizumu", album: "",
-    lien: "https://music.youtube.com/watch?v=aYMC_4EycVw", note: "Mon chouchou",
+    lien: "https://music.youtube.com/watch?v=aYMC_4EycVw", note: "Super pour la bibliothèque",
     ambiance: "soleil", style: "City pop, funk japonais", bpm: 110, voix: "chant",
     tags: ["citypop", "japon", "funk", "groove"],
     energie: 5, etrange: 6, danse: 6 },
@@ -1204,13 +1169,13 @@ const MORCEAUX = [
     energie: 3, etrange: 6, danse: 4 },
 
   { titre: "DROPPING SEEDS", artiste: "Carly Gibert", album: "",
-    lien: "https://music.youtube.com/watch?v=ejamlNAYHmY", note: "Elle a des clips sublimes si jamais",
+    lien: "https://music.youtube.com/watch?v=r0hClR5smoU", note: "Elle a des clips sublimes si jamais",
     ambiance: "brume", style: "R&B alternatif", bpm: 90, voix: "chant",
     tags: ["rnb", "alternatif", "doux"],
     energie: 4, etrange: 6, danse: 4 },
 
-  { titre: "Broke", artiste: "Prince Waly", album: "",
-    lien: "https://music.youtube.com/watch?v=ZT-UAsTZcdY", note: "Allah y Rahmo, grand homme",
+  { titre: "Broke/Miroir (A COLORS SHOW)", artiste: "Prince Waly", album: "",
+    lien: "https://music.youtube.com/watch?v=EZyuiCwosis", note: "Allah y Rahmo, grand homme",
     ambiance: "bitume", style: "Rap français, boom bap", bpm: 90, voix: "rap",
     tags: ["rap", "france", "boom bap"],
     energie: 5, etrange: 4, danse: 5 },
@@ -1222,7 +1187,7 @@ const MORCEAUX = [
     energie: 5, etrange: 5, danse: 5 },
 
   { titre: "Buddies", artiste: "Quelle Chris", album: "",
-    lien: "https://music.youtube.com/watch?v=29AuPDvKnxU", note: "Perso je m'aime trop donc j'aime beaucoup",
+    lien: "https://music.youtube.com/watch?v=Yq_Cc3hZqEM", note: "Perso je m'aime trop donc j'aime beaucoup",
     ambiance: "bitume", style: "Rap abstrait", bpm: 88, voix: "rap",
     tags: ["rap", "abstrait", "detroit"],
     energie: 4, etrange: 6, danse: 4 },
@@ -1258,13 +1223,13 @@ const MORCEAUX = [
     energie: 4, etrange: 7, danse: 4 },
 
   { titre: "Embarcadero", artiste: "Paul Desmond", album: "",
-    lien: "https://music.youtube.com/watch?v=k4uvlHw_AMg", note: "Le saxophone est pour moi ex æquo avec le piano",
+    lien: "https://music.youtube.com/watch?v=k4uvlHw_AMg", note: "J'ai réfléchi, finalement saxophone et piano ex æquo",
     ambiance: "brume", style: "Jazz, saxophone", bpm: 110, voix: "instru",
     tags: ["jazz", "saxophone", "cool jazz"],
     energie: 3, etrange: 3, danse: 3 },
 
   { titre: "Can't Go Wrong", artiste: "O.C.", album: "Jewelz",
-    lien: "https://music.youtube.com/watch?v=gjBUb4hY7H4", note: "Que de souvenirs à QB… enfin Queensbridge (comme ça vous comprenez aussi)",
+    lien: "https://music.youtube.com/watch?v=gjBUb4hY7H4", note: "Tant de souvenirs à QB… enfin, Queensbridge, comme vous dites ici",
     ambiance: "bitume", style: "Rap new-yorkais", annee: 1997, bpm: 90, voix: "rap",
     tags: ["rap", "new york", "boom bap", "samples"],
     energie: 5, etrange: 4, danse: 5 },
@@ -1282,7 +1247,7 @@ const MORCEAUX = [
     energie: 2, etrange: 7, danse: 1 },
 
   { titre: "Body Count", artiste: "Mozzy", album: "",
-    lien: "https://music.youtube.com/watch?v=uE9rwGpR-Qk", note: "Ça a plus de gueule que vos débats nuls",
+    lien: "https://music.youtube.com/watch?v=uE9rwGpR-Qk", note: "T'sais, le mec qui a rien compris",
     ambiance: "bitume", style: "Rap de Sacramento", bpm: 85, voix: "rap",
     tags: ["rap", "west coast", "street"],
     energie: 7, etrange: 4, danse: 5 },
@@ -1294,7 +1259,7 @@ const MORCEAUX = [
     energie: 5, etrange: 4, danse: 6 },
 
   { titre: "For Me", artiste: "Chase B feat. OMB Bloodbath & KenTheMan", album: "",
-    lien: "https://music.youtube.com/watch?v=Gz6Wgz3HOpM", note: "Bwaap Bwaap Bwaap Bwaap Bwaap Bwaap (je fais la basse)",
+    lien: "https://music.youtube.com/watch?v=UvTxuQFbkzQ", note: "Bwaap Bwaap Bwaap Bwaap Bwaap Bwaap (je fais la basse)",
     ambiance: "bitume", style: "Rap de Houston", annee: 2020, bpm: 150, voix: "rap",
     tags: ["rap", "houston", "trap", "basse"],
     energie: 7, etrange: 4, danse: 7 },
@@ -1306,7 +1271,7 @@ const MORCEAUX = [
     energie: 6, etrange: 1, danse: 7 },
 
   { titre: "B.M.F. (Blowin' Money Fast)", artiste: "Rick Ross feat. Styles P", album: "Teflon Don",
-    lien: "https://music.youtube.com/watch?v=bdTAlbL72W8", note: "Pourquoi se priver ?",
+    lien: "https://music.youtube.com/watch?v=bdTAlbL72W8", note: "Pourquoi se priver ?", pochette: 'maison',
     ambiance: "bitume", style: "Rap de Miami", annee: 2010, bpm: 80, voix: "rap",
     tags: ["rap", "miami", "trap", "lourd"],
     energie: 8, etrange: 2, danse: 6 },
@@ -1359,12 +1324,6 @@ const MORCEAUX = [
     tags: ["jazz", "hip-hop", "japon", "piano"],
     energie: 3, etrange: 3, danse: 4 },
 
-  { titre: "Confiture d'orties", artiste: "Lucio Bukowski", album: "",
-    lien: "https://music.youtube.com/watch?v=eozd1FdeSUs", note: "",
-    ambiance: "bitume", style: "Rap lyonnais, boom bap", bpm: 88, voix: "rap",
-    tags: ["rap", "france", "lyon", "boom bap"],
-    energie: 5, etrange: 5, danse: 4 },
-
   { titre: "Life Goes On", artiste: "2Pac", album: "All Eyez on Me",
     lien: "https://music.youtube.com/watch?v=k11iUIQ5XbY", note: "À l'époque je voulais ça comme son d'enterrement, aujourd'hui un petit clair de lune", connu: true,
     ambiance: "bitume", style: "Rap West Coast", annee: 1996, bpm: 90, voix: "rap",
@@ -1395,6 +1354,18 @@ const MORCEAUX = [
     tags: ["rap", "france", "cloud"],
     energie: 5, etrange: 5, danse: 4 },
 
+  { titre: "Something to Rap About (feat. Tyler, The Creator)", artiste: "Freddie Gibbs & The Alchemist", album: "Alfredo 2",
+    lien: "https://music.youtube.com/watch?v=POw27Wug4wo", note: "Une de mes instrus préférées",
+    ambiance: "bitume", style: "Rap, boucle soul", annee: 2023, bpm: 80, voix: "rap",
+    tags: ["rap", "alchemist", "samples", "boucle"],
+    energie: 4, etrange: 4, danse: 4 },
+
+  { titre: "Tiny Desk Concert", artiste: "T-Pain", album: "",
+    lien: "https://music.youtube.com/watch?v=CIjXUg1s5gc", note: "Régalez-vous bien",
+    ambiance: "soleil", style: "R&B en live, sans Auto-Tune", annee: 2014, bpm: 90, voix: "chant",
+    tags: ["rnb", "live", "voix", "tiny desk"],
+    energie: 5, etrange: 3, danse: 5 },
+
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
@@ -1405,5 +1376,18 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=beO3qViOUiQ", // The Weekend (Original 12 Inch Mix)
   "https://music.youtube.com/watch?v=VwgTm70Njs8", // Casiopea, Sailing Alone
   "https://music.youtube.com/watch?v=9D6xRc5YoZ4", // Sous la pluie
+  "https://music.youtube.com/watch?v=lcwGFZQLD9Q", // Al Green, Judy
+  "https://music.youtube.com/watch?v=q7LXyZse14I", // David Ruffin, You Ought To Know Me
+  "https://music.youtube.com/watch?v=0us-KJG6UIM", // Miles Davis, I See Your Face Before Me
+  "https://music.youtube.com/watch?v=jPzKKSzqYzk", // Olivia Rodrigo, all-american bitch
+  "https://music.youtube.com/watch?v=jYb-B1j4ul8", // JR Writer, Bird Call
+  "https://music.youtube.com/watch?v=Pc6TLSnhvUY", // Grant Green, We've Only Just Begun
+  "https://music.youtube.com/watch?v=eozd1FdeSUs", // Lucio Bukowski, Confiture d'orties
+  "https://music.youtube.com/watch?v=ZT-UAsTZcdY", // Prince Waly, Broke (audio, remplacé par la COLORS)
+  "https://music.youtube.com/watch?v=WZKXguICxUo", // MINISKIRT (audio, remplacé par la vidéo)
+  "https://music.youtube.com/watch?v=1DqzwJlvX-0", // Through the Fire (audio, remplacé par la vidéo COLORS)
+  "https://music.youtube.com/watch?v=ejamlNAYHmY", // DROPPING SEEDS (audio, remplacé par le clip)
+  "https://music.youtube.com/watch?v=Gz6Wgz3HOpM", // For Me (audio, remplacé par le clip)
+  "https://music.youtube.com/watch?v=29AuPDvKnxU", // Buddies (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=SEpJx322NIc", // David Ruffin, I Miss You (Part 1), autre version (le site garde l'autre)
 ];

@@ -29,7 +29,7 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, p { margin: 0; }
 :focus-visible { outline: 2px solid var(--aiguille); outline-offset: 3px; border-radius: 6px; }
-h1, h2, .gros-bouton, .marque {
+h1, h2, .marque {
   font-family: var(--display);
   font-weight: var(--display-poids);
   font-stretch: var(--display-etirement, 100%);
@@ -52,7 +52,8 @@ p, li, .livret-texte { text-wrap: pretty; }
   transition: background-color .5s ease;
 }
 body[data-vue="allumage"] .facade-droite { visibility: hidden; }
-.marque { font-size: 13px; line-height: 1.05; letter-spacing: 0; text-align: left; }
+.marque { font-size: 19px; line-height: .92; letter-spacing: -.01em; text-align: left; }
+.allumage-texte h1 em, .marque em { font-style: italic; }
 .facade-droite { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .bouton-facade {
   height: 42px; padding: 0 16px; border-radius: 999px; white-space: nowrap;
@@ -123,7 +124,7 @@ body.sans-selection .bouton-trouvailles { display: none; }
 
 /* ─────────────────────────────── LE CARTON D'ENTRÉE ─────────────────────────────── */
 .ecran-allumage { display: grid; place-content: center; justify-items: center; gap: 34px; text-align: center; }
-.allumage-texte h1 { font-size: clamp(2rem, 4.5vw, 4.4rem); max-width: none; margin: 0 auto; text-wrap: balance; }
+.allumage-texte h1 { font-size: clamp(2.8rem, 7vw, 6.2rem); line-height: .95; max-width: none; margin: 0 auto; text-wrap: balance; }
 .allumage-texte h1 .ligne { display: inline-block; text-wrap: balance; }
 .allumage-texte .surtitre { margin-bottom: 18px; font-size: 13.65px; }
 .surtitre { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--encre-2); }
@@ -178,7 +179,7 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
 @supports not (aspect-ratio: 1 / 1) { .pochette::before { content: ""; display: block; padding-top: 100%; } }
 .pochette-repli {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-family: var(--display); font-weight: 800; line-height: 1; font-size: 4rem;
+  font-family: var(--display); font-weight: var(--display-poids); line-height: 1; font-size: 4rem;
   color: hsl(var(--h) 55% 72%);
 }
 .pochette-mini .pochette-repli, .pochette-livret .pochette-repli { font-size: 1.5rem; }
@@ -210,7 +211,7 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
 }
 .disque-nom {
   position: absolute; left: 50%; top: 17%; transform: translateX(-50%); width: 72%; text-align: center;
-  font-family: var(--display); font-weight: 600; letter-spacing: -0.03em; font-size: 14px; font-size: 12cqw; line-height: 1; color: var(--amb-encre);
+  font-family: var(--display); font-weight: var(--display-poids); letter-spacing: -0.01em; font-size: 14px; font-size: 13cqw; line-height: 1; color: var(--amb-encre);
 }
 .disque-nom small { display: block; margin-top: .45em; font-family: var(--texte); font-weight: 600; letter-spacing: .14em; font-size: .3em; text-transform: uppercase; opacity: .7; }
 /* la radio : un disque holographique */
@@ -225,7 +226,7 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
   conic-gradient(from 0deg, #e9ecef, #cfd5db, #f7f8f9, #c8ced5, #eef0f2, #d3d8dd, #f5f6f7, #cdd3d9, #e9ecef); }
 .disque-main {
   position: absolute; left: 50%; top: 14%; transform: translateX(-50%) rotate(-8deg); white-space: nowrap;
-  font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 700; font-size: 14px; font-size: 12cqw; line-height: 1; color: var(--amb-encre);
+  font-family: var(--display); font-style: italic; font-weight: 400; font-size: 15px; font-size: 13cqw; line-height: 1; color: var(--amb-encre);
 }
 @keyframes tourne { to { transform: rotate(360deg); } }
 /* le picture disc : la pochette du morceau imprimée sur le disque, des sillons, un anneau
@@ -289,7 +290,7 @@ body.cd-tourne .plateau-reflet { animation-play-state: running; }
 }
 .hifi-enceinte-g { grid-area: g; }
 .hifi-enceinte-d { grid-area: d; }
-.hp-plaque { justify-self: center; font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .12em; color: var(--hifi-encre); opacity: .55; text-align: center; line-height: 1; }
+.hp-plaque { justify-self: center; font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .12em; color: var(--hifi-encre); opacity: .55; text-align: center; line-height: 1; }
 .hp-plaque small { display: block; font-family: var(--texte); font-weight: 600; font-size: 8px; letter-spacing: .2em; text-transform: uppercase; margin-top: 3px; }
 .hp-tweeter { position: relative; width: 52%; aspect-ratio: 1 / 1; border-radius: 26%; background: radial-gradient(circle, #1a1b1e 0 30%, #2c2e33 46%, #3d4046 62%, #2a2c30 70%); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.6); cursor: pointer; }
 .hp-tweeter i { position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fbfbfb 0 12%, #a7adb4 30%, #33363c 70%); }
@@ -342,7 +343,7 @@ body.loudness.cd-tourne .hp-event { animation: souffle var(--battement, .5s) eas
   transform: translateY(-104%); transition: transform .5s cubic-bezier(.3,1.2,.4,1);
 }
 body.grilles .hp-grille { transform: none; }
-.hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .1em; color: #c9ccd2; opacity: .6; }
+.hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .1em; color: #c9ccd2; opacity: .6; }
 /* les petites bidouilles : on tape sur les haut-parleurs, ils répondent */
 .hp-boomer.coup { animation: coup .5s cubic-bezier(.2,.8,.3,1); }
 .hp-boomer.coup .hp-cone { animation: coup-cone .5s cubic-bezier(.2,.8,.3,1); }
@@ -363,7 +364,7 @@ body.cd-tourne.energie-forte .hifi-enceinte { animation: tremble calc(var(--batt
 }
 body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); grid-template-areas: "haut haut" "afficheur ecran" "commandes commandes" "trappe trappe"; }
 .hifi-haut { grid-area: haut; display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--hifi-trait); }
-.hifi-marque { font-family: "Unbounded", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; }
+.hifi-marque { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; }
 .hifi-modele { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
 .hifi-veille { margin-left: 4px; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
 body.chaine-allumee .hifi-veille { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
@@ -569,7 +570,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
   padding: 14px 0 0; color: var(--encre);
 }
 .pile-haut { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 0 4px; }
-.pile-titre { font-family: "Unbounded", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; line-height: 1.2; }
+.pile-titre { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; line-height: 1.2; }
 /* la radio ou ta sélection : le sélecteur « FUNCTION » des chaînes */
 .sources { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
 .source-choix { min-height: 30px; padding: 0 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; white-space: nowrap; transition: background-color .15s, color .15s; }
@@ -602,8 +603,9 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .pile-reflet { position: absolute; z-index: 2; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.32), rgba(255,255,255,0) 38%); }
 .pile-scotch {
   position: absolute; z-index: 3; top: -13px; left: 50%; max-width: 112%; transform: translateX(-50%) rotate(-3deg);
-  padding: 3px 14px 1px; background: rgba(250, 238, 190, .94); box-shadow: 0 2px 4px rgba(0,0,0,.18);
-  font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 600; font-size: 16px; line-height: 1.2; color: #2a2620; white-space: nowrap;
+  padding: 4px 10px 3px; border-radius: 2px; background: linear-gradient(180deg, #2b2b31, #151518); box-shadow: 0 2px 5px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12);
+  font-family: var(--mono); font-weight: 600; font-size: 11px; line-height: 1.3; letter-spacing: .08em; text-transform: uppercase; color: #f1eee6; white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255,255,255,.22), 0 -1px 0 rgba(0,0,0,.7);   /* les lettres en relief de l'étiqueteuse */
 }
 .disque-pile:nth-child(2) .pile-scotch { transform: translateX(-50%) rotate(2deg); }
 .disque-pile:nth-child(3) .pile-scotch { transform: translateX(-50%) rotate(-1.5deg); }
@@ -612,7 +614,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .maison { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; display: grid; text-align: left; }
 .maison-cadre { position: relative; overflow: hidden; }
 .maison-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.3) brightness(1.08); mix-blend-mode: multiply; }
-.maison-titre { font-family: "Unbounded", sans-serif; font-weight: 800; text-transform: uppercase; line-height: .98; letter-spacing: -.01em; font-size: calc(var(--t) * 1cqw); overflow-wrap: break-word; }
+.maison-titre { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; text-transform: uppercase; line-height: .98; letter-spacing: -.01em; font-size: calc(var(--t) * 1cqw); overflow-wrap: break-word; }
 .maison-artiste { font-family: var(--texte); font-weight: 600; font-size: 5.6cqw; letter-spacing: .06em; text-transform: uppercase; line-height: 1.15; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 /* 1. bleue : la photo en haut, un aplat de couleur, le titre en grand (façon jazz des années 60) */
 .maison-bleue { grid-template-rows: 52% 1fr auto; background: hsl(var(--h) 62% 34%); color: #fff; }
@@ -640,7 +642,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .disque-pile.choisi::before {
   content: "Ensuite"; position: absolute; z-index: 4; top: -42px; left: 50%; transform: translateX(-50%);
   padding: 3px 9px; border-radius: 999px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
-  font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
 }
 .pile-maintenant {
   position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
@@ -671,26 +673,26 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .pilote-led { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #4bd37b; box-shadow: 0 0 8px 2px rgba(75, 211, 123, .7); animation: pilote 2s ease-in-out infinite; }
 @keyframes pilote { 50% { opacity: .45; } }
 .pilote-textes { flex: 1; min-width: 0; display: grid; gap: 2px; font-size: 14px; line-height: 1.35; }
-.pilote-textes b { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.pilote-textes b { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
 .pilote-textes span { opacity: .8; }
 .pilote-stop { flex: none; min-height: 38px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--hifi-bouton); color: var(--hifi-encre); box-shadow: var(--hifi-bouton-ombre); }
 .tuner.en-auto .pile-disques { padding: 18px 0 14px; min-height: 0; }
 
-/* ─── le post-it : ton mot sur le morceau, collé sur l'enceinte de droite (placé en JS) ─── */
+/* ─── le mot d'Amélien : une fiche de disquaire, punaisée sur l'enceinte de droite (placée en JS) ─── */
 .post-it {
-  --penche: -2deg;
+  --penche: -1.4deg;
   position: absolute; z-index: 4; right: -14px; top: 8%;
-  width: 206px; padding: 26px 18px 14px;
-  background: linear-gradient(170deg, #fff6b8, #fde98a 70%, #f7dc6a);
-  color: #2b2a33; box-shadow: 0 14px 24px -8px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.12);
+  width: 216px; padding: 22px 18px 16px; border-radius: 2px;
+  background: linear-gradient(176deg, #fcfaf4, #f1ebde);
+  color: #1d1a16; box-shadow: 0 16px 26px -10px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.12), inset 0 0 0 1px rgba(60,40,20,.08);
   transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--penche)); transform-origin: 50% 0;
 }
-.post-it::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: linear-gradient(transparent, rgba(0,0,0,.05)); pointer-events: none; }
-.post-it-scotch { position: absolute; top: -11px; left: 50%; width: 78px; height: 24px; margin-left: -39px; transform: rotate(calc(var(--penche) * -1.6)); background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.12); backdrop-filter: blur(1px); }
-.post-it-texte { font-family: "Shantell Sans", "Bradley Hand", cursive; font-weight: 500; font-size: 19px; line-height: 1.2; overflow-wrap: anywhere; text-wrap: pretty; }
-.post-it.long .post-it-texte { font-size: 16px; }
-.post-it-signe { margin-top: 8px; text-align: right; font-family: "Shantell Sans", cursive; font-weight: 600; font-size: 14px; opacity: .6; }
-.post-it-signe::before { content: "— "; }
+.post-it-scotch { position: absolute; top: 7px; left: 50%; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%;   /* la punaise */
+  background: radial-gradient(circle at 35% 30%, #ff8f73, #c8361f 55%, #7d1c0e); box-shadow: 0 3px 4px rgba(0,0,0,.35); }
+.post-it-texte { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 23px; line-height: 1.16; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
+.post-it.long .post-it-texte { font-size: 19px; }
+.post-it-signe { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(60,40,20,.14); font-family: var(--mono); font-weight: 600; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #a2361f; }
+.post-it-signe::before { content: "Le mot d'"; }
 .post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
 @keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
 /* on le décolle, on le recolle ailleurs (double-clic : il revient) */
@@ -1063,13 +1065,13 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
 }
 .aide.ouverte { opacity: 1; transform: none; }
-.aide-titre { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 14px; letter-spacing: .02em; }
+.aide-titre { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 14px; letter-spacing: .02em; }
 .aide-liste { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; counter-reset: aide; }
 .aide-liste li { position: relative; padding-left: 34px; font-size: 14.5px; line-height: 1.42; color: var(--encre-2); counter-increment: aide; }
 .aide-liste li b { color: var(--encre); }
 .aide-liste li::before {
   content: counter(aide); position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-  font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 12px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
+  font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 12px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
 }
 .aide .gros-bouton { justify-self: start; min-height: 38px; padding: 0 18px; font-size: 14px; }
 @media (max-width: 640px) { .aide { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; } }
@@ -1082,3 +1084,37 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 @media (prefers-reduced-motion: reduce) { .bouton-reglages.brille { animation: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--aiguille) 45%, transparent); } }
 /* l'astuce apparaît : « J'aime bien » s'allume trois fois */
 #radio-garder.pulse { animation: brille 1.3s ease-in-out 3; }
+
+/* ─── le salon : quelqu'un dans un fauteuil, la fenêtre à l'heure qu'il est, la musique qui réchauffe ─── */
+.salon { position: relative; width: 100%; max-width: 1100px; margin: 0 auto; aspect-ratio: 1200 / 360; min-height: 170px; border-radius: 18px; overflow: hidden;
+  background: #2a2420; box-shadow: var(--relief-fort); --jour: .5; --battement: .62s; --amplitude: 5deg; }
+.salon-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.salon * { transform-box: view-box; }
+.salon-nuit { opacity: calc((1 - var(--jour)) * .66); transition: opacity 2s; }
+.salon-rayon { opacity: calc(var(--jour) * .12); mix-blend-mode: screen; }
+.salon .etoiles, .salon .fenetres-allumees { opacity: calc(1 - var(--jour)); }
+.salon-halo { opacity: calc(.18 + (1 - var(--jour)) * .3); mix-blend-mode: screen; transition: opacity 4s ease; }
+.salon-chaleur { opacity: 0; mix-blend-mode: soft-light; transition: opacity 5s ease; }
+.salon .ampoule { opacity: calc(.55 + (1 - var(--jour)) * .4); transition: opacity 3s; }
+.salon-ondes, .salon-poussieres { opacity: 0; transition: opacity 1.5s; }
+.salon .cadre-pochette { opacity: 0; transition: opacity .8s; }
+.salon.avec-pochette .cadre-pochette { opacity: 1; }
+/* la musique joue : la pièce se réchauffe, la tête suit le tempo, le pied tape */
+.salon.joue .salon-halo { opacity: calc(.42 + (1 - var(--jour)) * .4); }
+.salon.joue .salon-chaleur { opacity: .85; }
+.salon.joue .salon-ondes, .salon.joue .salon-poussieres { opacity: 1; }
+.salon.joue .salon-tete { transform-origin: var(--o); animation: salon-hoche var(--battement) ease-in-out infinite; }
+.salon.joue .salon-pied { transform-origin: var(--o); animation: salon-tape var(--battement) ease-in-out infinite; }
+.salon.joue .onde { animation: salon-onde calc(var(--battement) * 2) ease-out infinite; animation-delay: calc(var(--i) * var(--battement) * .66); transform-origin: 632px 230px; }
+.salon.joue .poussiere { animation: salon-poussiere 9s ease-in-out infinite; animation-delay: calc(var(--i) * -1.1s); }
+@keyframes salon-hoche { 0%, 100% { transform: rotate(0deg); } 45% { transform: rotate(calc(var(--amplitude) * -1)); } }
+@keyframes salon-tape { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
+@keyframes salon-onde { 0% { opacity: 0; transform: scale(.7); } 30% { opacity: .9; } 100% { opacity: 0; transform: scale(1.25) translateY(-6px); } }
+@keyframes salon-poussiere { 0%, 100% { transform: translate(0, 0); opacity: .2; } 50% { transform: translate(-14px, -22px); opacity: .9; } }
+.salon-heure { position: absolute; left: 14px; bottom: 10px; margin: 0; padding: 4px 9px; border-radius: 999px; background: rgba(20,16,12,.55); color: #f3ece0;
+  font: 500 11px/1.3 var(--mono); letter-spacing: .04em; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.ecran-machine .salon { margin-top: clamp(26px, 4vw, 44px); }
+.ecran-allumage .salon { max-width: 760px; margin-top: clamp(24px, 4vw, 40px); }
+@media (max-width: 700px) { .salon { aspect-ratio: 2 / 1; border-radius: 14px; } }
+@media (prefers-reduced-motion: reduce) { .salon *, .salon.joue * { animation: none !important; } }
+@media (max-width: 520px) { .pile-scotch { font-size: 9.5px; padding: 3px 7px 2px; letter-spacing: .05em; } }

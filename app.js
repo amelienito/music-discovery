@@ -501,6 +501,7 @@ audioExtrait.addEventListener('error', () => { if (extraitPour) { arreterExtrait
 document.addEventListener('pochette-prete', e => {
   const id = e.detail;
   if (S.joue === id && S.vue === 'machine') majAfficheur();
+  if (S.joue === id) majSalon();
   // une vraie pochette arrive pour un disque de la pile : on le repose avec
   if (S.vue === 'machine' && S.pile.some(p => p.m.id === id)) rendreTuner();
 });
@@ -687,8 +688,15 @@ setInterval(() => {
   if (S.lecture !== 'yt' || !lecteurPret || S.finTraitee || !S.joue) return;
   try { if (lecteur.getPlayerState() === YT.PlayerState.ENDED) finDuMorceau(); } catch (e) {}
 }, 1500);
+function majSalon() {
+  if (typeof Salon === 'undefined') return;
+  const m = parId[S.joue];
+  const im = m && Pochettes.image(m);
+  Salon.maj({ joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, pochette: im ? im.src : null });
+}
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
+  majSalon();
   $('#radio-icone').classList.toggle('pause', S.enLecture);
   majAvis();
   majVideo();
@@ -762,9 +770,25 @@ function poolSource() {
   const ok = p.filter(ecoutable);
   return ok.length >= 3 ? ok : p;
 }
-// ce que tu aimes attire, ce que tu n'aimes pas repousse
+/* l'équité de la radio : les morceaux du centre (ceux qui ressemblent à tout le monde) revenaient
+   sans cesse, ceux des bords presque jamais. Chaque écoute est comptée dans ce navigateur :
+   un morceau jamais entendu passe devant, un morceau très entendu recule, et l'écart
+   s'efface avec le temps. */
+const ECOUTES = memoire.lire('md-ecoutes', {});
+function compterEcoute(m) {
+  const e = ECOUTES[m.id] || { n: 0, t: 0 };
+  e.n++; e.t = Date.now(); ECOUTES[m.id] = e;
+  memoire.ecrire('md-ecoutes', ECOUTES);
+}
+function fraicheur(x) {
+  const e = ECOUTES[x.id];
+  if (!e) return -1.1;                                        // jamais entendu : il passe devant
+  const jours = (Date.now() - e.t) / 864e5;
+  return Math.min(1.6, 0.45 * Math.log2(1 + e.n)) - Math.min(0.9, jours / 10);
+}
+// ce que tu aimes attire, ce que tu n'aimes pas repousse (et ce que tu as peu entendu revient)
 function gout(x) {
-  let d = 0;
+  let d = S.source === 'selection' ? 0 : fraicheur(x);
   S.aime.forEach(id => { const a = parId[id]; if (a && a !== x) d -= 0.7 * Math.exp(-Moteur.distance(a, x) / 2.6); });
   S.aimePas.forEach(id => { const a = parId[id]; if (a) d += 2.4 * Math.exp(-Moteur.distance(a, x) / 2.2); });
   return d;
@@ -982,7 +1006,7 @@ function jouerRadio(id, { debut = 0 } = {}) {
   if (!m) return;
   S.livrets.machine = false;
   croiser(m.id);
-  if (S.historique[S.historique.length - 1] !== m.id) S.historique.push(m.id);
+  if (S.historique[S.historique.length - 1] !== m.id) { S.historique.push(m.id); compterEcoute(m); }
   memoire.ecrire('md-historique', S.historique.slice(-60));
   jouerMorceau(m, debut);
   if (++S.joues >= 2) setTimeout(montrerAide, 4000);
@@ -1146,6 +1170,18 @@ function disquePile({ m, dir }, i) {
   </div>`;
 }
 // ton mot sur le morceau : un post-it collé sur l'enceinte de droite (sous la chaîne sur petit écran)
+// la typographie française : jamais de « : », « ? », « ! » ou « » » seul en début de ligne,
+// jamais de virgule après une espace, et le dernier mot ne reste pas seul sur sa ligne
+const FINE = '\u202F', INSECABLE = '\u00A0';
+function typoFr(t) {
+  return String(t)
+    .replace(/\s+([,.…])/g, '$1')
+    .replace(/\s*([;!?»])/g, (x, p, i, s) => (i > 0 && !/\s/.test(s[i - 1]) && p !== '»' && !/\s/.test(x[0]) ? p : FINE + p))
+    .replace(/\s+:/g, INSECABLE + ':')
+    .replace(/«\s*/g, '«' + FINE)
+    .replace(/(\S+) (\S{1,12})$/, '$1' + INSECABLE + '$2')
+    .replace(/^\u202F/, '');
+}
 function majPostIt(m) {
   const el = $('#post-it');
   const note = m && m.note ? m.note.trim() : '';
@@ -1153,11 +1189,11 @@ function majPostIt(m) {
   el.dataset.id = m ? m.id : '';
   el.hidden = !note;
   if (!note) return;
-  $('#post-it-texte').innerHTML = E(note).replace(/\n/g, '<br>');
+  $('#post-it-texte').innerHTML = E(typoFr(note)).replace(/\n/g, '<br>');
   el.classList.toggle('long', note.length > 80);
   placerPostIt();
   el.style.setProperty('--dx', '0px'); el.style.setProperty('--dy', '0px');
-  el.style.setProperty('--penche', `${(hache(m.id) % 7) - 3.5}deg`);
+  el.style.setProperty('--penche', `${((hache(m.id) % 7) - 3.5) * .5}deg`);
   el.classList.remove('colle'); void el.offsetWidth; el.classList.add('colle');
 }
 function placerPostIt() {
@@ -1607,5 +1643,6 @@ if (S.gardes.length || S.croises.length) {
   pi.addEventListener('pointerup', lacher); pi.addEventListener('pointercancel', lacher);
   pi.addEventListener('dblclick', () => { pi.style.setProperty('--dx', '0px'); pi.style.setProperty('--dy', '0px'); });
 })();
+if (typeof Salon !== 'undefined') { document.querySelectorAll('[data-salon]').forEach(Salon.monter); majSalon(); }
 aller('allumage');
 })();

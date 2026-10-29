@@ -12,7 +12,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Familjen+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" rel="stylesheet">
   <style>
     :root {
       --fond: radial-gradient(120% 80% at 50% 0%, #f1f0ed, #dedcd8);
@@ -36,9 +36,9 @@
     }
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
-    body { margin: 0; min-height: 100vh; overflow-x: hidden; background: var(--fond); background-attachment: fixed; color: var(--encre); font: 16px/1.5 "Familjen Grotesk", system-ui, sans-serif; -webkit-font-smoothing: antialiased; transition: color .3s; }
+    body { margin: 0; min-height: 100vh; overflow-x: hidden; background: var(--fond); background-attachment: fixed; color: var(--encre); font: 16px/1.5 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; transition: color .3s; }
     button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
-    h1, h2, .gros { font-family: "Unbounded", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin: 0; }
+    h1, h2, .gros { font-family: "Instrument Sans", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin: 0; }
     main { max-width: 980px; margin: 0 auto; padding: 24px 18px 140px; padding-top: max(24px, env(safe-area-inset-top)); display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
     p { margin: 0; }
     .sous { color: var(--encre-2); max-width: 60ch; }
@@ -78,7 +78,7 @@
     .fiche { grid-area: fiche; }
     .ecran { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,.25); touch-action: pan-y; }
     .ecran > div, .ecran iframe { width: 100%; height: 100%; display: block; border: 0; }
-    .verdict-flash { position: absolute; inset: 0; display: grid; place-items: center; font-family: "Unbounded", sans-serif; font-size: 3rem; color: #fff; pointer-events: none; opacity: 0; transition: opacity .2s; }
+    .verdict-flash { position: absolute; inset: 0; display: grid; place-items: center; font-family: "Instrument Sans", sans-serif; font-size: 3rem; color: #fff; pointer-events: none; opacity: 0; transition: opacity .2s; }
     .verdict-flash.oui { background: rgba(31,154,90,.75); opacity: 1; }
     .verdict-flash.non { background: rgba(214,64,47,.75); opacity: 1; }
     .fiche { display: grid; gap: 14px; }
@@ -117,7 +117,7 @@
     :root { --mot-fond: #fff6cc; --mot-bord: #e0a800; --mot-lueur: rgba(224,168,0,.35); --mot-titre: #8a5a00; --mot-champ: #fffdf3; --mot-encre: #1c1d22; --mot-indice: #8a6d2a; }
     [data-theme="sombre"] { --mot-fond: #2b2408; --mot-bord: #ffd23f; --mot-lueur: rgba(255,210,63,.45); --mot-titre: #ffd23f; --mot-champ: #15130a; --mot-encre: #fffbea; --mot-indice: #d9c27a; }
     .mot { display: grid; gap: 10px; padding: 14px; border-radius: 18px; background: var(--mot-fond); box-shadow: inset 0 0 0 2px var(--mot-bord), 0 0 24px var(--mot-lueur); }
-    .mot label { font: 700 15px "Unbounded", sans-serif; letter-spacing: -.01em; color: var(--mot-titre); }
+    .mot label { font: 700 15px "Instrument Sans", sans-serif; letter-spacing: -.01em; color: var(--mot-titre); }
     .mot label::before { content: "✎ "; }
     .mot textarea { width: 100%; min-height: 84px; max-height: 260px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--mot-bord); background: var(--mot-champ); color: var(--mot-encre); font: inherit; font-size: 18px; line-height: 1.45; resize: none; caret-color: var(--mot-bord); }
     .mot textarea::placeholder { color: var(--mot-indice); opacity: 1; }
@@ -139,21 +139,21 @@
     .transport { display: flex; gap: 8px; flex-wrap: wrap; }
     .transport button { min-width: 64px; min-height: 42px; padding: 0 12px; border-radius: 10px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); font-weight: 600; font-size: 14px; }
     .verdicts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .v { min-height: 92px; border-radius: 18px; color: #fff; font-family: "Unbounded", sans-serif; font-size: 1.35rem; padding: 0 6px; text-align: center; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
+    .v { min-height: 92px; border-radius: 18px; color: #fff; font-family: "Instrument Sans", sans-serif; font-weight: 700; font-size: 1.35rem; padding: 0 6px; text-align: center; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
     .v:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
-    .v small { display: block; font-family: "Familjen Grotesk", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
+    .v small { display: block; font-family: "Instrument Sans", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
     .v-non { background: var(--non); } .v-oui { background: var(--oui); }
     .v-tard { width: 100%; min-height: 54px; margin-top: 12px; border-radius: 16px; background: var(--carte); color: var(--encre); font-weight: 600; font-size: 15px; box-shadow: 0 4px 0 rgba(0,0,0,.2), inset 0 0 0 1.5px var(--oui); transition: transform .08s, box-shadow .08s; }
     .v-tard:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.2), inset 0 0 0 1.5px var(--oui); }
     .v-tard small { color: var(--encre-2); font-weight: 500; }
-    .pullup { width: 100%; min-height: 72px; border-radius: 18px; background: var(--klein); color: var(--sur-klein); font-family: "Unbounded", sans-serif; font-size: 1.5rem; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
+    .pullup { width: 100%; min-height: 72px; border-radius: 18px; background: var(--klein); color: var(--sur-klein); font-family: "Instrument Sans", sans-serif; font-weight: 700; font-size: 1.5rem; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s, box-shadow .08s; }
     .pullup:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
-    .pullup small { display: block; font-family: "Familjen Grotesk", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
+    .pullup small { display: block; font-family: "Instrument Sans", sans-serif; font-size: 13px; font-weight: 500; opacity: .85; }
     .v-passe { background: var(--doute-fond); color: #1c1d22; }
     .v-passe small { opacity: .75; }
     .lien-ytm { font-size: 14px; }
     /* l'effet du pull up : flash, balayage de bobine qui se rembobine, secousse de la carte */
-    .rebobine { position: absolute; inset: 0; pointer-events: none; opacity: 0; display: grid; place-items: center; color: #fff; font: 700 clamp(1.6rem, 6vw, 2.8rem) "Unbounded", sans-serif; letter-spacing: -.03em; text-shadow: 0 0 24px rgba(111,136,255,.9); background: repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0 2px, transparent 2px 6px), radial-gradient(circle, rgba(111,136,255,.55), rgba(111,136,255,.05)); }
+    .rebobine { position: absolute; inset: 0; pointer-events: none; opacity: 0; display: grid; place-items: center; color: #fff; font: 700 clamp(1.6rem, 6vw, 2.8rem) "Instrument Sans", sans-serif; letter-spacing: -.03em; text-shadow: 0 0 24px rgba(111,136,255,.9); background: repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0 2px, transparent 2px 6px), radial-gradient(circle, rgba(111,136,255,.55), rgba(111,136,255,.05)); }
     .ecran.pull .rebobine { animation: rebobine .7s ease-out; }
     @keyframes rebobine { 0% { opacity: 1; transform: scale(1.06); filter: blur(2px); } 25% { opacity: 1; transform: scale(1); filter: none; } 100% { opacity: 0; transform: scale(.98); } }
     .ecran.pull { animation: secousse .35s ease-out; }
@@ -164,7 +164,7 @@
     .pull-fx { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: 0; display: grid; place-items: center; overflow: hidden; }
     .pull-fx::before { content: ""; position: absolute; inset: -20%; background: repeating-conic-gradient(from 0deg at 50% 55%, rgba(111,136,255,.55) 0 5deg, transparent 5deg 12deg); mask-image: radial-gradient(circle at 50% 55%, transparent 8%, #000 60%); -webkit-mask-image: radial-gradient(circle at 50% 55%, transparent 8%, #000 60%); }
     .pull-fx::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(255,255,255,.95), rgba(111,136,255,.45) 45%, transparent 75%); }
-    .pull-fx b { position: relative; z-index: 1; font: 700 clamp(3rem, 17vw, 9rem)/1 "Unbounded", sans-serif; letter-spacing: -.05em; color: #fff; text-shadow: -.04em 0 #ff2d6f, .04em 0 #2de2ff, 0 0 40px rgba(111,136,255,.9); }
+    .pull-fx b { position: relative; z-index: 1; font: 700 clamp(3rem, 17vw, 9rem)/1 "Instrument Sans", sans-serif; letter-spacing: -.05em; color: #fff; text-shadow: -.04em 0 #ff2d6f, .04em 0 #2de2ff, 0 0 40px rgba(111,136,255,.9); }
     .pull-fx.go { animation: flashPlein .85s cubic-bezier(.2,.8,.2,1); }
     .pull-fx.go b { animation: gros .85s cubic-bezier(.2,1.4,.3,1); }
     .pull-fx.go::before { animation: tourne .85s linear; }
@@ -179,7 +179,7 @@
     .options label { display: inline-flex; gap: 8px; align-items: center; }
     .lien { text-decoration: underline; text-underline-offset: 4px; font-size: 14px; color: var(--encre-2); }
     .raccourcis { font-size: 13px; color: var(--encre-2); }
-    kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border-radius: 5px; background: var(--carte); color: var(--encre); box-shadow: inset 0 0 0 1px var(--trait), 0 1px 0 var(--trait); font: 600 12px "Familjen Grotesk", sans-serif; text-align: center; }
+    kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border-radius: 5px; background: var(--carte); color: var(--encre); box-shadow: inset 0 0 0 1px var(--trait), 0 1px 0 var(--trait); font: 600 12px "Instrument Sans", sans-serif; text-align: center; }
 
     /* la frise : une case par morceau de la playlist */
     .frise-bloc { display: grid; gap: 8px; }
@@ -218,7 +218,7 @@
     .panneau h2 { font-size: 1.3rem; }
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .stat { padding: 10px 12px; border-radius: 12px; background: var(--mur-2); box-shadow: inset 0 0 0 1px var(--trait); }
-    .stat b { display: block; font: 700 1.2rem "Unbounded", sans-serif; letter-spacing: -.03em; }
+    .stat b { display: block; font: 700 1.2rem "Instrument Sans", sans-serif; letter-spacing: -.03em; }
     .stat span { font-size: 13px; color: var(--encre-2); }
     .filtres { display: flex; gap: 6px; flex-wrap: wrap; }
     .filtre { padding: 6px 12px; border-radius: 999px; background: var(--carte); box-shadow: inset 0 0 0 1px var(--trait); font-size: 14px; }
@@ -260,7 +260,7 @@
     /* le mode révision : écouter et commenter, sans trier */
     .revision-barre { display: none; gap: 10px; padding: 14px 16px; border-radius: 16px; background: var(--mur-2); box-shadow: inset 0 0 0 1.5px var(--klein); }
     .revision-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-    .revision-tete b { font-family: "Unbounded", sans-serif; font-size: 15px; color: var(--klein); }
+    .revision-tete b { font-family: "Instrument Sans", sans-serif; font-size: 15px; color: var(--klein); }
     #rv-position { font-size: 14px; color: var(--encre-2); font-variant-numeric: tabular-nums; margin-left: 6px; }
     .revision-nav { display: none; grid-template-columns: 1fr 2fr; gap: 12px; }
     .v-prec { background: var(--carte); color: var(--encre); box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 0 0 1px var(--trait); }
@@ -474,7 +474,7 @@
 <div class="pull-fx" id="pull-fx" aria-hidden="true"><b>PULL UP</b></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data.js?v=27"></script>
+<script src="data.js?v=28"></script>
 <script src="tri.js?v=23"></script>
 </body>
 </html>

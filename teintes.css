@@ -11,6 +11,8 @@
 /* ─── SALON (par défaut) : d'après la pochette « For A Good Time… » d'Odeal.
    Mur gris clair de studio, velours bleu Klein, noyer, aluminium, plexi fumé, cuir cognac. ─── */
 :root, [data-teinte="salon"] {
+  --etiquette: "Instrument Sans", system-ui, sans-serif;   /* les petites inscriptions de l'appareil */
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
   --fond: #dcdbd8;
   --fond-2: #e9e8e5;
   --fond-3: #f3f2ef;
@@ -34,10 +36,10 @@
   --relief-plein: 0 10px 24px rgba(27,30,60,.22);
   --ombre-pochette: 0 6px 16px rgba(45,32,20,.22);
 
-  --display: "Unbounded", system-ui, sans-serif;
-  --display-poids: 600;
-  --display-interlettre: -0.035em;
-  --texte: "Familjen Grotesk", system-ui, sans-serif;
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --display-poids: 400;
+  --display-interlettre: -0.012em;
+  --texte: "Instrument Sans", system-ui, sans-serif;
 
   --rayon-objet: 18px;
   --rayon-pochette: 2px;
@@ -87,10 +89,10 @@
   --relief-plein: 0 10px 24px rgba(0,0,0,.45);
   --ombre-pochette: 0 6px 16px rgba(0,0,0,.5);
 
-  --display: "Unbounded", system-ui, sans-serif;
-  --display-poids: 600;
-  --display-interlettre: -0.035em;
-  --texte: "Familjen Grotesk", system-ui, sans-serif;
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --display-poids: 400;
+  --display-interlettre: -0.012em;
+  --texte: "Instrument Sans", system-ui, sans-serif;
 
   --rayon-objet: 18px;
   --rayon-pochette: 2px;
@@ -142,7 +144,7 @@
   --display: "Newsreader", Georgia, serif;
   --display-poids: 400;
   --display-interlettre: -0.025em;
-  --texte: "Familjen Grotesk", system-ui, sans-serif;
+  --texte: "Instrument Sans", system-ui, sans-serif;
 
   --rayon-objet: 2px;
   --rayon-pochette: 0px;

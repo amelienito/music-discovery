@@ -42,6 +42,8 @@ const Pochettes = (() => {
 
   // ce qu'on peut afficher tout de suite
   function image(m) {
+    // pochette: 'maison' dans data.js : on ignore ce que trouvent Apple et Deezer (mauvaise image)
+    if (m.pochette === 'maison') { const yt = miniatureYouTube(m); return yt ? { src: yt, yt: true } : null; }
     const c = cache[m.id];
     if (c && c.art) return { src: c.art, yt: false };
     const yt = miniatureYouTube(m);

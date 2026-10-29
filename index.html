@@ -13,15 +13,15 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Familjen+Grotesk:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&family=Shantell+Sans:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=45">
-  <link rel="stylesheet" href="teintes.css?v=14">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=46">
+  <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
 
   <!-- ═════════════ LA FAÇADE (barre du haut) ═════════════ -->
   <header class="facade-haut" id="facade">
-    <button class="marque" data-action="accueil" aria-label="Music Discovery">Music<br>Discovery</button>
+    <button class="marque" data-action="accueil" aria-label="Music Discovery">Music<br><em>Discovery</em></button>
 
     <div class="facade-droite">
       <div class="teintes masquer-mobile" role="radiogroup" aria-label="Teinte du site" id="teintes-facade"></div>
@@ -49,7 +49,7 @@
     <!-- ═════════════ LE CARTON D'ENTRÉE ═════════════ -->
     <section class="ecran ecran-allumage" data-ecran="allumage">
       <div class="allumage-texte">
-        <h1>Music Discovery</h1>
+        <h1>Music <em>Discovery</em></h1>
       </div>
       <ol class="etapes" aria-label="Comment ça marche">
         <li><b>1</b><span>Allume la chaîne</span></li>
@@ -71,6 +71,7 @@
       </div>
       <p class="allumage-conseil" id="allumage-conseil">Conseil&nbsp;: Règle d'abord le volume grâce à&nbsp;cette super&nbsp;molette.</p>
       <p class="allumage-retour" id="allumage-retour" hidden></p>
+      <div class="salon" data-salon></div>
       <p class="allumage-libre">Logiquement, tes choix restent enregistrés dans ton navigateur pour la prochaine&nbsp;fois.</p>
     </section>
 
@@ -235,6 +236,7 @@
         </aside>
       </div>
 
+      <div class="salon" data-salon></div>
       <p class="machine-source" id="machine-source" hidden></p>
       <section class="livret livret-machine" id="livret-machine" aria-label="Plus d'infos sur le morceau qui passe" hidden></section>
     </section>
@@ -304,10 +306,11 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=27"></script>
+  <script src="data.js?v=28"></script>
   <script src="moteur.js?v=4"></script>
-  <script src="pochettes.js?v=15"></script>
+  <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
-  <script src="app.js?v=48"></script>
+  <script src="salon.js?v=1"></script>
+  <script src="app.js?v=50"></script>
 </body>
 </html>
