@@ -148,12 +148,22 @@ const Salon = (() => {
           <path d="M846 186 Q870 178 892 182" fill="none" stroke="#3a58d0" stroke-width="3" opacity=".6"/>
           <g class="salon-tete" style="--o:868px 172px">
             <rect x="858" y="156" width="17" height="22" rx="7" fill="#56321f"/>
+            <!-- l'afro, derrière le visage -->
+            <g class="afro" fill="#15100d">
+              <circle cx="878" cy="128" r="30"/><circle cx="860" cy="114" r="18"/><circle cx="872" cy="100" r="16"/><circle cx="891" cy="108" r="17"/>
+              <circle cx="902" cy="128" r="16"/><circle cx="898" cy="148" r="14"/><circle cx="848" cy="124" r="11"/>
+            </g>
             <circle cx="866" cy="142" r="21" fill="#6e4330"/>
-            <path d="M845 142 Q842 114 870 114 Q895 116 891 144 Q887 128 873 127 Q860 128 857 140 Z" fill="#120c0a"/>
+            <path d="M845 136 Q846 120 862 118 Q852 126 851 136 Z" fill="#15100d"/>
             <path d="M846 145 l-8 6 l8 2" fill="#6e4330"/>
             <path class="oeil" d="M850 140 q4.5 3.5 9 0" fill="none" stroke="#120c0a" stroke-width="2" stroke-linecap="round"/>
             <path d="M849 156 q4 2.5 9 .5" fill="none" stroke="#3a1f16" stroke-width="1.8" stroke-linecap="round"/>
             <ellipse cx="875" cy="145" rx="4.5" ry="6.5" fill="#56321f"/>
+            <!-- les lunettes rondes, monture fine -->
+            <g class="lunettes" fill="none" stroke="#d6b25a" stroke-width="1.4">
+              <circle cx="853" cy="140" r="6.5" fill="rgba(255,255,255,.08)"/>
+              <path d="M846.5 140 l-3 1"/><path d="M859.5 139.5 L873 142"/>
+            </g>
           </g>
         </g>
         <!-- l'accoudoir, devant -->
