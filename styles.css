@@ -1102,12 +1102,33 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .salon.joue .salon-halo { opacity: calc(.42 + (1 - var(--jour)) * .4); }
 .salon.joue .salon-chaleur { opacity: .85; }
 .salon.joue .salon-ondes, .salon.joue .salon-poussieres { opacity: 1; }
-.salon.joue .salon-tete { transform-origin: var(--o); animation: salon-hoche var(--battement) ease-in-out infinite; }
-.salon.joue .salon-pied { transform-origin: var(--o); animation: salon-tape var(--battement) ease-in-out infinite; }
+.salon .bras-livre, .salon .bras-tete { display: none; }
+.salon.humeur-doux .bras-poses, .salon.humeur-detente .bras-poses { display: none; }
+.salon.humeur-doux .bras-livre { display: inline; }
+.salon.humeur-detente .bras-tete { display: inline; }
+.salon-buste { transform-origin: var(--o); animation: salon-respire 4.6s ease-in-out infinite; }
+.salon .zzz text { animation: salon-zzz 3.4s ease-in-out infinite; } .salon .zzz text + text { animation-delay: 1.2s; }
+/* groovy : la tête et les épaules balancent sur le tempo, le pied tape */
+.salon.humeur-groove .salon-tete { transform-origin: var(--o); animation: salon-balance calc(var(--battement) * 2) ease-in-out infinite; }
+.salon.humeur-groove .salon-buste { animation: salon-epaules calc(var(--battement) * 2) ease-in-out infinite; }
+.salon.humeur-groove .salon-pied, .salon.humeur-energie .salon-pied { transform-origin: var(--o); animation: salon-tape var(--battement) ease-in-out infinite; }
+/* énergique : la tête hoche franchement, les mains tapent sur les accoudoirs */
+.salon.humeur-energie .salon-tete { transform-origin: var(--o); animation: salon-hoche var(--battement) ease-in-out infinite; }
+.salon.humeur-energie .main-g, .salon.humeur-energie .main-d { animation: salon-tambour var(--battement) ease-in-out infinite; }
+.salon.humeur-energie .main-d { animation-delay: calc(var(--battement) * -.5); }
+/* catchy : les mains derrière la tête, un léger hochement */
+.salon.humeur-detente .salon-tete { transform-origin: var(--o); animation: salon-hoche calc(var(--battement) * 2) ease-in-out infinite; --amplitude: 3deg; }
+/* très doux : il lit, la tête penchée sur le livre */
+.salon.humeur-doux .salon-tete { transform-origin: var(--o); transform: rotate(0deg) translateY(4px); animation: none; }
+@keyframes salon-respire { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
+@keyframes salon-balance { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes salon-epaules { 0%, 100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
+@keyframes salon-tambour { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+@keyframes salon-zzz { 0% { opacity: 0; transform: translate(0, 0); } 30% { opacity: .9; } 100% { opacity: 0; transform: translate(6px, -12px); } }
 .salon.joue .onde { animation: salon-onde calc(var(--battement) * 2) ease-out infinite; animation-delay: calc(var(--i) * var(--battement) * .66); transform-origin: 632px 230px; }
 .salon.joue .poussiere { animation: salon-poussiere 9s ease-in-out infinite; animation-delay: calc(var(--i) * -1.1s); }
-@keyframes salon-hoche { 0%, 100% { transform: rotate(0deg); } 45% { transform: rotate(calc(var(--amplitude) * -1)); } }
-@keyframes salon-tape { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
+@keyframes salon-hoche { 0%, 100% { transform: translateY(0) rotate(0deg); } 45% { transform: translateY(3px) rotate(calc(var(--amplitude) * .4)); } }
+@keyframes salon-tape { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-6deg); } }
 @keyframes salon-onde { 0% { opacity: 0; transform: scale(.7); } 30% { opacity: .9; } 100% { opacity: 0; transform: scale(1.25) translateY(-6px); } }
 @keyframes salon-poussiere { 0%, 100% { transform: translate(0, 0); opacity: .2; } 50% { transform: translate(-14px, -22px); opacity: .9; } }
 .salon-heure { position: absolute; left: 14px; bottom: 10px; margin: 0; padding: 4px 9px; border-radius: 999px; background: rgba(20,16,12,.55); color: #f3ece0;

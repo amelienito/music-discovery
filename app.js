@@ -692,7 +692,7 @@ function majSalon() {
   if (typeof Salon === 'undefined') return;
   const m = parId[S.joue];
   const im = m && Pochettes.image(m);
-  Salon.maj({ joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, pochette: im ? im.src : null });
+  Salon.maj({ joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null });
 }
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);

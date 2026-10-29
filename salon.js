@@ -139,55 +139,81 @@ const Salon = (() => {
       </g>
 
       <!-- le fauteuil club et la personne -->
+      <!-- le fauteuil club, vu de face, et Amélien assis dedans -->
       <g class="salon-fauteuil">
-        <path d="M884 150 Q888 128 920 126 Q962 124 970 152 L978 300 L878 300 Z" fill="url(#salon-cuir-${id})"/>
-        <path d="M900 140 Q925 132 956 142" fill="none" stroke="#d48a4c" stroke-width="2" opacity=".6"/>
-        <!-- la personne : afro, lunettes rondes noires, moustache, manteau sombre, chemise blanche et cravate orange -->
+        <!-- le dossier -->
+        <path d="M786 250 L786 168 Q786 136 822 134 L898 134 Q934 136 934 168 L934 250 Z" fill="url(#salon-cuir-${id})"/>
+        <path d="M800 160 Q860 146 920 160" fill="none" stroke="#d48a4c" stroke-width="2" opacity=".55"/>
+        <!-- Amélien -->
         <g class="salon-personne">
-          <path d="M834 180 Q866 162 902 174 Q916 210 916 252 L826 254 Q824 214 834 180 Z" fill="#1d2233"/>
-          <path d="M856 172 L866 196 L876 172 Z" fill="#f4f1ea"/>
-          <path d="M864 178 L868 178 L871 214 L866 222 L861 214 Z" fill="#d06a32"/><circle cx="866" cy="190" r="1.3" fill="#f0b07a"/><circle cx="867" cy="202" r="1.3" fill="#f0b07a"/>
-          <path d="M850 176 L862 200" stroke="#151a28" stroke-width="3"/><path d="M882 176 L872 200" stroke="#151a28" stroke-width="3"/>
-          <g class="salon-tete" style="--o:868px 172px">
-            <rect x="859" y="154" width="15" height="24" rx="6" fill="#7e5034"/>
-            <!-- l'afro, derrière le visage -->
-            <g class="afro" fill="#2e1c14">
-              <circle cx="874" cy="120" r="37"/><circle cx="911.0" cy="120.0" r="4.2"/><circle cx="910.4" cy="126.8" r="5.1"/><circle cx="908.5" cy="133.4" r="6.0"/><circle cx="905.5" cy="139.5" r="4.2"/><circle cx="901.3" cy="144.9" r="5.1"/><circle cx="896.3" cy="149.5" r="6.0"/><circle cx="890.5" cy="153.1" r="4.2"/><circle cx="884.1" cy="155.6" r="5.1"/><circle cx="877.4" cy="156.8" r="6.0"/><circle cx="870.6" cy="156.8" r="4.2"/><circle cx="863.9" cy="155.6" r="5.1"/><circle cx="857.5" cy="153.1" r="6.0"/><circle cx="851.7" cy="149.5" r="4.2"/><circle cx="846.7" cy="144.9" r="5.1"/><circle cx="842.5" cy="139.5" r="6.0"/><circle cx="839.5" cy="133.4" r="4.2"/><circle cx="837.6" cy="126.8" r="5.1"/><circle cx="837.0" cy="120.0" r="6.0"/><circle cx="837.6" cy="113.2" r="4.2"/><circle cx="839.5" cy="106.6" r="5.1"/><circle cx="842.5" cy="100.5" r="6.0"/><circle cx="846.7" cy="95.1" r="4.2"/><circle cx="851.7" cy="90.5" r="5.1"/><circle cx="857.5" cy="86.9" r="6.0"/><circle cx="863.9" cy="84.4" r="4.2"/><circle cx="870.6" cy="83.2" r="5.1"/><circle cx="877.4" cy="83.2" r="6.0"/><circle cx="884.1" cy="84.4" r="4.2"/><circle cx="890.5" cy="86.9" r="5.1"/><circle cx="896.3" cy="90.5" r="6.0"/><circle cx="901.3" cy="95.1" r="4.2"/><circle cx="905.5" cy="100.5" r="5.1"/><circle cx="908.5" cy="106.6" r="6.0"/><circle cx="910.4" cy="113.2" r="4.2"/>
+          <g class="salon-buste" style="--o:860px 250px">
+            <!-- le corps : manteau sombre, chemise blanche, cravate orange -->
+            <path d="M826 186 Q860 174 894 186 L900 252 L820 252 Z" fill="#1d2233"/>
+            <path d="M851 178 L860 206 L869 178 Z" fill="#f4f1ea"/>
+            <path d="M858 184 L862 184 L865 222 L860 230 L855 222 Z" fill="#d06a32"/><circle cx="860" cy="196" r="1.3" fill="#f0b07a"/><circle cx="860.6" cy="209" r="1.3" fill="#f0b07a"/>
+            <path d="M846 180 L856 206" stroke="#151a28" stroke-width="3"/><path d="M874 180 L864 206" stroke="#151a28" stroke-width="3"/>
+            <!-- les bras, selon l'humeur : posés, un livre, derrière la tête -->
+            <g class="bras bras-poses">
+              <path d="M830 192 L808 226" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/><path d="M890 192 L912 226" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/>
+              <g class="main-g"><ellipse cx="806" cy="230" rx="8" ry="6" fill="#9a6646"/><path d="M799 226 l2 -15 h10 l2 15z" fill="#f4efe6" opacity=".9"/><rect x="801" y="217" width="10" height="7" fill="#c8a24a" opacity=".9"/></g>
+              <g class="main-d"><ellipse cx="914" cy="230" rx="8" ry="6" fill="#9a6646"/></g>
             </g>
-            <ellipse cx="864" cy="142" rx="18.5" ry="21.5" fill="#9a6646"/>
-            <path d="M846 127 Q850 116 864 114 Q852 122 848 132 Z" fill="#2e1c14"/>
-            <path d="M846 143 l-8 7 l9 2" fill="#9a6646"/>
-            <path class="oeil" d="M849 138 q4.5 -3 9 0" fill="none" stroke="#1a100b" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M843 152 q6 -3 12 1" fill="none" stroke="#1a100b" stroke-width="3.2" stroke-linecap="round"/>
-            <path d="M845 156.5 q6 4.5 12 -.5" fill="#f4efe6" stroke="#3b1d14" stroke-width="1.4" stroke-linecap="round"/>
-            <path d="M847 162 q4 4 9 1 l-1 4 q-4 2 -8 -1 z" fill="#1a100b"/>
-            <ellipse cx="876" cy="144" rx="4.5" ry="6.5" fill="#7e5034"/><circle cx="876.5" cy="151.5" r="1.4" fill="#e3c06a"/>
-            <!-- les lunettes rondes, monture noire -->
-            <g class="lunettes" fill="none" stroke="#121010" stroke-width="2.3">
-              <circle cx="852.5" cy="139" r="6.8" fill="rgba(255,255,255,.06)"/>
-              <path d="M845.7 139 l-3 1.2"/><path d="M859.3 138 L874 141"/>
+            <g class="bras bras-livre">
+              <path d="M830 192 L836 230 L850 232" fill="none" stroke="#1d2233" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M890 192 L884 230 L870 232" fill="none" stroke="#1d2233" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M838 220 L860 226 L882 220 L882 238 L860 244 L838 238 Z" fill="#7a2f24"/>
+              <path d="M840 219 L860 224 L860 241 L840 236 Z" fill="#f6f0e2"/><path d="M880 219 L860 224 L860 241 L880 236 Z" fill="#efe6d2"/>
+              <path d="M844 226 l12 3 M844 230 l12 3 M864 229 l12 -3 M864 233 l12 -3" stroke="#b9ad96" stroke-width="1"/>
+              <ellipse cx="840" cy="232" rx="6" ry="5" fill="#9a6646"/><ellipse cx="880" cy="232" rx="6" ry="5" fill="#9a6646"/>
+            </g>
+            <g class="bras bras-tete">
+              <path d="M830 190 L812 158 L836 126" fill="none" stroke="#1d2233" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M890 190 L908 158 L884 126" fill="none" stroke="#1d2233" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <!-- la tête : grand afro, lunettes rondes noires, moustache -->
+            <g class="salon-tete" style="--o:860px 176px">
+              <rect x="853" y="160" width="14" height="22" rx="6" fill="#7e5034"/>
+              <g class="afro" fill="#2e1c14"><circle cx="860" cy="128" r="35"/><circle cx="895.0" cy="128.0" r="4.2"/><circle cx="894.5" cy="134.1" r="5.1"/><circle cx="892.9" cy="140.0" r="6.0"/><circle cx="890.3" cy="145.5" r="4.2"/><circle cx="886.8" cy="150.5" r="5.1"/><circle cx="882.5" cy="154.8" r="6.0"/><circle cx="877.5" cy="158.3" r="4.2"/><circle cx="872.0" cy="160.9" r="5.1"/><circle cx="866.1" cy="162.5" r="6.0"/><circle cx="860.0" cy="163.0" r="4.2"/><circle cx="853.9" cy="162.5" r="5.1"/><circle cx="848.0" cy="160.9" r="6.0"/><circle cx="842.5" cy="158.3" r="4.2"/><circle cx="837.5" cy="154.8" r="5.1"/><circle cx="833.2" cy="150.5" r="6.0"/><circle cx="829.7" cy="145.5" r="4.2"/><circle cx="827.1" cy="140.0" r="5.1"/><circle cx="825.5" cy="134.1" r="6.0"/><circle cx="825.0" cy="128.0" r="4.2"/><circle cx="825.5" cy="121.9" r="5.1"/><circle cx="827.1" cy="116.0" r="6.0"/><circle cx="829.7" cy="110.5" r="4.2"/><circle cx="833.2" cy="105.5" r="5.1"/><circle cx="837.5" cy="101.2" r="6.0"/><circle cx="842.5" cy="97.7" r="4.2"/><circle cx="848.0" cy="95.1" r="5.1"/><circle cx="853.9" cy="93.5" r="6.0"/><circle cx="860.0" cy="93.0" r="4.2"/><circle cx="866.1" cy="93.5" r="5.1"/><circle cx="872.0" cy="95.1" r="6.0"/><circle cx="877.5" cy="97.7" r="4.2"/><circle cx="882.5" cy="101.2" r="5.1"/><circle cx="886.8" cy="105.5" r="6.0"/><circle cx="890.3" cy="110.5" r="4.2"/><circle cx="892.9" cy="116.0" r="5.1"/><circle cx="894.5" cy="121.9" r="6.0"/></g>
+              <ellipse cx="843" cy="153" rx="3.5" ry="5.5" fill="#7e5034"/><ellipse cx="877" cy="153" rx="3.5" ry="5.5" fill="#7e5034"/>
+              <circle cx="877" cy="160" r="1.4" fill="#e3c06a"/>
+              <ellipse cx="860" cy="151" rx="16" ry="19.5" fill="#9a6646"/>
+              <path d="M845 140 Q860 128 875 140 Q868 133 860 133 Q852 133 845 140 Z" fill="#2e1c14"/>
+              <path class="oeil" d="M849 149 q4 -3 8 0 M863 149 q4 -3 8 0" fill="none" stroke="#1a100b" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M860 151 l-2 8 h4" fill="none" stroke="#7e5034" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M851 162 q9 -5 18 0" fill="none" stroke="#1a100b" stroke-width="3.2" stroke-linecap="round"/>
+              <path d="M853 164.5 q7 5 14 0" fill="#f4efe6" stroke="#3b1d14" stroke-width="1.3"/>
+              <path d="M855 170 q5 3 10 0 l-1 3 q-4 2 -8 0 z" fill="#1a100b"/>
+              <g class="lunettes" fill="rgba(255,255,255,.06)" stroke="#121010" stroke-width="2.2">
+                <circle cx="852.5" cy="149" r="6.2"/><circle cx="867.5" cy="149" r="6.2"/><path d="M858.7 148.5 q1.3 -1.5 2.6 0" fill="none"/>
+                <path d="M846.3 148 l-3 -1 M873.7 148 l3 -1" fill="none"/>
+              </g>
             </g>
           </g>
+          <!-- les jambes : sur le coussin, puis devant le fauteuil, les pieds sur le tapis -->
+          <path d="M832 240 Q846 236 858 242 L856 266 L834 266 Z" fill="#23262f"/><path d="M862 242 Q874 236 888 240 L886 266 L864 266 Z" fill="#23262f"/>
         </g>
-        <!-- l'accoudoir, devant -->
-        <path d="M772 238 Q760 214 786 210 L940 210 Q960 212 960 236 L962 300 L772 300 Z" fill="url(#salon-cuir2-${id})"/>
-        <path d="M776 236 Q772 214 796 214 L940 214" fill="none" stroke="#d68c4e" stroke-width="2.5" opacity=".55"/>
-        <circle cx="790" cy="236" r="20" fill="#8c4a22"/><circle cx="790" cy="236" r="12" fill="none" stroke="#c47a3c" stroke-width="2" opacity=".7"/>
-        <rect x="782" y="300" width="10" height="26" rx="2" fill="#3b2316"/><rect x="944" y="300" width="10" height="26" rx="2" fill="#3b2316"/>
-        <rect x="776" y="294" width="190" height="10" rx="4" fill="#6e3518"/>
-        <!-- le bras posé sur l'accoudoir, le verre à la main -->
-        <path d="M848 190 L832 222" stroke="#1d2233" stroke-width="20" stroke-linecap="round"/>
-        <path d="M832 222 L810 213" stroke="#1d2233" stroke-width="17" stroke-linecap="round"/><path d="M812 214 l-3 -1" stroke="#f4f1ea" stroke-width="15" stroke-linecap="round"/>
-        <ellipse cx="801" cy="211" rx="9" ry="7" fill="#9a6646"/>
-        <path d="M793 207 l2 -17 h11 l2 17z" fill="#f4efe6" opacity=".9"/><rect x="795" y="197" width="11" height="8" fill="#c8a24a" opacity=".9"/>
-        <!-- les jambes croisées : celle qui reste au sol, puis celle qui bat la mesure -->
-        <path d="M772 236 L744 318" stroke="#2a2c35" stroke-width="23" stroke-linecap="round"/>
-        <path d="M720 322 q2 -9 22 -10 q14 0 16 10 z" fill="#efe9df"/><rect x="719" y="321" width="40" height="5" rx="2" fill="#3a3a3e"/>
-        <g class="salon-pied" style="--o:774px 228px">
-          <path d="M776 226 L722 280" stroke="#33363f" stroke-width="21" stroke-linecap="round"/>
-          <path d="M716 270 q-16 4 -22 14 q4 6 14 4 l16 -6z" fill="#efe9df"/><path d="M694 284 q4 6 14 4 l16 -6 l1 3 l-16 6 q-12 3 -16 -4z" fill="#3a3a3e"/>
+        <!-- le coussin et les accoudoirs, devant le corps -->
+        <path d="M800 252 Q860 244 920 252 L920 268 L800 268 Z" fill="#b8693a"/>
+        <path d="M768 300 L768 214 Q768 194 790 194 Q812 194 812 214 L812 300 Z" fill="url(#salon-cuir2-${id})"/>
+        <path d="M908 300 L908 214 Q908 194 930 194 Q952 194 952 214 L952 300 Z" fill="url(#salon-cuir2-${id})"/>
+        <ellipse cx="790" cy="204" rx="16" ry="7" fill="#c47a3c" opacity=".7"/><ellipse cx="930" cy="204" rx="16" ry="7" fill="#c47a3c" opacity=".7"/>
+        <rect x="772" y="266" width="176" height="36" rx="5" fill="#8c4a22"/>
+        <rect x="778" y="300" width="10" height="24" rx="2" fill="#3b2316"/><rect x="932" y="300" width="10" height="24" rx="2" fill="#3b2316"/>
+        <!-- les tibias et les chaussures, devant le fauteuil (rien ne traverse) -->
+        <g class="salon-jambes">
+          <path d="M845 264 L842 318" stroke="#23262f" stroke-width="21" stroke-linecap="round"/>
+          <g class="salon-pied" style="--o:875px 264px"><path d="M875 264 L878 318" stroke="#23262f" stroke-width="21" stroke-linecap="round"/><path d="M866 322 q2 -8 14 -8 q10 0 12 8 z" fill="#3a2418"/></g>
+          <path d="M830 322 q2 -8 14 -8 q10 0 12 8 z" fill="#3a2418"/>
         </g>
-        <circle cx="774" cy="230" r="13" fill="#2f323b"/>
+      </g>
+
+      <!-- le chat qui dort sur le tapis -->
+      <g class="salon-chat">
+        <ellipse cx="1000" cy="330" rx="26" ry="9" fill="#2b2522"/>
+        <circle cx="980" cy="324" r="9" fill="#2b2522"/><path d="M974 317 l2 -7 l4 5 z M982 316 l4 -6 l2 7 z" fill="#2b2522"/>
+        <path d="M1024 332 q14 2 10 -8" fill="none" stroke="#2b2522" stroke-width="4" stroke-linecap="round"/>
+        <path d="M976 324 q2 1.5 4 0 M982 324 q2 1.5 4 0" stroke="#d9cfc0" stroke-width=".9" fill="none"/>
+        <g class="zzz" fill="#8a7f72" font-family="var(--mono, monospace)" font-size="9"><text x="986" y="306">z</text><text x="992" y="298" font-size="7">z</text></g>
       </g>
 
       <!-- la plante -->
@@ -240,12 +266,21 @@ const Salon = (() => {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) heure(); });
 
   // la musique joue (ou pas), sur quel tempo, avec quelle pochette au mur
-  function maj({ joue = false, bpm = 96, energie = 5, pochette = null } = {}) {
+  // l'humeur du morceau : très doux = il lit ; groovy = la tête et les épaules balancent ;
+  // énergique = il tape sur les accoudoirs ; entre les deux, catchy = les mains derrière la tête
+  function humeurDe(energie, danse) {
+    if (energie <= 3 && danse <= 4) return 'doux';
+    if (energie >= 8) return 'energie';
+    if (danse >= 6) return 'groove';
+    return 'detente';
+  }
+  function maj({ joue = false, bpm = 96, energie = 5, danse = 5, pochette = null } = {}) {
     let b = Number(bpm) || 96;
     while (b > 132) b /= 2;
     while (b < 66) b *= 2;
     salons.forEach(el => {
       el.classList.toggle('joue', !!joue);
+      ['doux', 'energie', 'groove', 'detente'].forEach(h => el.classList.toggle('humeur-' + h, !!joue && humeurDe(energie, danse) === h));
       el.style.setProperty('--battement', (60 / b).toFixed(3) + 's');
       el.style.setProperty('--amplitude', (2.5 + Math.min(10, energie) * .55).toFixed(2) + 'deg');
       const im = el.querySelector('.cadre-pochette');
