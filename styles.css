@@ -682,7 +682,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .post-it {
   --penche: -1.4deg;
   position: absolute; z-index: 4; right: -14px; top: 8%;
-  width: 216px; padding: 22px 18px 16px; border-radius: 2px;
+  width: 216px; padding: 24px 18px 18px; border-radius: 2px;
   background: linear-gradient(176deg, #fcfaf4, #f1ebde);
   color: #1d1a16; box-shadow: 0 16px 26px -10px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.12), inset 0 0 0 1px rgba(60,40,20,.08);
   transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--penche)); transform-origin: 50% 0;
@@ -691,8 +691,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
   background: radial-gradient(circle at 35% 30%, #ff8f73, #c8361f 55%, #7d1c0e); box-shadow: 0 3px 4px rgba(0,0,0,.35); }
 .post-it-texte { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 23px; line-height: 1.16; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
 .post-it.long .post-it-texte { font-size: 19px; }
-.post-it-signe { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(60,40,20,.14); font-family: var(--mono); font-weight: 600; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #a2361f; }
-.post-it-signe::before { content: "Le mot d'"; }
+.post-it-signe { display: none; }
 .post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
 @keyframes colle { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) - 9deg)) scale(1.06); } }
 /* on le décolle, on le recolle ailleurs (double-clic : il revient) */

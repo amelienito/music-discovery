@@ -793,7 +793,17 @@ function gout(x) {
   S.aimePas.forEach(id => { const a = parId[id]; if (a) d += 2.4 * Math.exp(-Moteur.distance(a, x) / 2.2); });
   return d;
 }
-const score = (cur, x) => Moteur.distance(cur, x) + gout(x);
+/* l'anti-boucle : un morceau qui ressemble beaucoup aux trois d'avant recule, pour que la radio
+   avance au lieu de tourner en rond dans un petit groupe (Great Fairy ↔ Moments ↔ Euryale ↔ Till) */
+function echo(x) {
+  if (S.source === 'selection') return 0;
+  let e = 0;
+  S.historique.slice(-4, -1).forEach(id => { const h = parId[id]; if (h && h !== x) e += Math.max(0, 1.8 - Moteur.distance(h, x)) * .7; });
+  return e;
+}
+// les derniers morceaux joués ne reviennent jamais tout de suite, même dans une petite sélection
+const derniersJoues = base => new Set(S.historique.slice(-Math.max(1, Math.min(12, base.length - 3))));
+const score = (cur, x) => Moteur.distance(cur, x) + gout(x) + echo(x);
 function parmiDeux(l) { return !l.length ? null : l.length === 1 || Math.random() < 0.72 ? l[0] : l[1]; }
 /* la suite : les six prochains morceaux, calculés depuis celui qui passe.
    Chaque morceau mène au plus proche (ce que tu aimes attire) ;
@@ -809,7 +819,8 @@ function construireSuite(depuis, n = 6) {
   const versionsRecentes = new Set(S.historique.slice(-12).map(id => parId[id] && parId[id].version));
   const base = poolSource().filter(m => (!depuis || (m.id !== depuis.id && m.version !== depuis.version)) && (selection || !S.aimePas.has(m.id)));
   let pool = base.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version));
-  if (pool.length < n) pool = base;
+  if (pool.length < n) { const garde = derniersJoues(base); pool = base.filter(m => !garde.has(m.id)); }
+  if (pool.length < 2) pool = base;
   const suite = [];
   let cur = depuis || hasard(pool);
   if (!depuis && cur) { suite.push(cur.id); pool = pool.filter(m => m !== cur); }
@@ -837,7 +848,9 @@ function poolPile(cur) {
   const base = poolSource().filter(m => m.id !== cur.id && m.version !== cur.version && (selection || !S.aimePas.has(m.id)));
   let pool = base.filter(m => !recents.has(m.id) && !versionsRecentes.has(m.version) && !S.dejaVus.has(m.id));
   if (pool.length < 6) pool = base.filter(m => !S.dejaVus.has(m.id) && !recents.has(m.id));
-  if (pool.length < 3) pool = base.filter(m => !S.dejaVus.has(m.id));
+  const garde = derniersJoues(base);
+  if (pool.length < 3) pool = base.filter(m => !S.dejaVus.has(m.id) && !garde.has(m.id));
+  if (pool.length < 3) pool = base.filter(m => !garde.has(m.id));
   if (pool.length < 3) pool = base;
   return pool;
 }
