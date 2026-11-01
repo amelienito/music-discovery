@@ -700,9 +700,29 @@ function majSalon() {
   if (typeof Salon !== 'undefined') Salon.maj(etat);
   if (window.Piece) window.Piece.maj(etat);
 }
+/* le mode salon : la pièce en grand, la musique continue (Échap pour revenir) */
+function modeSalon(on) {
+  const p = $('#salon-plein'); if (!p) return;
+  if (on && !document.body.classList.contains('piece-3d')) return;
+  p.hidden = !on;
+  document.body.classList.toggle('mode-salon', on);
+  majPlein();
+  if (window.Piece) window.Piece.placer();
+  placerEcranVideo();
+  const b = on ? p.querySelector('.rond-lecture') : $('.salon-agrandir');
+  if (b) b.focus({ preventScroll: true });
+}
+function majPlein() {
+  if (!document.body.classList.contains('mode-salon')) return;
+  const m = parId[S.joue];
+  $('#plein-titre').textContent = m ? m.affiche : 'Rien ne joue';
+  $('#plein-artiste').textContent = m ? m.artiste : 'Appuie sur lecture';
+  $('#plein-icone').classList.toggle('pause', S.enLecture);
+}
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
   majSalon();
+  majPlein();
   $('#radio-icone').classList.toggle('pause', S.enLecture);
   majAvis();
   majVideo();
@@ -728,7 +748,9 @@ function majVideo() {
 }
 let suiviRAF = null;
 function emplacementCible() {
-  if (!S.joue || S.lecture !== 'yt' || S.vue !== 'machine') return null;
+  if (!S.joue || S.lecture !== 'yt') return null;
+  if (document.body.classList.contains('mode-salon')) return $('[data-emplacement="salon"]');   // en mode salon : la vidéo dans le coin
+  if (S.vue !== 'machine') return null;
   return $('[data-emplacement="machine"]');
 }
 function placerEcranVideo() {
@@ -1528,6 +1550,8 @@ const ACTIONS = {
     clic(1000, 0.04, 0.05);
   },
   'radio-lecture': radioLecture,
+  'mode-salon': () => modeSalon(true),
+  'quitter-salon': () => modeSalon(false),
   'radio-suivant': radioSuivant,
   'radio-precedent': radioPrecedent,
   'radio-stop': radioStop,
@@ -1561,6 +1585,7 @@ document.addEventListener('click', e => {
 /* le clavier : Espace (lecture / pause), ← et → (morceau précédent / suivant),
    J (j'aime bien), X (pas trop comme ça), Échap (refermer) */
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('mode-salon')) { modeSalon(false); return; }
   if (e.key === 'Escape') { fermerAide(); fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
   if (e.ctrlKey || e.metaKey || e.altKey || S.vue !== 'machine' || !S.joue) return;
   const t = e.target;

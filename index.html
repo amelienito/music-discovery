@@ -10,11 +10,13 @@
     // la teinte est posée tout de suite (évite un flash de la mauvaise couleur) ; sans choix, on suit le mode sombre du téléphone
     try { var t = JSON.parse(localStorage.getItem('md-teinte-v5')), anc = { ambre: 'nuit', signal: 'salon', vide: 'salon', fievre: 'salon' };
       document.documentElement.dataset.teinte = t ? (anc[t] || t) : (matchMedia('(prefers-color-scheme: dark)').matches ? 'nuit' : 'salon'); } catch (e) {}
+    // la pièce en 3D arrive : on ne montre pas le salon dessiné en attendant (il ne revient que si la 3D ne marche pas)
+    try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=51">
+  <link rel="stylesheet" href="styles.css?v=52">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -245,6 +247,21 @@
 
   <div class="ecran-video" id="ecran-video" hidden><div id="yt-lecteur"></div></div>
 
+  <!-- ═════════════ LE MODE SALON : la pièce en grand, la musique continue ═════════════ -->
+  <div class="salon-plein" id="salon-plein" role="dialog" aria-modal="true" aria-label="Le salon en grand" hidden>
+    <div class="salon" data-salon data-plein></div>
+    <div class="plein-video" data-emplacement="salon"></div>
+    <div class="plein-barre">
+      <p class="plein-morceau"><strong id="plein-titre"></strong><span id="plein-artiste"></span></p>
+      <div class="plein-commandes">
+        <button class="rond" data-action="radio-precedent" aria-label="Morceau précédent" title="Morceau précédent (←)"><span class="icone icone-prec"></span></button>
+        <button class="rond rond-lecture" data-action="radio-lecture" aria-label="Lecture / pause" title="Lecture / pause (Espace)"><span class="icone icone-lecture" id="plein-icone"></span></button>
+        <button class="rond" data-action="radio-suivant" aria-label="Morceau suivant" title="Morceau suivant (→)"><span class="icone icone-suiv"></span></button>
+      </div>
+      <button class="plein-fermer" data-action="quitter-salon">Revenir à la chaîne</button>
+    </div>
+  </div>
+
   <!-- ═════════════ MA SÉLECTION ═════════════ -->
   <div class="voile" id="voile" data-action="fermer-panneaux" hidden></div>
 
@@ -310,8 +327,10 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
-  <script src="salon.js?v=7"></script>
-  <script src="app.js?v=54"></script>
-  <script type="module" src="piece.js?v=3"></script>
+  <script src="salon.js?v=8"></script>
+  <script src="app.js?v=55"></script>
+  <script type="module" src="piece.js?v=4"></script>
+  <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
+  <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>
 </html>

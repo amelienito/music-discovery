@@ -1146,22 +1146,59 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .salon.joue .salon-lcd { animation: salon-lcd 1.6s steps(4) infinite; }
 @keyframes salon-lcd { 0% { width: 18px; } 50% { width: 10px; } 100% { width: 18px; } }
 
-/* ─── la pièce en 3D (piece.js) : elle remplace le salon dessiné quand le navigateur sait faire ─── */
-.salon.en-3d { aspect-ratio: 16 / 7.4; background: #1a1410; }
-.salon.en-3d .salon-svg { display: none; }
-.piece-toile { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* ─── la pièce en 3D (piece.js) : elle remplace le salon dessiné quand le navigateur sait faire ───
+   En attendant qu'elle arrive, on ne montre pas l'ancien dessin : juste la pièce dans la pénombre. */
+.avec-3d .salon, .salon.en-3d { aspect-ratio: 16 / 7.4; background: linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
+.avec-3d .salon .salon-svg, .salon.en-3d .salon-svg { visibility: hidden; }
+.piece-toile { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .9s ease, filter 1.6s ease; }
+.piece-toile.prete { opacity: 1; }
+/* sans musique, la pièce perd ses couleurs */
+.salon.triste .piece-toile { filter: saturate(.42) brightness(.93); }
 body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient une pensée, dans la pièce */
-.piece-pensee { position: absolute; z-index: 2; left: 50%; top: 20%; width: max-content; max-width: min(300px, 46%); transform: translate(-50%, -100%);
-  opacity: 0; pointer-events: none; transition: opacity .6s ease; }
-.piece-pensee.visible { opacity: 1; }
-.piece-pensee-texte { margin: 0; padding: 12px 16px; border-radius: 26px; background: rgba(252, 249, 242, .94); color: #1d1a16;
+.piece-pensee { position: absolute; z-index: 2; left: 0; top: 0; width: max-content; max-width: min(300px, 46%);
+  opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
+.piece-pensee.visible, .piece-pensee-point.visible { opacity: 1; }
+.piece-pensee-texte { margin: 0; padding: 12px 16px; border-radius: 26px; background: rgba(252, 249, 242, .95); color: #1d1a16;
   font: italic 400 17px/1.2 var(--display); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
-.piece-pensee i { position: absolute; left: 50%; border-radius: 50%; background: rgba(252, 249, 242, .94); box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); }
-.piece-pensee i:nth-of-type(1) { width: 12px; height: 12px; bottom: -14px; margin-left: -10px; }
-.piece-pensee i:nth-of-type(2) { width: 8px; height: 8px; bottom: -26px; margin-left: -4px; }
-.piece-pensee i:nth-of-type(3) { width: 5px; height: 5px; bottom: -35px; margin-left: 0; }
+.piece-pensee-point { position: absolute; z-index: 2; left: 0; top: 0; border-radius: 50%; background: rgba(252, 249, 242, .95);
+  box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
+/* le bouton pour passer la pièce en grand */
+.salon-agrandir { display: none; position: absolute; z-index: 3; right: 12px; bottom: 12px; align-items: center; gap: 7px;
+  min-height: 34px; padding: 0 13px; border-radius: 999px; background: rgba(20, 16, 12, .62); color: #f3ece0;
+  font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 0 0 1px rgba(243, 236, 224, .18) inset; transition: background .2s, transform .15s; }
+.salon-agrandir span { font-size: 15px; line-height: 1; }
+.salon-agrandir:hover { background: rgba(20, 16, 12, .82); }
+.salon-agrandir:active { transform: scale(.97); }
+body.piece-3d .salon-agrandir { display: inline-flex; }
 @media (max-width: 700px) {
-  .salon.en-3d { aspect-ratio: 1 / .9; }
+  .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; }
   .piece-pensee { max-width: 70%; }
   .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
+  .salon-agrandir { right: 10px; bottom: 10px; min-height: 32px; padding: 0 11px; font-size: 11px; }
 }
+
+/* ─── le mode salon : la pièce en plein écran, la vidéo dans le coin, juste de quoi piloter ─── */
+body.mode-salon { overflow: hidden; }
+.salon-plein { position: fixed; inset: 0; z-index: 46; background: #15110d; }
+.salon-plein[hidden] { display: none; }
+.salon-plein .salon { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; min-height: 0; margin: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: #15110d; }
+.plein-video { position: absolute; z-index: 1; top: calc(16px + env(safe-area-inset-top)); left: 16px; width: min(300px, 30vw); aspect-ratio: 16 / 9; pointer-events: none; }
+body.mode-salon .ecran-video { z-index: 47; border-radius: 12px; box-shadow: 0 14px 30px -10px rgba(0,0,0,.6); }
+.plein-barre { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+  padding: 40px 24px calc(20px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(12, 9, 7, .78)); color: #f3ece0; }
+.plein-morceau { margin: 0; min-width: 0; display: grid; gap: 2px; }
+.plein-morceau strong { font: 400 clamp(20px, 2.4vw, 28px)/1.1 var(--display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plein-morceau span { font: 500 13px/1.3 var(--texte); opacity: .75; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plein-commandes { display: flex; align-items: center; gap: 12px; }
+.plein-fermer { justify-self: end; min-height: 40px; padding: 0 16px; border-radius: 999px; color: #f3ece0; background: rgba(243, 236, 224, .1);
+  box-shadow: 0 0 0 1px rgba(243, 236, 224, .25) inset; font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.plein-fermer:hover { background: rgba(243, 236, 224, .2); }
+@media (max-width: 700px) {
+  .plein-video { top: calc(12px + env(safe-area-inset-top)); left: 12px; width: 50vw; }
+  .plein-barre { grid-template-columns: 1fr auto; grid-template-areas: "morceau fermer" "commandes commandes"; gap: 12px 10px; padding: 34px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .plein-morceau { grid-area: morceau; }
+  .plein-commandes { grid-area: commandes; justify-content: center; }
+  .plein-fermer { grid-area: fermer; min-height: 34px; padding: 0 12px; font-size: 11px; }
+}
+

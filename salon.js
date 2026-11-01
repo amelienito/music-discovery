@@ -309,6 +309,8 @@ const Salon = (() => {
   let px = 0, py = 0, cx = 0, cy = 0, souris = false, boucle = null;
   addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; souris = true; px = e.clientX / innerWidth * 2 - 1; py = e.clientY / innerHeight * 2 - 1; }, { passive: true });
   function bouger(t) {
+    // la pièce en 3D est là : le salon dessiné n'a rien à faire
+    if (document.documentElement.classList.contains('avec-3d')) { boucle = requestAnimationFrame(bouger); return; }
     if (!souris) { px = Math.sin(t / 4200) * .8; py = Math.sin(t / 6100) * .4; }
     cx += (px - cx) * .06; cy += (py - cy) * .06;
     salons.forEach(el => { el.style.setProperty('--px', cx.toFixed(3)); el.style.setProperty('--py', cy.toFixed(3)); });
