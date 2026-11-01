@@ -141,7 +141,7 @@ function lancer() {
   const REBORD = FY - FH / 2 - .07;
 
   /* le poster, au-dessus de la chaîne : la pochette du morceau */
-  const poster = groupe(piece, -1.85, 1.98, FOND + .03);
+  const poster = vivant(groupe(piece, -1.85, 1.84, FOND + .03));
   boite(.74, .74, .04, M('#1f1a15'), poster, 0, 0, 0);
   boite(.66, .66, .045, M('#efe7d8'), poster, 0, 0, .002);
   const vierge = (() => { const { x, t } = toileTexte(64, 64); x.fillStyle = '#c8572f'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#1d1c22'; x.beginPath(); x.arc(32, 32, 18, 0, 7); x.fill(); x.fillStyle = '#efe7d8'; x.beginPath(); x.arc(32, 32, 3, 0, 7); x.fill(); return t; })();
@@ -155,30 +155,50 @@ function lancer() {
     chargeur.load(src, t => { if (pochetteActuelle !== src) return; t.colorSpace = THREE.SRGBColorSpace; affiche.material.map = t; affiche.material.needsUpdate = true; }, undefined, () => {});
   }
 
-  /* au mur de droite du fond : Mode Créatif, encadré */
-  const encadre = groupe(piece, 2.78, 1.72, FOND + .03);
-  boite(.5, .5, .04, M('#2a2420'), encadre, 0, 0, 0);
-  boite(.44, .44, .045, M('#efe7d8'), encadre, 0, 0, .002);
-  const disque = cyl(.17, .17, .012, 28, M('#121113', { roughness: .3, flatShading: false }), encadre, 0, 0, .032); disque.rotation.x = Math.PI / 2;
-  const rond = toileTexte(256, 256);
-  rond.x.fillStyle = '#d06a32'; rond.x.beginPath(); rond.x.arc(128, 128, 126, 0, 7); rond.x.fill();
-  rond.x.fillStyle = '#1d1a16'; rond.x.textAlign = 'center'; rond.x.font = '700 34px "Instrument Sans", Helvetica, Arial, sans-serif';
-  rond.x.fillText('MODE', 128, 112); rond.x.fillText('CRÉATIF', 128, 152);
-  rond.x.beginPath(); rond.x.arc(128, 128, 7, 0, 7); rond.x.fill();
-  const etiquette = new THREE.Mesh(new THREE.CircleGeometry(.065, 20), new THREE.MeshStandardMaterial({ map: rond.t, roughness: .7 }));
-  etiquette.position.z = .04; encadre.add(etiquette);
-  if (document.fonts) document.fonts.load('700 34px "Instrument Sans"').then(() => {
-    rond.x.fillStyle = '#d06a32'; rond.x.beginPath(); rond.x.arc(128, 128, 126, 0, 7); rond.x.fill();
-    rond.x.fillStyle = '#1d1a16'; rond.x.fillText('MODE', 128, 112); rond.x.fillText('CRÉATIF', 128, 152); rond.x.beginPath(); rond.x.arc(128, 128, 7, 0, 7); rond.x.fill();
-    rond.t.needsUpdate = true;
-  }).catch(() => {});
+  /* ═══════════════ aux murs : les images d'Amélien ═══════════════
+     chaque cadre : une baguette, un passe-partout, l'image (chargée après le reste) */
+  const CADRES_IMG = [];
+  function cadreImage(nom, w, h, parent, x, y, z, ry, legende) {
+    const g = vivant(groupe(parent, x, y, z, ry));
+    const bord = Math.min(w, h) * .07;
+    boite(w + bord * 2, h + bord * 2, .035, M('#1b1712', { roughness: .5 }), g, 0, 0, 0);
+    boite(w + bord * .6, h + bord * .6, .038, M('#efe7d8'), g, 0, 0, .002);
+    const image = new THREE.Mesh(new THREE.PlaneGeometry(w * .9, h * .9), new THREE.MeshStandardMaterial({ color: '#3a3430', roughness: .55 }));
+    image.position.z = .023; g.add(image);
+    CADRES_IMG.push({ g, nom, image, legende });
+    return g;
+  }
+  // le mur du fond : l'album d'Amélien au-dessus de la colonne de gauche, l'illustration de Massy au-dessus du fauteuil, Kerry James Marshall à côté
+  cadreImage('mode-creatif', .46, .46, piece, -2.95, 1.7, FOND + .03, 0, 'Mode Créatif, l’album d’Amélien');
+  cadreImage('massy', .5, .667, piece, -.42, 1.76, FOND + .03, 0, 'Illustration de Massy pour Cul7ure');
+  cadreImage('marshall', .3, .374, piece, .3, 1.66, FOND + .03, 0, 'Kerry James Marshall');
+  // le mur de gauche, entre le coin et la bibliothèque : Seta, Junji Ito, The Boondocks
+  cadreImage('seta', .38, .38, piece, -LARG + .03, 1.56, -2.22, Math.PI / 2, 'Seta, chez Cul7ure');
+  cadreImage('junji', .29, .48, piece, -LARG + .03, 1.6, -1.8, Math.PI / 2, 'Junji Ito');
+  cadreImage('boondocks', .3, .44, piece, -LARG + .03, 1.58, -1.42, Math.PI / 2, 'The Boondocks');
 
+  /* la porte du bureau (la pièce de la vitrine), entrouverte, à droite de la fenêtre ; Talya dort devant */
+  const PX = 2.66, PL = .84, PH = 2.04;
+  const porte = vivant(groupe(piece, PX, 0, FOND));
+  const dela = toileTexte(128, 256);
+  { const x = dela.x; const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, '#f3dfb6'); g.addColorStop(.7, '#e7c995'); g.addColorStop(.72, '#a8703f'); g.addColorStop(1, '#8a5a34'); x.fillStyle = g; x.fillRect(0, 0, 128, 256); }
+  const ouverture = new THREE.Mesh(new THREE.PlaneGeometry(PL, PH), new THREE.MeshBasicMaterial({ map: dela.t, toneMapped: false })); ouverture.position.set(0, PH / 2, .006); porte.add(ouverture);
+  boite(PL + .16, .08, .07, cadre, porte, 0, PH + .04, .03); boite(.08, PH, .07, cadre, porte, -PL / 2 - .04, PH / 2, .03); boite(.08, PH, .07, cadre, porte, PL / 2 + .04, PH / 2, .03);
+  const battant = vivant(groupe(porte, PL / 2, 0, .03));   // la charnière à droite
+  const boisPorte = M('#8a5b36', { roughness: .6 });
+  boite(PL - .02, PH - .02, .04, boisPorte, battant, -PL / 2, PH / 2, 0);
+  [[.55, 1.45], [.55, .55]].forEach(([hh, y]) => boite(PL - .2, hh, .012, M('#7a4f2e', { roughness: .6 }), battant, -PL / 2, y, .024));
+  bille(.022, M('#c9a64a', { metalness: .7, roughness: .3 }), battant, -PL + .09, 1.0, .04, 1);
+  battant.rotation.y = .42;
+
+  /* sur le meuble de la chaîne, un cadre photo (Les Anges déchus) ; sur la bibliothèque, I Love Ugly, le globe et la boîte à curiosités */
   /* la bibliothèque, contre le mur de gauche */
-  const biblio = groupe(piece, -LARG + .17, 0, -.7, Math.PI / 2);
+  const biblio = groupe(piece, -LARG + .17, 0, -.5, Math.PI / 2);
+  const livresMobiles = [];
   const noyer = M('#4b2f1c'), noyerF = M('#2e1c10');
-  boite(1.3, 1.95, .04, noyerF, biblio, 0, .98, -.14);
-  boite(.05, 1.95, .32, noyer, biblio, -.64, .98, 0); boite(.05, 1.95, .32, noyer, biblio, .64, .98, 0);
-  for (let e = 0; e < 4; e++) {
+  boite(1.3, 1.47, .04, noyerF, biblio, 0, .735, -.14);
+  boite(.05, 1.47, .32, noyer, biblio, -.64, .735, 0); boite(.05, 1.47, .32, noyer, biblio, .64, .735, 0);
+  for (let e = 0; e < 3; e++) {
     const y = .05 + e * .48;
     boite(1.28, .04, .32, noyer, biblio, 0, y, 0);
     let x = -.58;
@@ -186,14 +206,37 @@ function lancer() {
       const w = .035 + ((k * 7 + e * 3) % 5) * .008, h = .26 + ((k * 13 + e) % 7) * .02;
       const livre = boite(w, h, .22, M(COULEURS[(k * 3 + e * 5) % 10]), biblio, x + w / 2, y + .02 + h / 2, .02);
       if ((k + e) % 9 === 4) livre.rotation.z = .18;
+      else if (e > 0 && (k * 5 + e) % 13 === 2) livresMobiles.push(vivant(livre));
       x += w + .006;
     }
   }
-  boite(1.3, .04, .32, noyer, biblio, 0, 1.94, 0);
+  boite(1.3, .04, .32, noyer, biblio, 0, 1.46, 0);
+  // sur la bibliothèque : I Love Ugly, le globe (Cite 3 Chinois), la boîte à curiosités (Fun facts)
+  const ugly = cadreImage('i-love-ugly', .42, .28, biblio, -.05, 1.68, -.06, 0, 'I Love Ugly'); ugly.rotation.x = -.12;
+  const globe = vivant(groupe(biblio, .45, 1.48, 0));
+  cyl(.05, .065, .02, 10, M('#8c6a3c', { metalness: .5, roughness: .4 }), globe, 0, .01, 0); cyl(.008, .008, .07, 6, M('#8c6a3c', { metalness: .5 }), globe, 0, .05, 0);
+  const globeBoule = (() => {
+    const geo = new THREE.IcosahedronGeometry(.09, 2).toNonIndexed(); const p = geo.attributes.position, coul = [];
+    for (let i = 0; i < p.count; i += 3) {
+      const cx = p.getX(i) + p.getX(i + 1) + p.getX(i + 2), cy = p.getY(i) + p.getY(i + 1) + p.getY(i + 2), cz = p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2);
+      const c = new THREE.Color(Math.sin(cx * 30) + Math.sin(cy * 25 + cz * 14) + Math.cos(cz * 33 - cx * 11) > .7 ? '#c9b27a' : '#3f6f8f');
+      for (let j = 0; j < 3; j++) coul.push(c.r, c.g, c.b);
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(coul, 3));
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .5, flatShading: true })); m.position.y = .17; m.rotation.z = .41; m.castShadow = true; globe.add(m); return m;
+  })();
+  const curio = vivant(groupe(biblio, -.48, 1.48, 0));
+  boite(.2, .13, .14, M('#5a3c26', { roughness: .6 }), curio, 0, .065, 0);
+  const couvercle = vivant(groupe(curio, 0, .13, -.07));
+  boite(.21, .02, .15, M('#4a301e', { roughness: .6 }), couvercle, 0, .01, .07);
+  bille(.014, M('#d8b04a', { metalness: .6, roughness: .3 }), curio, 0, .07, .075, 0);
+  const lueurCurio = new THREE.PointLight('#ffd9a0', 0, .8, 1.6); lueurCurio.position.set(0, .14, 0); curio.add(lueurCurio);
 
   /* la plante, dans le coin (il faut bien) */
-  cyl(.2, .15, .38, 7, M('#b5603c'), piece, 3.0, .19, -2.2);
-  for (let i = 0; i < 8; i++) { const f = cyl(0, .085, .8, 4, M('#4f7a46'), piece, 3.0 + Math.cos(i) * .07, .7, -2.2 + Math.sin(i) * .07); f.rotation.set(Math.sin(i * 2) * .5, i, Math.cos(i * 2) * .5); }
+  const plante = vivant(groupe(piece, 3.0, 0, -2.2));
+  cyl(.2, .15, .38, 7, M('#b5603c'), plante, 0, .19, 0);
+  const feuilles = vivant(groupe(plante, 0, .38, 0));
+  for (let i = 0; i < 8; i++) { const f = cyl(0, .085, .8, 4, M('#4f7a46'), feuilles, Math.cos(i) * .07, .32, Math.sin(i) * .07); f.rotation.set(Math.sin(i * 2) * .5, i, Math.cos(i * 2) * .5); }
 
   /* la lampe à arc, derrière lui à sa gauche */
   const lampe = groupe(piece, 1.08, 0, -.88);
@@ -259,6 +302,26 @@ function lancer() {
   ecran.position.set(.18, .046, .192); lecteurCD.add(ecran);
   boite(.25, .044, .006, noirHifi, lecteurCD, .18, .046, .189);
   for (let k = 0; k < 4; k++) boite(.026, .011, .008, aluF, lecteurCD, -.25 + k * .04, .027, .192);
+  // à droite sur le meuble : un cadre photo (Les Anges déchus) ; à gauche : la figurine du loup de Cul7ure
+  const photo = cadreImage('fallen-angels', .24, .134, chaine, .5, .63, .02, -.15, 'Les Anges déchus, Wong Kar-wai'); photo.rotation.x = -.18;
+  boite(.02, .1, .06, M('#1b1712'), photo, 0, -.05, -.04).rotation.x = .5;
+  const loup = vivant(groupe(chaine, -.5, .525, .04, .35));
+  {
+    const gris = M('#5f6b6a', { roughness: .7 }), grisC = M('#9aa6a3', { roughness: .7 }), rouge = M('#b4485a', { roughness: .6 }), blancL = M('#ecebe4'), noirL = M('#16201e'), vert = M('#27e08a', { roughness: .4 });
+    cyl(.07, .075, .02, 16, noirL, loup, 0, .01, 0);                                   // le socle
+    [-1, 1].forEach(s => { const j = cyl(.022, .02, .07, 8, M('#2c3436'), loup, s * .03, .055, 0); });
+    const corps = cyl(.055, .045, .11, 10, rouge, loup, 0, .14, 0); corps.scale.z = .8;  // la veste de survêtement rouge
+    boite(.112, .012, .09, blancL, loup, 0, .14, 0);                                  // la bande blanche
+    [-1, 1].forEach(s => { const b = cyl(.018, .016, .09, 8, rouge, loup, s * .065, .15, .01); b.rotation.z = s * .35; bille(.018, grisC, loup, s * .08, .1, .015, 0); });
+    const teteL = groupe(loup, 0, .24, .005);
+    bille(.05, gris, teteL, 0, 0, 0, 1).scale.set(1, .95, 1);
+    const museau = poser(new THREE.Mesh(new THREE.ConeGeometry(.03, .07, 6), grisC), teteL, 0, -.012, .055); museau.rotation.x = Math.PI / 2;
+    bille(.011, noirL, teteL, 0, -.012, .09, 0);
+    [-1, 1].forEach(s => { const o = poser(new THREE.Mesh(new THREE.ConeGeometry(.018, .055, 4), gris), teteL, s * .03, .05, -.005); o.rotation.z = -s * .3; bille(.009, vert, teteL, s * .02, .012, .043, 0); });
+    const casquette = poser(new THREE.Mesh(new THREE.SphereGeometry(.052, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), blancL), teteL, 0, .015, -.005); casquette.rotation.x = -.25;
+    const visiere = boite(.06, .006, .05, blancL, teteL, 0, .02, -.055); visiere.rotation.x = .2;   // la visière en arrière
+  }
+
   // les deux colonnes, tournées vers le fauteuil
   const haut_parleurs = [];
   function colonne(x, z, ry) {
@@ -343,28 +406,35 @@ function lancer() {
 
   /* ═══════════════ Amélien ═══════════════ */
   const peau = M('#8c5737', { roughness: .62 }), peauF = M('#734428', { roughness: .7 });
-  const veste = M('#1f2537', { roughness: .78 }), pant = M('#262a34', { roughness: .85 });
-  const chemise = M('#f3f0e9', { roughness: .7 }), cravate = M('#d26a2c', { roughness: .55 });
+  // le pull vert en maille fine (façon pull de tennis), et un pantalon bleu nuit un peu large
+  const maille = toileTexte(64, 64);
+  {
+    const x = maille.x;
+    x.fillStyle = '#1f6b47'; x.fillRect(0, 0, 64, 64);
+    for (let c = 0; c < 8; c++) {                       // des côtes verticales, et de petits « v » de tricot
+      x.fillStyle = c % 2 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.08)'; x.fillRect(c * 8, 0, 8, 64);
+      x.strokeStyle = 'rgba(0,0,0,.13)'; x.lineWidth = 1;
+      for (let r = 0; r < 8; r++) { x.beginPath(); x.moveTo(c * 8 + 1, r * 8 + 1); x.lineTo(c * 8 + 4, r * 8 + 6); x.lineTo(c * 8 + 7, r * 8 + 1); x.stroke(); }
+    }
+    maille.t.wrapS = maille.t.wrapT = THREE.RepeatWrapping; maille.t.repeat.set(5, 4);
+  }
+  const pull = new THREE.MeshStandardMaterial({ color: '#ffffff', map: maille.t, roughness: .95 });
+  const cotes = new THREE.MeshStandardMaterial({ color: '#185a3b', roughness: .95 });
+  const pant = new THREE.MeshStandardMaterial({ color: '#141c2e', roughness: .9 });
   const poils = M('#160d09', { roughness: 1 }), cheveux = M('#0d0705', { roughness: 1 }), monture = M('#0d0b0b', { roughness: .3, metalness: .3 });
   const cuirChaussure = M('#3d2417', { roughness: .4 }), semelle = M('#17110d', { roughness: .8 }), sombre = M('#1a0f0a');
   const perso = groupe(fauteuil);
 
   // le bassin et le buste (le buste pivote au niveau des hanches)
-  const bassin = poser(new THREE.Mesh(new THREE.CylinderGeometry(.165, .155, .17, 8), pant), perso, 0, .575, -.11); bassin.scale.z = .78;
+  const bassin = poser(new THREE.Mesh(new THREE.CylinderGeometry(.17, .16, .17, 18), pant), perso, 0, .575, -.11); bassin.scale.z = .8;
   const buste = groupe(perso, 0, .585, -.13);
-  const torseGeo = new THREE.CylinderGeometry(.205, .168, .47, 8); torseGeo.rotateY(Math.PI / 8); torseGeo.translate(0, .245, 0);
-  poser(new THREE.Mesh(torseGeo, veste), buste).scale.z = .64;
-  const avant = y => .591 * (.168 + .037 * ((y - .01) / .47)) + .004;   // la surface de devant du torse, à la hauteur y
-  const v = new THREE.Shape(); v.moveTo(-.064, 0); v.lineTo(.064, 0); v.lineTo(0, -.24); v.closePath();
-  const plastron = poser(new THREE.Mesh(new THREE.ShapeGeometry(v), chemise), buste, 0, .47, avant(.36)); plastron.rotation.x = -.046;
-  boite(.034, .03, .016, cravate, buste, 0, .447, avant(.447) + .008);
-  boite(.03, .2, .008, cravate, buste, 0, .33, avant(.33) + .008).rotation.x = -.046;
-  const pointe = boite(.0212, .0212, .008, cravate, buste, 0, .229, avant(.23) + .008); pointe.rotation.z = Math.PI / 4;
-  [-1, 1].forEach(s => { const r = boite(.024, .26, .014, veste, buste, s * .04, .352, avant(.352) + .007); r.rotation.set(-.046, 0, s * .27); });
-  bille(.009, M('#c9a64a', { metalness: .6, roughness: .3 }), buste, 0, .17, avant(.17) + .004, 0);
-  const epaulettes = [-1, 1].map(s => { const b = bille(.078, veste, buste, s * .19, .435, -.005); b.scale.set(1, .82, .9); return b; });
-  cyl(.062, .066, .05, 8, chemise, buste, 0, .49, .005);
-  cyl(.053, .058, .09, 7, peauF, buste, 0, .525, .012);
+  // le pull : un peu ample, côtes en bas, au col rond et aux poignets
+  const torseGeo = new THREE.CylinderGeometry(.205, .19, .47, 20, 3); torseGeo.translate(0, .245, 0);
+  poser(new THREE.Mesh(torseGeo, pull), buste).scale.z = .66;
+  poser(new THREE.Mesh(new THREE.CylinderGeometry(.193, .196, .055, 20), cotes), buste, 0, .035, 0).scale.z = .68;
+  const epaulettes = [-1, 1].map(s => { const b = poser(new THREE.Mesh(new THREE.SphereGeometry(.08, 14, 10), pull), buste, s * .185, .43, -.005); b.scale.set(1.02, .8, .92); return b; });
+  poser(new THREE.Mesh(new THREE.TorusGeometry(.06, .014, 8, 20), cotes), buste, 0, .49, .008).rotation.x = Math.PI / 2;
+  poser(new THREE.Mesh(new THREE.CylinderGeometry(.051, .056, .1, 12), peauF), buste, 0, .525, .012);
 
   // la tête : visage taillé (mâchoire plus étroite), afro, lunettes rondes, fine moustache
   const tete = groupe(buste, 0, .64, .03);
@@ -413,10 +483,10 @@ function lancer() {
   const L_BRAS = .285, L_AVANT = .265;
   const bras = [-1, 1].map(s => {
     const epaule = groupe(buste, s * .195, .43, -.005);
-    gelule(.056, L_BRAS, veste, epaule, 0, -L_BRAS / 2, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.059, L_BRAS, 4, 12), pull), epaule, 0, -L_BRAS / 2, 0);
     const coude = groupe(epaule, 0, -L_BRAS, 0);
-    gelule(.049, L_AVANT - .03, veste, coude, 0, -(L_AVANT - .03) / 2, 0);
-    cyl(.043, .043, .03, 7, chemise, coude, 0, -L_AVANT + .022, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.053, L_AVANT - .04, 4, 12), pull), coude, 0, -(L_AVANT - .04) / 2, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.047, .05, .045, 12), cotes), coude, 0, -L_AVANT + .03, 0);
     const main = groupe(coude, 0, -L_AVANT, 0);
     boite(.068, .062, .03, peau, main, 0, -.031, 0);
     const doigts = boite(.062, .05, .026, peau, main, 0, -.078, .006); doigts.rotation.x = .28;
@@ -434,9 +504,10 @@ function lancer() {
   const L_CUISSE = .46, L_TIBIA = .45;
   const jambes = [-1, 1].map(s => {
     const hanche = groupe(perso, s * .095, .565, -.1);
-    gelule(.074, L_CUISSE, pant, hanche, 0, -L_CUISSE / 2, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.08, L_CUISSE, 4, 12), pant), hanche, 0, -L_CUISSE / 2, 0);
     const genou = groupe(hanche, 0, -L_CUISSE, 0);
-    gelule(.058, L_TIBIA - .02, pant, genou, 0, -L_TIBIA / 2 + .01, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.07, L_TIBIA - .05, 4, 12), pant), genou, 0, -L_TIBIA / 2 + .02, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.071, .075, .06, 12), pant), genou, 0, -L_TIBIA + .045, 0);   // le bas du pantalon, un peu large
     const cheville = groupe(genou, 0, -L_TIBIA, 0);
     const p = groupe(cheville);
     cyl(.044, .046, .05, 7, M('#14161c'), p, 0, -.01, 0);
@@ -445,6 +516,35 @@ function lancer() {
     bille(.047, cuirChaussure, p, 0, -.04, .135, 1).scale.set(.98, .72, 1.12);
     return { s, hanche, genou, pied: p };
   });
+
+  /* l'ordinateur portable : posé sur le tapis à sa gauche, sur ses genoux quand il s'en sert ; l'écran affiche son blog */
+  const ordi = vivant(groupe(fauteuil, .62, .012, .55, .5));
+  const aluOrdi = M('#c9cbcf', { metalness: .55, roughness: .3, flatShading: false });
+  boite(.31, .014, .215, aluOrdi, ordi, 0, .007, 0);
+  boite(.27, .002, .1, M('#2a2b2f'), ordi, 0, .015, -.02);
+  const capot = groupe(ordi, 0, .014, -.1075);
+  boite(.31, .205, .008, aluOrdi, capot, 0, .1025, -.004);
+  const page = toileTexte(256, 168);
+  {
+    const x = page.x;
+    x.fillStyle = '#f4efe4'; x.fillRect(0, 0, 256, 168); x.fillStyle = '#1b1a17'; x.fillRect(0, 0, 256, 18);
+    x.fillStyle = '#f4efe4'; x.font = '600 10px Georgia, serif'; x.fillText('onsenbranle.fr', 8, 13);
+    x.fillStyle = '#1b1a17'; x.font = '700 21px Georgia, serif'; x.fillText('En vrai,', 12, 50); x.fillText('on s’en branle', 12, 74);
+    x.fillStyle = '#c8572f'; x.fillRect(12, 84, 34, 3); x.fillStyle = '#b8b0a0'; for (let i = 0; i < 5; i++) x.fillRect(12, 96 + i * 13, i % 3 === 2 ? 130 : 220, 5);
+  }
+  const ecranOrdi = new THREE.Mesh(new THREE.PlaneGeometry(.28, .18), new THREE.MeshBasicMaterial({ map: page.t, toneMapped: false })); ecranOrdi.position.set(0, .104, .001); capot.add(ecranOrdi);
+  const autocollant = toileTexte(64, 64);
+  { const x = autocollant.x; x.fillStyle = '#d06a32'; x.beginPath(); x.arc(32, 32, 30, 0, 7); x.fill(); x.fillStyle = '#1d1a16'; x.font = '800 20px Helvetica, Arial, sans-serif'; x.textAlign = 'center'; x.fillText('OSB', 32, 39); }
+  const sticker = new THREE.Mesh(new THREE.CircleGeometry(.03, 16), new THREE.MeshStandardMaterial({ map: autocollant.t, roughness: .7 })); sticker.position.set(.06, .12, -.0085); sticker.rotation.y = Math.PI; capot.add(sticker);
+  const lueurOrdi = new THREE.PointLight('#cfe0ff', 0, 1.2, 1.5); lueurOrdi.position.set(0, .12, .12); capot.add(lueurOrdi);
+  ordi.traverse(m => { if (m.isMesh) m.castShadow = true; });
+  const posRepos = new THREE.Vector3(.62, .012, .55), quatRepos = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, .5, 0)), posMilieu = new THREE.Vector3(.62, 1.25, .5);
+  const posGenoux = new THREE.Vector3(0, .68, .17), quatGenoux = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0));
+  // le téléphone, dans la main droite
+  const tel = vivant(groupe(bras[0].main, 0, -.075, .03));
+  boite(.072, .145, .009, M('#16161a', { roughness: .3 }), tel, 0, 0, 0);
+  const ecranTel = new THREE.Mesh(new THREE.PlaneGeometry(.064, .132), new THREE.MeshBasicMaterial({ color: '#9fc4ff', toneMapped: false })); ecranTel.position.z = .005; tel.add(ecranTel);
+  tel.rotation.x = -1.2; tel.visible = false;
 
   /* ═══════════════ le petit nuage (sans musique) ═══════════════ */
   const nuage = new THREE.Group(); nuage.visible = false; scene.add(nuage);
@@ -521,7 +621,7 @@ function lancer() {
   const jourDe = h => Math.max(0, Math.min(1, Math.sin((h - 6.2) / 13.6 * Math.PI) * 1.6));
   let jour = .5;
   function dessinerCiel(t, gris) {
-    const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+    const d = new Date(), h = (d.getHours() + d.getMinutes() / 60 + (decalageHeure || 0)) % 24;
     jour = jourDe(h);
     let [haut, bas] = couleursCiel(h);
     haut = mel(haut, jour > .35 ? '#56606f' : '#141925', gris * .8); bas = mel(bas, jour > .35 ? '#8c939e' : '#262c3a', gris * .8);
@@ -555,11 +655,12 @@ function lancer() {
   /* ═══════════════ l'écran de la chaîne ═══════════════ */
   let lcdTexte = 'MUSIC DISCOVERY', lcdDecalage = 0, lcdPolice = 'bold 42px ui-monospace, monospace';
   if (document.fonts) document.fonts.load('900 42px Doto').then(f => { if (f && f.length) lcdPolice = '900 42px Doto, ui-monospace, monospace'; }).catch(() => {});
-  function dessinerLcd(pause, t) {
+  function dessinerLcd(pause, t, message) {
     const x = lcd.x;
     x.fillStyle = '#06111c'; x.fillRect(0, 0, 512, 72);
     x.fillStyle = '#8fdcff'; x.font = lcdPolice; x.textBaseline = 'middle';
-    if (pause) {
+    if (message) { x.textAlign = 'center'; x.fillText(message, 256, 38); x.textAlign = 'left'; }
+    else if (pause) {
       if (Math.floor(t * 1.4) % 2 === 0) { x.textAlign = 'center'; x.fillText('PAUSE', 256, 38); x.textAlign = 'left'; }
     } else {
       const sep = '   ·   ', largeur = x.measureText(lcdTexte + sep).width;
@@ -603,14 +704,14 @@ function lancer() {
     doux: (t) => ({
       buste: [-.22, 0, 0], tete: [.42 + ondule(Math.sin(t * .4) * .03), 0, ondule(Math.sin(t * .27) * .03)], epaules: 0,
       main: s => ['buste', s * .14, .265, .3], pole: s => [s, -.6, -.35],
-      pied: s => [s * .1, .565, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .18,
+      pied: s => [s * .1, .56, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .18,
       sourcils: .15, bouche: .25,
     }),
     // catchy : les mains derrière la tête, les chevilles croisées, un petit hochement
     detente: (t, ph) => ({
       buste: [-.31, 0, 0], tete: [-.1 + ondule(Math.sin(ph / 2) * .06), 0, 0], epaules: 0,
       main: s => ['tete', s * .09, .03, -.15], pole: s => [s, .75, -.25],
-      pied: s => s < 0 ? [.05, .68, .77] : [-.02, .57, .79], polePied: [0, 1, .2], tangage: -1.0, lacet: .15,
+      pied: s => s < 0 ? [.05, .665, .77] : [-.02, .56, .79], polePied: [0, 1, .2], tangage: -1.0, lacet: .15,
       sourcils: .4, bouche: .75,
     }),
     // groovy : la tête et les épaules balancent, le verre dans la main droite, la gauche tapote, le pied bat
@@ -619,7 +720,7 @@ function lancer() {
       return {
         buste: [-.25, bal * .05, -bal * .04], tete: [.05 + bat * .07, -.1 + bal * .05, bal * .17], epaules: 0,
         main: s => s < 0 ? ['F', -.41, .87, .06] : ['F', .41, .83 + bat * .035, .13], pole: s => [s, -.6, -.3],
-        pied: s => s > 0 ? [.12, .57, .79] : [-.1, .565, .77], polePied: [0, 1, .2], tangage: -1.05, lacet: .18, tape: 1,
+        pied: s => s > 0 ? [.12, .56, .79] : [-.1, .56, .77], polePied: [0, 1, .2], tangage: -1.05, lacet: .18, tape: 1,
         sourcils: .3, bouche: .85,
       };
     },
@@ -629,13 +730,50 @@ function lancer() {
       return {
         buste: [-.15 + bat * .05, 0, 0], tete: [.08 + bat * .26, 0, 0], epaules: bat * .015, assise: .03,
         main: s => ['F', s * .41, .83 + ondule(Math.max(0, Math.sin(ph + (s > 0 ? Math.PI : 0)))) * .1, .12], pole: s => [s, -.7, -.2],
-        pied: s => [s * .11, .57, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .16, tape: 1.4,
+        pied: s => [s * .11, .56, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .16, tape: 1.4,
         sourcils: .65, bouche: 1,
       };
     },
   };
+  const surPouf = s => [s * .1, .56, .78];
+  Object.assign(P, {
+    // l'ordi sur les genoux : il tape, il lit son écran
+    ordi: (t) => ({
+      buste: [-.16, 0, 0], tete: [.5 + ondule(Math.sin(t * .5) * .03), ondule(Math.sin(t * .23) * .06), 0], epaules: 0,
+      main: s => ['F', s * .085, .73 + ondule(Math.max(0, Math.sin(t * 13 + s * 1.9)) * .016), .1], pole: s => [s, -.6, -.2],
+      pied: surPouf, polePied: [0, 1, .2], tangage: -1.05, lacet: .18, sourcils: .15, bouche: .2,
+    }),
+    // une gorgée
+    boire: () => ({
+      buste: [-.22, 0, 0], tete: [-.2, 0, 0], epaules: 0,
+      main: s => s < 0 ? ['tete', -.02, -.13, .14] : ['F', .41, .83, .12], pole: s => s < 0 ? [-1, -.5, .1] : [1, -.6, -.3],
+      pied: surPouf, polePied: [0, 1, .2], tangage: -1.05, lacet: .18, sourcils: .2, bouche: 0,
+    }),
+    // il regarde son téléphone
+    telephone: (t) => ({
+      buste: [-.24, 0, 0], tete: [.45, -.06, 0], epaules: 0,
+      main: s => s < 0 ? ['buste', -.06, .25 + ondule(Math.sin(t * 2.3) * .006), .32] : ['F', .41, .83, .1], pole: s => s < 0 ? [-1, -.8, -.2] : [1, -.6, -.3],
+      pied: s => s > 0 ? [.04, .62, .77] : [-.05, .56, .79], polePied: [0, 1, .2], tangage: -1.0, lacet: .15, sourcils: 0, bouche: .1,
+    }),
+    // il s'étire
+    etirement: () => ({
+      buste: [-.3, 0, 0], tete: [-.35, 0, 0], epaules: .035,
+      main: s => ['buste', s * .2, 1.12, .02], pole: s => [s, 0, -.5],
+      pied: s => [s * .13, .56, .8], polePied: [0, 1, .2], tangage: -1.2, lacet: .25, sourcils: .5, bouche: .4,
+    }),
+    // il te fait coucou
+    salut: (t) => ({
+      buste: [-.2, 0, -.04], tete: [0, .38, .06], epaules: 0,
+      main: s => s > 0 ? ['buste', .33 + ondule(Math.sin(t * 10) * .07), .8, .14] : ['F', -.41, .83, .1], pole: s => s > 0 ? [1, -.4, -.3] : [-1, -.6, -.3],
+      pied: surPouf, polePied: [0, 1, .2], tangage: -1.05, lacet: .18, sourcils: .7, bouche: 1,
+    }),
+  });
   const HUMEURS = Object.keys(P);
-  const poids = { triste: 1, doux: 0, detente: 0, groove: 0, energie: 0 };
+  const poids = Object.fromEntries(HUMEURS.map(h => [h, h === 'triste' ? 1 : 0]));
+  let activite = null, finActivite = 0, prochaineActivite = 12;
+  const DUREES = { ordi: 13, boire: 3.6, telephone: 9, etirement: 3.4, salut: 2.8 };
+  function lancerActivite(nom) { activite = nom; finActivite = horlogeCorps + DUREES[nom]; }
+  let horlogeCorps = 0;
 
   const BAS = new THREE.Vector3(0, -1, 0);
   const _d = new THREE.Vector3(), _q = new THREE.Vector3(), _e = new THREE.Vector3(), _f = new THREE.Vector3(), _qi = new THREE.Quaternion();
@@ -669,7 +807,9 @@ function lancer() {
     // le mélange des attitudes
     const k = calme ? 1 : 1 - Math.exp(-dt * 3.2);
     let total = 0, maxi = 0;
-    HUMEURS.forEach(h => { poids[h] = borne(lisse(poids[h], h === etat.humeur ? 1 : 0, k), 0, 1); if (poids[h] < .002) poids[h] = 0; total += poids[h]; maxi = Math.max(maxi, poids[h]); });
+    horlogeCorps = t;
+    const visee = activite || etat.humeur;
+    HUMEURS.forEach(h => { poids[h] = borne(lisse(poids[h], h === visee ? 1 : 0, k), 0, 1); if (poids[h] < .002) poids[h] = 0; total += poids[h]; maxi = Math.max(maxi, poids[h]); });
     if (window.__piecePoids) { Object.assign(poids, window.__piecePoids); total = 1; maxi = Math.max(...Object.values(poids)); }   // pour les vérifications
     const att = HUMEURS.filter(h => poids[h] > 0).map(h => [poids[h] / total, P[h](t, ph)]);
     const ecart = 1 - maxi / total;
@@ -698,7 +838,7 @@ function lancer() {
       att.forEach(([w, a]) => { _c.addScaledVector(_p.set(...a.pied(j.s)), w); _pole.addScaledVector(_p.set(...a.polePied), w); tg += w * a.tangage; lc += w * a.lacet * j.s; });
       _c.y += ecart * .5;  // les pieds se lèvent pour passer du sol au pouf
       // et ne rentrent jamais dans le pouf : s'ils sont au-dessus, ils se posent dessus
-      if (Math.hypot(_c.x, _c.z - POUF_Z) < .38 || Math.hypot(_c.x, _c.z + .14 - POUF_Z) < .35) _c.y = Math.max(_c.y, POUF_H + .095);
+      if (Math.hypot(_c.x, _c.z - POUF_Z) < .38 || Math.hypot(_c.x, _c.z + .14 - POUF_Z) < .35) _c.y = Math.max(_c.y, POUF_H + .08);
       if (j.s > 0 && etat.joue) tg += tape * ondule(Math.max(0, Math.sin(ph))) * .3;   // le pied bat la mesure
       ik(j.hanche, j.genou, L_CUISSE, L_TIBIA, _c, _pole);
       _qf.setFromEuler(_eul.set(tg, lc, 0, 'YXZ'));
@@ -712,7 +852,14 @@ function lancer() {
     yeux.forEach(o => { o.scale.y = clinT > 0 ? .15 : 1; });
     // le livre et le verre
     livre.visible = poids.doux > .15; livre.scale.setScalar(Math.max(.001, borne((poids.doux - .15) * 1.6, 0, 1)));
-    verreMain.visible = poids.groove > .5; verreTable.visible = !verreMain.visible;
+    verreMain.visible = poids.groove + poids.boire > .5; verreTable.visible = !verreMain.visible;
+    tel.visible = poids.telephone > .45;
+    // l'ordi : du tapis jusqu'à ses genoux (en passant au-dessus de l'accoudoir), le capot s'ouvre
+    const wo = borne(poids.ordi, 0, 1), u = 1 - wo;   // une courbe qui passe devant l'accoudoir, bien au-dessus
+    ordi.position.set(0, 0, 0).addScaledVector(posRepos, u * u).addScaledVector(posMilieu, 2 * u * wo).addScaledVector(posGenoux, wo * wo);
+    ordi.quaternion.slerpQuaternions(quatRepos, quatGenoux, wo);
+    capot.rotation.x = lisse(Math.PI / 2, -.28, borne((wo - .45) * 2.2, 0, 1));
+    lueurOrdi.intensity = borne((wo - .5) * 2, 0, 1) * .5;
     if (verreMain.visible) { bras[0].main.updateWorldMatrix(true, false); bras[0].main.getWorldQuaternion(_qa); verreMain.quaternion.copy(_qa.invert().multiply(fauteuil.quaternion)); }
   }
 
@@ -728,9 +875,11 @@ function lancer() {
     const a = camera.aspect;
     let i = 0; while (i < CADRES.length - 2 && a > CADRES[i + 1].a) i++;
     const A = CADRES[i], B = CADRES[i + 1], f = borne((a - A.a) / (B.a - A.a), 0, 1);
-    const fov = lisse(A.fov, B.fov, f), w = lisse(A.w, B.w, f), h = lisse(A.h, B.h, f);
+    const fov = lisse(A.fov, B.fov, f);
+    let w = lisse(A.w, B.w, f), h = lisse(A.h, B.h, f);
     cadreActuel.c.set(lisse(A.c[0], B.c[0], f), lisse(A.c[1], B.c[1], f), lisse(A.c[2], B.c[2], f));
     if (parent === plein && a < 1) cadreActuel.c.y -= .45;    // en grand sur téléphone : la pièce remonte, les commandes sont en bas
+    if (parent === plein && a >= 1) { w = Math.max(w, 6.9); h = Math.max(h, 3.2); cadreActuel.c.x = -.22; cadreActuel.c.y -= .08; }   // en grand sur ordinateur : toute la pièce, porte comprise
     const tv = Math.tan(fov * Math.PI / 360);
     cadreActuel.d = Math.max(h / 2 / tv, w / 2 / (tv * a));
     camera.fov = fov; camera.updateProjectionMatrix();
@@ -782,6 +931,138 @@ function lancer() {
     });
   }
 
+  /* ═══════════════ ce qu'on peut toucher ═══════════════
+     Des objets futiles (le chat, la lampe, la fenêtre, les enceintes, les cadres…) et des passerelles
+     vers les autres créations d'Amélien (la porte du bureau, Talya, l'ordi, le globe, la boîte à curiosités).
+     Une passerelle ouvre dans un nouvel onglet : la musique continue ici. */
+  const zone = (w, h, d, parent, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ visible: false })); m.position.set(x, y, z); parent.add(m); return m; };
+  const CIBLES = [];
+  const cible = (obj, nom, action) => CIBLES.push({ obj, nom, action });
+  const reactions = {};                                        // nom → instant où ça a commencé
+  const reagir = nom => { reactions[nom] = horloge; };
+  const depuis = nom => reactions[nom] === undefined ? 99 : horloge - reactions[nom];
+  let lampeEteinte = false, decalageHeure = 0, finDecalage = 0, vuForce = 0, lcdMessage = '', finLcdMessage = 0;
+  const ALLER = { bureau: 'https://amelienito.github.io/', talya: 'https://amelienito.github.io/Hb/', blog: 'https://www.onsenbranle.fr', cite: 'https://amelienito.github.io/cite-trois-chinois/', faits: 'https://amelienito.github.io/fun-facts/' };
+  const hasard = l => l[Math.floor(Math.random() * l.length)];
+
+  // lui
+  cible(zone(.5, .8, .4, buste, 0, .4, 0), 'Amélien', () => {
+    if (!etat.joue) { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
+    lancerActivite('salut');
+    return { texte: hasard(['Salut !', 'Ça te plaît ?', 'Toujours le H.I.P.-H.O.P.', 'Monte le son !']) };
+  });
+  cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return { texte: 'Il pleut dans sa tête.' }; });
+  // les passerelles
+  cible(porte, 'La porte du bureau', () => { reagir('porte'); return { texte: 'Le bureau, à côté : toutes les créations d’Amélien', lien: ALLER.bureau, quoi: 'Entrer' }; });
+  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Y aller' }; });
+  cible(ordi, 'L’ordi', () => { if (etat.joue && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
+  cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; });
+  cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : un terrier de faits vérifiés', lien: ALLER.faits, quoi: 'Ouvrir' }; });
+  // les objets futiles
+  cible(chat, 'Le chat', () => { reagir('chat'); return { texte: hasard(['Mrrr…', 'Miaou.', '(il se rendort)']) }; });
+  const zoneLampe = zone(.2, 2.2, .2, lampe, 0, 1.1, 0); zone(.44, .3, .44, zoneLampe, -.68, 1.17, .46);
+  cible(zoneLampe, 'La lampe', () => { lampeEteinte = !lampeEteinte; return { texte: lampeEteinte ? 'Clic. Ambiance.' : 'Clic. Lumière !' }; });
+  cible(vitre, 'La fenêtre', () => {
+    decalageHeure = (decalageHeure + 6) % 24; finDecalage = horloge + 25; cielT = 99;
+    const h = Math.floor((new Date().getHours() + decalageHeure) % 24);
+    return { texte: decalageHeure ? `Et s’il était ${h} h ? (pour de faux)` : 'Retour à l’heure qu’il est.' };
+  });
+  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.hp.parent, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return { texte: hasard(['Boum.', 'Les voisins vont adorer.', 'Ça, c’est du grave.']) }; }); });
+  cible(zone(.74, .4, .42, chaine, 0, .73, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return { texte: 'Les aiguilles s’affolent.' }; });
+  cible(plante, 'La plante', () => { reagir('plante'); return { texte: hasard(['Elle a soif.', 'Elle danse aussi.']) }; });
+  cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { const l = hasard(livresMobiles); if (l) { l.userData.sortie = horloge; } return { texte: 'Un livre au hasard…' }; });
+  cible(zone(.5, .2, .5, table, 0, .62, 0), 'La carafe', () => { if (etat.joue && !activite) lancerActivite('boire'); return { texte: 'Santé.' }; });
+  cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf.' }; });
+  cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return { texte: 'Awouuu. (le loup de Cul7ure)' }; });
+  cible(poster, 'Le poster', () => { poster.userData.penche = !poster.userData.penche; return { texte: etat.titre ? `${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
+  CADRES_IMG.forEach(c => cible(c.g, c.legende, () => { c.g.userData.penche = !c.g.userData.penche; return { texte: c.legende }; }));
+
+  // l'étiquette qui apparaît là où on a touché, et le nom de l'objet sous la souris
+  const etiquette = document.createElement('div'); etiquette.className = 'piece-etiquette';
+  const survol = document.createElement('div'); survol.className = 'piece-survol';
+  let etiquettePoint = null, finEtiquette = 0;
+  function montrerEtiquette(r, point) {
+    etiquette.innerHTML = '';
+    const p = document.createElement('span'); p.textContent = r.texte; etiquette.appendChild(p);
+    if (r.lien) { const a = document.createElement('a'); a.href = r.lien; a.target = '_blank'; a.rel = 'noopener'; a.textContent = `${r.quoi || 'Y aller'} ↗`; etiquette.appendChild(a); }
+    etiquettePoint = point.clone(); finEtiquette = horloge + (r.lien ? 7 : 3.2);
+    etiquette.classList.add('visible');
+  }
+  const rayon = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  function viser(ev) {
+    const r = toile.getBoundingClientRect();
+    ptr.set((ev.clientX - r.left) / r.width * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    rayon.setFromCamera(ptr, camera);
+    let mieux = null, d = Infinity, point = null;
+    for (const c of CIBLES) {
+      if (!c.obj.visible && c.obj !== nuage) continue;
+      if (c.obj === nuage && !nuage.visible) continue;
+      const h = rayon.intersectObject(c.obj, true)[0];
+      if (h && h.distance < d) { d = h.distance; mieux = c; point = h.point; }
+    }
+    return mieux && { c: mieux, point };
+  }
+  toile.addEventListener('click', ev => {
+    const v = viser(ev);
+    if (!v) { etiquette.classList.remove('visible'); return; }
+    const r = v.c.action();
+    if (r) montrerEtiquette(r, v.point);
+  });
+  let survolPrevu = false;
+  toile.addEventListener('pointermove', ev => {
+    if (ev.pointerType !== 'mouse' || survolPrevu) return;
+    survolPrevu = true;
+    requestAnimationFrame(() => {
+      survolPrevu = false;
+      const v = viser(ev);
+      toile.style.cursor = v ? 'pointer' : '';
+      survol.classList.toggle('visible', !!v);
+      if (v) { const r = toile.getBoundingClientRect(); survol.textContent = v.c.nom; survol.style.transform = `translate(${Math.round(ev.clientX - r.left + 14)}px, ${Math.round(ev.clientY - r.top + 16)}px)`; }
+    });
+  });
+  toile.addEventListener('pointerleave', () => { survol.classList.remove('visible'); toile.style.cursor = ''; });
+  const _ep = new THREE.Vector3();
+  function placerEtiquette() {
+    if (!etiquettePoint) return;
+    if (horloge > finEtiquette) { etiquette.classList.remove('visible'); etiquettePoint = null; return; }
+    _ep.copy(etiquettePoint).project(camera);
+    const W = toile.clientWidth, H = toile.clientHeight, ew = etiquette.offsetWidth, eh = etiquette.offsetHeight;
+    const x = borne((_ep.x + 1) / 2 * W - ew / 2, 8, W - ew - 8), y = borne((1 - _ep.y) / 2 * H - eh - 14, 8, H - eh - 8);
+    etiquette.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+  }
+
+  // les réactions, image après image
+  let eveilTalya = 0;
+  function animerReactions(t, dt) {
+    // il vit sa vie en mode salon : de temps en temps, l'ordi, une gorgée, le téléphone, un étirement
+    if (activite && (t > finActivite || (!etat.joue && activite !== 'salut'))) { activite = null; prochaineActivite = t + 9 + Math.random() * 9; }
+    if (!activite && parent === plein && etat.joue && !calme && t > prochaineActivite) lancerActivite(hasard(['ordi', 'boire', 'telephone', 'etirement', 'ordi']));
+    // l'heure « pour de faux » à la fenêtre
+    if (decalageHeure && t > finDecalage) { decalageHeure = 0; cielT = 99; }
+    // la porte s'ouvre un peu plus, puis revient
+    const dp = depuis('porte'); battant.rotation.y = .42 + (dp < 4 ? Math.sin(Math.min(1, dp * 3) * Math.PI / 2) * .5 * Math.min(1, (4 - dp) * 1.5) : 0);
+    // Talya relève la tête et remue la queue
+    const dt2 = depuis('talya'); eveilTalya = dt2 < 3 ? Math.min(1, dt2 * 4, (3 - dt2) * 2) : 0;
+    teteT.position.y = .36 + eveilTalya * .1;
+    // le chat s'étire
+    const dc = depuis('chat'), et = dc < 1.6 ? Math.sin(dc / 1.6 * Math.PI) : 0;
+    corpsChat.scale.x = 1.35 + et * .35; chat.position.y = REBORD + .03 + et * .02;
+    // le globe tourne, la boîte s'ouvre, le loup fait un tour, la plante danse, le pouf rebondit
+    globeBoule.rotation.y += dt * (.1 + (depuis('globe') < 2.5 ? (2.5 - depuis('globe')) * 6 : 0));
+    const dcu = depuis('curio'), ouvert = dcu < 5 ? Math.min(1, dcu * 3, (5 - dcu) * 2) : 0;
+    couvercle.rotation.x = -ouvert * 1.6; lueurCurio.intensity = ouvert * 1.2;
+    const dl = depuis('loup'); loup.rotation.y = .35 + (dl < .9 ? (dl / .9) * Math.PI * 2 : 0); loup.position.y = .525 + (dl < .9 ? Math.sin(dl / .9 * Math.PI) * .05 : 0);
+    const dpl = depuis('plante'); feuilles.rotation.z = dpl < 2 ? Math.sin(dpl * 14) * .12 * (2 - dpl) / 2 : ondule(Math.sin(t * .8) * .01);
+    const dpo = depuis('pouf'); pouf.scale.y = 1 - (dpo < .5 ? Math.sin(dpo / .5 * Math.PI) * .12 : 0);
+    // les cadres qu'on a mis de travers
+    [poster, ...CADRES_IMG.map(c => c.g)].forEach((g, i) => { const vise = g.userData.penche ? (i % 2 ? .07 : -.07) : 0; g.rotation.z = lisse(g.rotation.z, vise, Math.min(1, dt * 8)); });
+    // un livre sort un peu, puis rentre
+    livresMobiles.forEach(l => { const d = l.userData.sortie === undefined ? 99 : t - l.userData.sortie; if (l.userData.z0 === undefined) l.userData.z0 = l.position.z; l.position.z = l.userData.z0 + (d < 2.4 ? Math.min(1, d * 4, (2.4 - d) * 2) * .11 : 0); });
+    // l'éclair dans le petit nuage
+    const de = depuis('eclair');
+    nuage.children.forEach(m => { if (m.material && m.material.emissive) m.material.emissive.setRGB(de < .35 ? 1.2 : 0, de < .35 ? 1.1 : 0, de < .35 ? .6 : 0); });
+  }
+
   /* ═══════════════ la boucle ═══════════════ */
   let visible = false, cielGris = 1, dernier = performance.now(), horloge = 0, prochainBattement = 0, lcdT = 0, cielT = 0, phase = 0, premiere = true;
   const niveaux = [0, 0], _t = new THREE.Vector3(), cFroid = new THREE.Color('#6f7fae'), cChaud = new THREE.Color(), cAmpouleOff = new THREE.Color('#3a3128'), cAmpouleOn = new THREE.Color('#ffe2a6'), cVuOff = new THREE.Color('#3b2c18'), cVuOn = new THREE.Color('#ffcf7a');
@@ -795,6 +1076,7 @@ function lancer() {
     const bpm = Number(etat.bpm) || 96;
     const battement = 60 / borne(bpm, 60, 170) * (bpm > 130 ? 2 : 1);
     phase += dt / battement * Math.PI * 2;
+    animerReactions(t, dt);
     animerCorps(t, dt, phase);
 
     // la lumière : la musique réchauffe la pièce ; sans elle, tout devient froid
@@ -802,13 +1084,13 @@ function lancer() {
     hemi.intensity = .26 + mus * (.36 + jour * .3);
     hemi.color.copy(cFroid).lerp(cChaud.set(mel('#c7c3d6', '#fff1dc', jour)), mus);
     plafonnier.intensity = 4 + mus * (28 + nuit * 14);
-    liseuse.intensity = mus * (7 + nuit * 24);
+    liseuse.intensity = (lampeEteinte ? 0 : 1) * mus * (7 + nuit * 24);
     chaleur.intensity = mus * (1.5 + nuit * 3);
     soleil.intensity = (.1 + jour * 1.5) * (1 - .6 * tr);
     soleil.color.set(mel('#6f86c6', '#fff1d8', jour));
     blues.intensity = tr * 70;
     rendu.toneMappingExposure = 1.1 - .18 * tr;
-    matAmpoule.color.copy(cAmpouleOff).lerp(cAmpouleOn, mus);
+    matAmpoule.color.copy(cAmpouleOff).lerp(cAmpouleOn, lampeEteinte ? 0 : mus);
     matVu.color.copy(cVuOff).lerp(cVuOn, mus);
     led.visible = mus > .5;
     if (parent) parent.classList.toggle('triste', tr > .5);
@@ -817,7 +1099,8 @@ function lancer() {
     const fort = (Number(etat.energie) || 5) >= 8;
     if (etat.joue && !calme && t >= prochainBattement) { emettre(fort); prochainBattement = t + battement * (fort ? .5 : 1); }
     aiguilles.forEach((a, i) => {
-      const cible = etat.joue ? borne(.32 + Math.pow(Math.abs(Math.sin(phase * .5 + i * .7)), 2) * (.25 + (Number(etat.energie) || 5) * .045) + (Math.random() - .5) * .12, 0, 1) : 0;
+      vuForce = Math.max(0, vuForce - dt / 2);
+      const cible = vuForce > .01 ? borne(.6 + vuForce * .5 + (Math.random() - .5) * .2, 0, 1) : etat.joue ? borne(.32 + Math.pow(Math.abs(Math.sin(phase * .5 + i * .7)), 2) * (.25 + (Number(etat.energie) || 5) * .045) + (Math.random() - .5) * .12, 0, 1) : 0;
       niveaux[i] = lisse(niveaux[i], cible, cible > niveaux[i] ? Math.min(1, dt * 18) : Math.min(1, dt * 4));
       a.rotation.z = .85 - niveaux[i] * 1.7;
     });
@@ -837,7 +1120,7 @@ function lancer() {
       if (n.vie <= 0 || tr > .6) { n.m.visible = false; n.vie = 0; }
     });
     // l'écran fait défiler le morceau
-    if ((lcdT += dt) > .05) { lcdT = 0; if (etat.joue) lcdDecalage += 4.5; dessinerLcd(!etat.joue, t); }
+    if ((lcdT += dt) > .05) { lcdT = 0; if (etat.joue) lcdDecalage += 4.5; dessinerLcd(!etat.joue, t, t < finLcdMessage ? lcdMessage : ''); }
     // la fenêtre : chaque minute, ou souvent quand il pleut
     cielT += dt;
     if (cielT > (tr > .02 || Math.abs(tr - cielGris) > .005 ? .08 : 60)) { cielT = 0; cielGris = tr; dessinerCiel(t, tr); }
@@ -856,14 +1139,15 @@ function lancer() {
     // Talya et le chat respirent ; une oreille frémit de temps en temps
     corpsT.scale.y = .55 + ondule(Math.sin(t * 1.5) * .015);
     corpsChat.scale.y = .6 + ondule(Math.sin(t * 1.7 + 1) * .03);
-    teteT.rotation.x = -.15 + ondule(Math.sin(t * .6) * .03);
+    teteT.rotation.x = -.15 - eveilTalya * .3 + ondule(Math.sin(t * .6) * .03);
     const frisson = ondule(Math.max(0, Math.sin(t * .9) - .985) * 40);
-    oreilles[0].rotation.x = Math.sin(t * 40) * frisson * .3;
-    queueT.rotation.y = ondule(Math.sin(t * (etat.joue ? 3 : 1.2)) * (etat.joue ? .25 : .08));
+    oreilles[0].rotation.x = Math.sin(t * 40) * frisson * .3 + eveilTalya * .25; oreilles[1].rotation.x = -eveilTalya * .25;
+    queueT.rotation.y = eveilTalya ? Math.sin(t * 16) * .55 * eveilTalya : ondule(Math.sin(t * (etat.joue ? 3 : 1.2)) * (etat.joue ? .25 : .08));
 
     placerCamera(ms);
     rendu.render(scene, camera);
     placerPensee();
+    placerEtiquette();
     if (premiere) { premiere = false; requestAnimationFrame(() => toile.classList.add('prete')); }
   }
   let boucle = null;
@@ -878,7 +1162,7 @@ function lancer() {
     if (cible && cible !== parent) {
       if (parent) parent.classList.remove('triste');
       parent = cible;
-      cible.append(toile, pensee, ...points);
+      cible.append(toile, pensee, ...points, etiquette, survol);
       taille();
     }
     if (visible) relancer();
@@ -902,8 +1186,15 @@ function lancer() {
   addEventListener('resize', taille);
   document.body.classList.add('piece-3d');
 
+  // les images des cadres arrivent après le reste
+  (window.requestIdleCallback || (f => setTimeout(f, 400)))(() => {
+    CADRES_IMG.forEach(c => chargeur.load(`img/salon/${c.nom}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; c.image.material.map = t; c.image.material.color.set('#ffffff'); c.image.material.needsUpdate = true; }, undefined, () => {}));
+  }, { timeout: 1500 });
   window.Piece = { maj, placer };
-  window.__pieceDebug = { THREE, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera };   // pour les vérifications
+  window.__pieceDebug = { THREE, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
+    // où se trouve un objet touchable à l'écran (pour les vérifications)
+    ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },
+    noms: () => CIBLES.map(c => c.nom) };   // pour les vérifications
   if (window.__salonEtat) maj(window.__salonEtat);
   placer();
 }

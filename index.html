@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=52">
+  <link rel="stylesheet" href="styles.css?v=53">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -251,6 +251,7 @@
   <div class="salon-plein" id="salon-plein" role="dialog" aria-modal="true" aria-label="Le salon en grand" hidden>
     <div class="salon" data-salon data-plein></div>
     <div class="plein-video" data-emplacement="salon"></div>
+    <p class="plein-astuce">Touche les objets de la pièce</p>
     <div class="plein-barre">
       <p class="plein-morceau"><strong id="plein-titre"></strong><span id="plein-artiste"></span></p>
       <div class="plein-commandes">
@@ -328,8 +329,8 @@
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=8"></script>
-  <script src="app.js?v=55"></script>
-  <script type="module" src="piece.js?v=4"></script>
+  <script src="app.js?v=56"></script>
+  <script type="module" src="piece.js?v=5"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

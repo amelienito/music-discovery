@@ -1162,6 +1162,21 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
   font: italic 400 17px/1.2 var(--display); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
 .piece-pensee-point { position: absolute; z-index: 2; left: 0; top: 0; border-radius: 50%; background: rgba(252, 249, 242, .95);
   box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
+/* ce qu'on touche dans la pièce : une étiquette (et parfois une passerelle vers une autre création) ; le nom de l'objet sous la souris */
+.piece-etiquette { position: absolute; z-index: 3; left: 0; top: 0; display: flex; align-items: center; gap: 10px; max-width: min(340px, 80%);
+  padding: 8px 10px 8px 14px; border-radius: 14px; background: rgba(252, 249, 242, .96); color: #1d1a16; font: 500 14px/1.25 var(--texte);
+  box-shadow: 0 10px 24px -8px rgba(0,0,0,.5); opacity: 0; pointer-events: none; transition: opacity .25s ease; will-change: transform; }
+.piece-etiquette.visible { opacity: 1; pointer-events: auto; }
+.piece-etiquette a { flex: none; padding: 6px 11px; border-radius: 999px; background: #1d1a16; color: #f3ece0; text-decoration: none; font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+.piece-etiquette a:hover { background: #c8572f; }
+.piece-survol { position: absolute; z-index: 3; left: 0; top: 0; padding: 4px 8px; border-radius: 999px; background: rgba(20, 16, 12, .72); color: #f3ece0;
+  font: 600 11px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; will-change: transform; }
+.piece-survol.visible { opacity: 1; }
+.plein-astuce { position: absolute; z-index: 2; left: 50%; top: calc(18px + env(safe-area-inset-top)); transform: translateX(-50%); margin: 0; padding: 7px 14px; border-radius: 999px;
+  background: rgba(20, 16, 12, .62); color: #f3ece0; font: 600 12px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; pointer-events: none;
+  animation: astuce 7s ease forwards; }
+@keyframes astuce { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (max-width: 700px) { .plein-astuce { top: auto; bottom: calc(150px + env(safe-area-inset-bottom)); } .piece-etiquette { font-size: 13px; } }
 /* le bouton pour passer la pièce en grand */
 .salon-agrandir { display: none; position: absolute; z-index: 3; right: 12px; bottom: 12px; align-items: center; gap: 7px;
   min-height: 34px; padding: 0 13px; border-radius: 999px; background: rgba(20, 16, 12, .62); color: #f3ece0;

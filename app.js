@@ -570,17 +570,24 @@ function surveillerPub(m, debut = 0) {
     if (immobile >= 5 && !S.pub) { S.pub = true; majAvis(); }
   }, 1000);
 }
-// une vidéo qui ne démarre jamais (lecture automatique bloquée, vidéo coincée) ne doit pas tout figer
+// une vidéo qui ne démarre jamais (lecture automatique bloquée, vidéo coincée) ne doit pas tout figer.
+// Mais une pub qui charge, ou une connexion lente, peut prendre plusieurs secondes sans que le lecteur ne dise rien :
+// on attend bien plus longtemps avant de passer (40 secondes, deux minutes et demie si une pub passe), en prévenant une fois
 function surveillerDemarrage(m) {
   clearTimeout(demarrage);
-  let patience = 2;
+  const depart = Date.now();
+  let prevenu = false;
   const verif = () => {
     if (S.joue !== m.id || S.lecture !== 'yt' || S.enLecture) return;
     let st = -1;
     try { st = lecteur.getPlayerState(); } catch (e) {}
     if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.PAUSED) return;
-    // une pub passe : on la laisse finir (jusqu'à deux minutes)
-    if ((st === YT.PlayerState.BUFFERING || S.pub) && patience-- > (S.pub ? -18 : 0)) { demarrage = setTimeout(verif, 6000); return; }
+    const ecoule = Date.now() - depart;
+    if (ecoule < (S.pub ? 150000 : 40000)) {
+      if (!prevenu && ecoule > 14000) { prevenu = true; toast('Ça charge (sûrement une pub)… Patiente un peu, ou passe au suivant.', 4500); }
+      demarrage = setTimeout(verif, 5000);
+      return;
+    }
     S.bloque = true;
     echecRadio(m, 'ne démarre pas');
     majEtat();
