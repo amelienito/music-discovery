@@ -119,14 +119,16 @@ const Salon = (() => {
         <rect x="574" y="256" width="150" height="70" rx="3" fill="#5a3520"/>
         <rect x="582" y="264" width="66" height="54" fill="#4a2a18"/><rect x="652" y="264" width="64" height="54" fill="#4a2a18"/>
         <rect x="584" y="326" width="6" height="10" fill="#2a1a10"/><rect x="708" y="326" width="6" height="10" fill="#2a1a10"/>
-        <rect x="592" y="242" width="96" height="14" rx="2" fill="#2b2a2e"/>
-        <ellipse cx="632" cy="242" rx="30" ry="5" fill="#141416"/><ellipse class="salon-vinyle" cx="632" cy="241" rx="24" ry="3.6" fill="#1e1d20"/>
-        <circle cx="632" cy="240.6" r="2.2" fill="#c8572f"/>
-        <path d="M676 238 l-14 4" stroke="#c9c9cc" stroke-width="2" stroke-linecap="round"/>
-        <rect x="700" y="222" width="14" height="34" rx="1" fill="#d8ccb8"/><rect x="704" y="226" width="14" height="30" rx="1" fill="#2f4a6b"/>
+        <!-- la mini-chaîne CD : deux enceintes, le lecteur au milieu -->
+        <rect x="588" y="214" width="22" height="42" rx="2" fill="#2b2a2e"/><circle cx="599" cy="226" r="4" fill="#45444a"/><circle cx="599" cy="243" r="7" fill="#45444a"/><circle cx="599" cy="243" r="3" fill="#1a1a1d"/>
+        <rect x="614" y="226" width="52" height="30" rx="2" fill="#c9cbce"/><rect x="614" y="226" width="52" height="4" rx="1" fill="#e6e7e9"/>
+        <rect x="619" y="233" width="28" height="9" rx="1" fill="#06111c"/><rect class="salon-lcd" x="621" y="235" width="18" height="2.4" fill="#8fdcff"/>
+        <rect x="619" y="246" width="42" height="3" rx="1" fill="#8f9196"/><circle cx="656" cy="237" r="3.5" fill="#b4b6ba"/>
+        <rect x="670" y="214" width="22" height="42" rx="2" fill="#2b2a2e"/><circle cx="681" cy="226" r="4" fill="#45444a"/><circle cx="681" cy="243" r="7" fill="#45444a"/><circle cx="681" cy="243" r="3" fill="#1a1a1d"/>
+        <rect x="700" y="230" width="12" height="26" rx="1" fill="#d8ccb8"/><rect x="704" y="233" width="12" height="23" rx="1" fill="#2f4a6b"/>
       </g>
       <g class="salon-ondes" fill="none" stroke="#c87a3e" stroke-width="2" stroke-linecap="round">
-        <path class="onde" d="M612 224 q20 -14 40 0" style="--i:0"/><path class="onde" d="M604 214 q28 -20 56 0" style="--i:1"/><path class="onde" d="M596 204 q36 -26 72 0" style="--i:2"/>
+        <path class="onde" d="M620 206 q20 -14 40 0" style="--i:0"/><path class="onde" d="M612 196 q28 -20 56 0" style="--i:1"/><path class="onde" d="M604 186 q36 -26 72 0" style="--i:2"/>
       </g>
 
       <!-- le tapis, la table basse -->
@@ -242,7 +244,7 @@ const Salon = (() => {
       <rect class="salon-chaleur" width="1200" height="360" fill="url(#salon-chaleur-${id})"/>
       <g class="salon-poussieres" fill="#ffe7b8">${poussieres}</g>
     </svg>
-    <p class="salon-heure"><span class="salon-heure-texte"></span></p>`;
+`;
   }
 
   const salons = [];
@@ -271,7 +273,6 @@ const Salon = (() => {
       a.setAttribute('fill', soleil ? (jour > .5 ? '#fff4d0' : '#ffb36b') : '#f3efe2');
       el.style.setProperty('--jour', jour.toFixed(3));
       el.querySelector('.immeubles').setAttribute('fill', mel('#151a33', '#7d8aa3', jour));
-      el.querySelector('.salon-heure-texte').textContent = texte;
       const t = el.querySelector('title'); if (t) t.textContent = `Le salon : quelqu'un écoute la musique dans un fauteuil club. Dehors, ${moment(h)}.`;
     });
   }

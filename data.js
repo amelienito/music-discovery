@@ -869,7 +869,7 @@ const MORCEAUX = [
     energie: 6, etrange: 4, danse: 5 },
 
   { titre: "Frank Ocean – Thinkin' Bout You (KLM Flip)", artiste: "K, Le Maestro", album: "",
-    lien: "https://music.youtube.com/watch?v=C8fH4h8b1HM", note: "Toujours le h.i.p. H.o.p.",
+    lien: "https://music.youtube.com/watch?v=C8fH4h8b1HM", note: "Toujours le H.I.P.-H.O.P.",
     ambiance: "brume", style: "Flip chopped & screwed", annee: 2023, bpm: 85, voix: "chant",
     tags: ["flip", "chopped & screwed", "r&b", "houston"],
     energie: 3, etrange: 3, danse: 4 },
