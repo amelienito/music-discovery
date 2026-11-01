@@ -1145,3 +1145,23 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 
 .salon.joue .salon-lcd { animation: salon-lcd 1.6s steps(4) infinite; }
 @keyframes salon-lcd { 0% { width: 18px; } 50% { width: 10px; } 100% { width: 18px; } }
+
+/* ─── la pièce en 3D (piece.js) : elle remplace le salon dessiné quand le navigateur sait faire ─── */
+.salon.en-3d { aspect-ratio: 16 / 7.4; background: #1a1410; }
+.salon.en-3d .salon-svg { display: none; }
+.piece-toile { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient une pensée, dans la pièce */
+.piece-pensee { position: absolute; z-index: 2; left: 50%; top: 20%; width: max-content; max-width: min(300px, 46%); transform: translate(-50%, -100%);
+  opacity: 0; pointer-events: none; transition: opacity .6s ease; }
+.piece-pensee.visible { opacity: 1; }
+.piece-pensee-texte { margin: 0; padding: 12px 16px; border-radius: 26px; background: rgba(252, 249, 242, .94); color: #1d1a16;
+  font: italic 400 17px/1.2 var(--display); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
+.piece-pensee i { position: absolute; left: 50%; border-radius: 50%; background: rgba(252, 249, 242, .94); box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); }
+.piece-pensee i:nth-of-type(1) { width: 12px; height: 12px; bottom: -14px; margin-left: -10px; }
+.piece-pensee i:nth-of-type(2) { width: 8px; height: 8px; bottom: -26px; margin-left: -4px; }
+.piece-pensee i:nth-of-type(3) { width: 5px; height: 5px; bottom: -35px; margin-left: 0; }
+@media (max-width: 700px) {
+  .salon.en-3d { aspect-ratio: 1 / .9; }
+  .piece-pensee { max-width: 70%; }
+  .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
+}

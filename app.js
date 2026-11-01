@@ -689,13 +689,16 @@ setInterval(() => {
   try { if (lecteur.getPlayerState() === YT.PlayerState.ENDED) finDuMorceau(); } catch (e) {}
 }, 1500);
 function majSalon() {
-  if (typeof Salon === 'undefined') return;
   const m = parId[S.joue];
   // au mur : la pochette du morceau qui passe, sinon celle du dernier écouté (ou d'un morceau au hasard)
   const affiche = m || parId[S.historique[S.historique.length - 1]] || (majSalon.hasard = majSalon.hasard || hasard(BANQUE));
   const im = affiche && Pochettes.image(affiche);
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
-  Salon.maj({ joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null });
+  const etat = { joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
+    titre: m ? m.affiche : '', artiste: m ? m.artiste : '', note: m && m.note ? typoFr(m.note) : '' };
+  window.__salonEtat = etat;                                   // la pièce 3D le lit en arrivant
+  if (typeof Salon !== 'undefined') Salon.maj(etat);
+  if (window.Piece) window.Piece.maj(etat);
 }
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
