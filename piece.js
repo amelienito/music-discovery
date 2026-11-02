@@ -975,7 +975,13 @@ function lancer() {
   cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return { texte: 'Il pleut dans sa tête.' }; });
   // les passerelles
   cible(porte, 'La porte du bureau', () => { reagir('porte'); return { texte: 'Le bureau, à côté : toutes les créations d’Amélien', lien: ALLER.bureau, quoi: 'Entrer' }; });
-  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Y aller' }; });
+  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => {
+    // Talya t'emmène directement dans son jeu (nouvel onglet : la musique continue ici)
+    reagir('talya');
+    const onglet = window.open(ALLER.talya, '_blank');
+    if (onglet) { try { onglet.opener = null; } catch (e) {} return { texte: 'Talya t’emmène dans son jeu : RP Talya (nouvel onglet)' }; }
+    return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Y aller' };
+  });
   cible(ordi, 'L’ordi', () => { if (etat.joue && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
   cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; });
   cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; });
