@@ -56,8 +56,10 @@ function lancer() {
   const toile = document.createElement('canvas');
   toile.className = 'piece-toile';
   toile.setAttribute('aria-hidden', 'true');
-  const rendu = new THREE.WebGLRenderer({ canvas: toile, antialias: true });
-  rendu.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+  const tactile = matchMedia('(pointer: coarse)').matches;   // tablette, téléphone : on ménage la mémoire
+  const rendu = new THREE.WebGLRenderer({ canvas: toile, antialias: true, powerPreference: tactile ? 'low-power' : 'default' });
+  rendu.setPixelRatio(Math.min(devicePixelRatio || 1, tactile ? 1.5 : 1.75));
+  const OMBRE = tactile ? 512 : 1024;
   rendu.shadowMap.enabled = true;
   rendu.shadowMap.type = THREE.PCFShadowMap;
   rendu.toneMapping = THREE.ACESFilmicToneMapping;
@@ -103,11 +105,11 @@ function lancer() {
   // le plafonnier, comme dans la vitrine
   const plafonnier = new THREE.SpotLight('#ffd9a8', 36, 12, 1.15, .65, 1.4);
   plafonnier.position.set(-.8, 3.7, .45); plafonnier.target.position.set(-.8, 0, -.35);
-  plafonnier.castShadow = true; plafonnier.shadow.mapSize.set(1024, 1024); plafonnier.shadow.bias = -.0006; plafonnier.shadow.normalBias = .02;
+  plafonnier.castShadow = true; plafonnier.shadow.mapSize.set(OMBRE, OMBRE); plafonnier.shadow.bias = -.0006; plafonnier.shadow.normalBias = .02;
   scene.add(plafonnier, plafonnier.target);
   // la liseuse (la lampe à arc), au-dessus de lui
   const liseuse = new THREE.SpotLight('#ffc98a', 20, 6, .8, .6, 1.5);
-  liseuse.castShadow = true; liseuse.shadow.mapSize.set(1024, 1024); liseuse.shadow.bias = -.0008; liseuse.shadow.normalBias = .02;
+  liseuse.castShadow = true; liseuse.shadow.mapSize.set(OMBRE, OMBRE); liseuse.shadow.bias = -.0008; liseuse.shadow.normalBias = .02;
   scene.add(liseuse, liseuse.target);
   const chaleur = new THREE.PointLight('#ff9a4a', 0, 7, 1.4); chaleur.position.set(-1.9, 1.4, .4); scene.add(chaleur);
   // sans musique : une seule lumière froide, sur lui
@@ -345,9 +347,12 @@ function lancer() {
   const led = new THREE.Mesh(new THREE.SphereGeometry(.008, 6, 4), lumiere('#ff5a3a')); led.position.set(-.4, .27, zf + .004); chaine.add(vivant(led));
   // l'analyseur de spectre : douze colonnes de diodes qui dansent avec la musique
   zf = facade(.31, .12);
-  const spectre = toileTexte(256, 64);
-  const ecranSpectre = new THREE.Mesh(new THREE.PlaneGeometry(.66, .085), new THREE.MeshBasicMaterial({ map: spectre.t, toneMapped: false }));
-  ecranSpectre.position.set(-.05, .37, zf + .004); chaine.add(ecranSpectre);
+  const diodes = vivant(new THREE.InstancedMesh(new THREE.PlaneGeometry(.044, .0062), new THREE.MeshBasicMaterial({ toneMapped: false }), 120));
+  {
+    const m4 = new THREE.Matrix4(), eteinte = new THREE.Color('#0f2117');
+    for (let i = 0; i < 12; i++) for (let k = 0; k < 10; k++) { m4.makeTranslation(-.353 + i * .055, .332 + k * .0085, zf + .004); diodes.setMatrixAt(i * 10 + k, m4); diodes.setColorAt(i * 10 + k, eteinte); }
+    diodes.castShadow = false; chaine.add(diodes);
+  }
   boite(.68, .095, .006, noirHifi, chaine, -.05, .37, zf + .001);
   for (let k = 0; k < 3; k++) { const b = cyl(.012, .012, .02, 10, aluF, chaine, .35, .335 + k * .03, zf + .01); b.rotation.x = Math.PI / 2; }
   // le tuner : le long cadran éclairé, l'aiguille rouge qui cherche les stations, le gros bouton d'accord
@@ -377,7 +382,8 @@ function lancer() {
   // le lecteur CD : le tiroir, l'écran qui fait défiler le morceau
   zf = facade(.73, .1);
   boite(.36, .014, .008, noirHifi, chaine, -.18, .8, zf);
-  const lcd = toileTexte(512, 72);
+  const lcd = toileTexte(512, 72);   // pour PAUSE et les petits messages
+  const ruban = toileTexte(512, 72); ruban.t.wrapS = THREE.RepeatWrapping;   // le titre qui défile
   const ecran = new THREE.Mesh(new THREE.PlaneGeometry(.3, .044), new THREE.MeshBasicMaterial({ map: lcd.t, toneMapped: false }));
   ecran.position.set(.22, .775, zf + .005); chaine.add(ecran);
   boite(.31, .052, .006, noirHifi, chaine, .22, .775, zf + .002);
@@ -855,33 +861,52 @@ function lancer() {
   /* ═══════════════ l'écran de la chaîne ═══════════════ */
   let lcdTexte = 'MUSIC DISCOVERY', lcdDecalage = 0, lcdPolice = 'bold 42px ui-monospace, monospace';
   if (document.fonts) document.fonts.load('900 42px Doto').then(f => { if (f && f.length) lcdPolice = '900 42px Doto, ui-monospace, monospace'; }).catch(() => {});
-  function dessinerLcd(pause, t, message) {
-    const x = lcd.x;
-    x.fillStyle = '#06111c'; x.fillRect(0, 0, 512, 72);
-    x.fillStyle = '#8fdcff'; x.font = lcdPolice; x.textBaseline = 'middle';
-    if (message) { x.textAlign = 'center'; x.fillText(message, 256, 38); x.textAlign = 'left'; }
-    else if (pause) {
-      if (Math.floor(t * 1.4) % 2 === 0) { x.textAlign = 'center'; x.fillText('PAUSE', 256, 38); x.textAlign = 'left'; }
-    } else {
-      const sep = '   ·   ', largeur = x.measureText(lcdTexte + sep).width;
-      x.fillText(lcdTexte + sep + lcdTexte, 10 - (lcdDecalage % largeur), 38);
-    }
+  let rubanPour = '', fixePour = '';
+  function preparerRuban() {
+    const cle = lcdTexte + '|' + lcdPolice; if (cle === rubanPour) return; rubanPour = cle;
+    const c = ruban.c; let x = ruban.x; x.font = lcdPolice;
+    const largeur = Math.min(4096, Math.max(512, Math.ceil(x.measureText(lcdTexte + '   ·   ').width)));
+    if (c.width !== largeur) { c.width = largeur; ruban.t.dispose(); x = ruban.x; }
+    x.fillStyle = '#06111c'; x.fillRect(0, 0, c.width, 72);
+    x.fillStyle = '#8fdcff'; x.font = lcdPolice; x.textBaseline = 'middle'; x.textAlign = 'left';
+    x.fillText(lcdTexte + '   ·   ', 0, 38);
+    ruban.t.repeat.x = 512 / c.width; ruban.t.needsUpdate = true;
+  }
+  function dessinerFixe(texte) {
+    if (texte === fixePour) return; fixePour = texte;
+    const x = lcd.x; x.fillStyle = '#06111c'; x.fillRect(0, 0, 512, 72);
+    x.fillStyle = '#8fdcff'; x.font = lcdPolice; x.textBaseline = 'middle'; x.textAlign = 'center'; x.fillText(texte, 256, 38); x.textAlign = 'left';
     lcd.t.needsUpdate = true;
+  }
+  function dessinerLcd(pause, t, message) {
+    if (message || pause) {
+      dessinerFixe(message || 'PAUSE');
+      if (ecran.material.map !== lcd.t) ecran.material.map = lcd.t;
+      ecran.visible = !!message || Math.floor(t * 1.4) % 2 === 0;
+    } else {
+      preparerRuban();
+      if (ecran.material.map !== ruban.t) ecran.material.map = ruban.t;
+      ecran.visible = true;
+      ruban.t.offset.x = ((lcdDecalage - 10) / ruban.c.width) % 1;
+    }
   }
 
   const barres = new Array(12).fill(0), cretes = new Array(12).fill(0);
   let vitesseDisque = 0, neonAllume = false;
+  const cVert = new THREE.Color('#5dff9a'), cAmbre = new THREE.Color('#ffc14a'), cRouge = new THREE.Color('#ff4a3a'), cEteinte = new THREE.Color('#0f2117');
+  let spectreVide = false;
   function dessinerSpectre(joue) {
-    const x = spectre.x, e = Number(etat.energie) || 5;
-    x.fillStyle = '#050608'; x.fillRect(0, 0, 256, 64);
+    const e = Number(etat.energie) || 5;
+    if (!joue && vuForce <= .01 && spectreVide) return;   // éteint : rien à renvoyer à la carte graphique
+    spectreVide = !joue && vuForce <= .01 && barres.every(b => b < .01) && cretes.every(c => c < .01);
     for (let i = 0; i < 12; i++) {
       const vise = vuForce > .01 ? .85 + Math.random() * .15 : joue && !calme ? borne(.18 + Math.pow(Math.abs(Math.sin(phase * .5 + i * .9 + Math.sin(phase * .13 + i))), 2) * (.32 + e * .05) + (Math.random() - .5) * .2 - i * .012, 0, 1) : 0;
       barres[i] = lisse(barres[i], vise, vise > barres[i] ? .75 : .22);
       cretes[i] = Math.max(barres[i], cretes[i] - .02);
       const n = Math.round(barres[i] * 10), c = Math.min(9, Math.round(cretes[i] * 10));
-      for (let k = 0; k < 10; k++) { x.fillStyle = k < n || (k === c && c > 0) ? (k > 7 ? '#ff4a3a' : k > 5 ? '#ffc14a' : '#5dff9a') : 'rgba(93,255,154,.07)'; x.fillRect(4 + i * 21, 57 - k * 5.6, 17, 4); }
+      for (let k = 0; k < 10; k++) diodes.setColorAt(i * 10 + k, k < n || (k === c && c > 0) ? (k > 7 ? cRouge : k > 5 ? cAmbre : cVert) : cEteinte);
     }
-    spectre.t.needsUpdate = true;
+    diodes.instanceColor.needsUpdate = true;
   }
 
   /* ═══════════════ l'état de la musique ═══════════════ */
@@ -1187,7 +1212,7 @@ function lancer() {
     const w = parent.clientWidth, h = parent.clientHeight;
     if (!w || !h) return;
     // pas plus d'environ 2,4 millions de pixels à calculer, même en plein écran sur un grand iPad (moins de mémoire, moins de chaleur)
-    rendu.setPixelRatio(Math.max(1, Math.min(devicePixelRatio || 1, 1.75, Math.sqrt(2.4e6 / (w * h)))));
+    rendu.setPixelRatio(Math.max(1, Math.min(devicePixelRatio || 1, tactile ? 1.5 : 1.75, Math.sqrt((tactile ? 1.6e6 : 2.4e6) / (w * h)))));
     rendu.setSize(w, h, false);
     // en grand : la pièce se cadre dans la zone libre, entre la vidéo (sur téléphone) et l'afficheur du bas
     let haut = 0, bas = h;
@@ -1431,7 +1456,7 @@ function lancer() {
     if ((mus > .5) !== neonAllume) { neonAllume = mus > .5; dessinerNeon(neonAllume); }
     lueurNeon.intensity = mus * (.5 + nuit * .7);
     vinyleMural.rotation.z -= dt * ((etat.joue ? .55 : 0) + (depuis('pochette') < 1.6 ? 9 * (1.6 - depuis('pochette')) : 0));
-    ecranCadran.material.color.setScalar(.25 + mus * .75); ecranSpectre.material.color.setScalar(.35 + mus * .65);
+    ecranCadran.material.color.setScalar(.25 + mus * .75);
     notes.forEach(n => {
       if (n.vie <= 0) return;
       n.vie -= dt; n.m.position.addScaledVector(n.v, dt); n.v.y -= dt * .06;
@@ -1450,7 +1475,8 @@ function lancer() {
     if ((lcdT += dt) > .05) { lcdT = 0; if (etat.joue) lcdDecalage += 4.5; dessinerLcd(!etat.joue, t, t < finLcdMessage ? lcdMessage : ''); dessinerSpectre(etat.joue); }
     // la fenêtre : chaque minute, ou souvent quand il pleut
     cielT += dt;
-    if (cielT > (calme ? 30 : .1)) { cielT = 0; cielGris = tr; dessinerCiel(t, tr); }
+    const cielBouge = tr > .02 || Math.abs(tr - cielGris) > .01 || tranche.oiseaux || tranche.avion || tranche.cumulus || tranche.montgolfiere || tranche.nuagesRoses || tranche.clignotant || tranche.filante || tranche.etoiles;
+    if (cielT > (calme ? 30 : cielBouge ? .25 : 20)) { cielT = 0; cielGris = tr; dessinerCiel(t, tr); }
 
     // le nuage au-dessus de sa tête
     nuage.visible = tr > .03;
@@ -1519,7 +1545,7 @@ function lancer() {
     CADRES_IMG.forEach(c => chargeur.load(`img/salon/${c.nom}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; c.image.material.map = t; c.image.material.color.set('#ffffff'); c.image.material.needsUpdate = true; }, undefined, () => {}));
   }, { timeout: 1500 });
   window.Piece = { maj, placer, vue: () => { pres = !pres && parent === plein; cadrer(); return pres; } };
-  window.__pieceDebug = { THREE, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
+  window.__pieceDebug = { THREE, rendu, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
     // où se trouve un objet touchable à l'écran (pour les vérifications)
     ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },
     noms: () => CIBLES.map(c => c.nom) };   // pour les vérifications

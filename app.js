@@ -1626,8 +1626,19 @@ function allumer() {
   }
   m = m || parId[construireSuite(null, 1)[0]];
   entrerMachine();
+  // la page s'est rechargée en pleine écoute : on reprend le même morceau, là où il s'était coupé
+  if (coupure) { const c = coupure; coupure = null; jouerRadio(c.id, { debut: c.t > 5 ? c.t : 0 }); return; }
   if (m) jouerRadio(m.id);
 }
+// si Safari recharge la page pendant l'écoute (ça arrive sur iPad), on le saura : où on en était, toutes les 4 secondes
+const COUPURE = 'md-coupure';
+let coupure = (() => { try { const c = JSON.parse(sessionStorage.getItem(COUPURE)); return c && parId[c.id] && Date.now() - c.a < 30 * 60e3 ? c : null; } catch (e) { return null; } })();
+setInterval(() => {
+  try {
+    if (S.enLecture && S.joue) { const [t] = tempsActuel(); sessionStorage.setItem(COUPURE, JSON.stringify({ id: S.joue, t: Math.floor(t), a: Date.now() })); }
+    else if (S.pauseVoulue || !S.joue) sessionStorage.removeItem(COUPURE);
+  } catch (e) {}
+}, 4000);
 const demarre = () => document.body.classList.contains('allume');
 
 /* ─────────────────────────────── les actions ─────────────────────────────── */
@@ -1733,7 +1744,12 @@ chargerAPI();
 // pochettes, extraits et fiches de toute la sélection, préparés dès l'arrivée (puis gardés en cache)
 BANQUE.forEach(m => Pochettes.demander(m));
 if (IOS) $('#allumage-conseil').textContent = 'Sur iPhone, le volume se règle avec les boutons du téléphone : baisse-le un peu avant de commencer.';
-if (S.gardes.length || S.croises.length) {
+if (coupure) {
+  const r = $('#allumage-retour'), m = parId[coupure.id], t = coupure.t;
+  r.hidden = false;
+  r.textContent = `La page s'est rechargée en pleine écoute. Appuie sur « Reprendre » : « ${m.affiche} » repart à ${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}.`;
+  $('.interrupteur-label').textContent = 'Reprendre';
+} else if (S.gardes.length || S.croises.length) {
   const r = $('#allumage-retour');
   r.hidden = false;
   r.textContent = S.gardes.length
