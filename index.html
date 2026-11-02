@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=55">
+  <link rel="stylesheet" href="styles.css?v=57">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -265,6 +265,8 @@
           <div class="lcd-ligne lcd-bas"><span id="plein-source" class="lcd-disque"></span><span id="plein-etat" class="lcd-etat">STOP</span></div>
         </div>
       </div>
+      <!-- la suite, comme les trois disques sous la chaîne : plus calme, dans la lignée, plus mainstream… -->
+      <div class="plein-pile" id="plein-pile" role="radiogroup" aria-label="Le morceau d'après"></div>
       <div class="plein-commandes">
         <button class="rond" data-action="radio-precedent" aria-label="Morceau précédent" title="Morceau précédent (←)"><span class="icone icone-prec"></span></button>
         <button class="rond rond-lecture" data-action="radio-lecture" aria-label="Lecture / pause" title="Lecture / pause (Espace)"><span class="icone icone-lecture" id="plein-icone"></span></button>
@@ -348,9 +350,9 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
-  <script src="salon.js?v=8"></script>
-  <script src="app.js?v=59"></script>
-  <script type="module" src="piece.js?v=9"></script>
+  <script src="salon.js?v=9"></script>
+  <script src="app.js?v=60"></script>
+  <script type="module" src="piece.js?v=10"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

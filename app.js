@@ -78,6 +78,7 @@ const S = {
   lecture: null,          // 'yt' | 'extrait' | null
   enLecture: false,
   pauseVoulue: false,     // on a vraiment mis pause (ou stop) : là seulement, le perso du salon déprime
+  pauseA: 0, chargeA: 0,  // depuis quand c'est en pause ; quand le morceau a été lancé
   finTraitee: false,
   erreur: false,          // rien n'a pu être lu
   bloque: false,          // la lecture ne démarre pas toute seule
@@ -540,7 +541,12 @@ window.onYouTubeIframeAPIReady = () => {
       onStateChange: e => {
         if (S.lecture !== 'yt') return;
         if (e.data === YT.PlayerState.PLAYING) { S.enLecture = true; S.pauseVoulue = false; S.aJoue = true; S.bloque = false; S.echecs = 0; clearTimeout(demarrage); appliquerVolume(); }
-        if (e.data === YT.PlayerState.PAUSED) { S.enLecture = false; S.pauseVoulue = true; }
+        if (e.data === YT.PlayerState.PAUSED) {
+          S.enLecture = false;
+          // une « pause » que YouTube envoie tout seul (fin de vidéo, chargement du suivant) n'est pas une vraie pause
+          let t = 0, d = 0; try { t = lecteur.getCurrentTime() || 0; d = lecteur.getDuration() || 0; } catch (err) {}
+          if (!(d && t > d - 2) && Date.now() - S.chargeA > 3000) marquerPause();
+        }
         if (e.data === YT.PlayerState.ENDED) { S.enLecture = false; finDuMorceau(); }
         majEtat();
       },
@@ -621,7 +627,7 @@ function jouerMorceau(m, debut = 0) {
   S.erreur = false;
   S.bloque = false;
   S.aJoue = false;
-  S.pauseVoulue = false;
+  S.pauseVoulue = false; S.chargeA = Date.now();
   audioLecture.pause();
   if (!jouable(m)) { jouerExtraitComplet(m); return; }
   bonCommentaire(m, false);
@@ -678,15 +684,15 @@ audioLecture.addEventListener('error', () => {
   extraitIntrouvable(m);
 });
 audioLecture.addEventListener('ended', () => { if (S.lecture !== 'extrait') return; S.enLecture = false; majEtat(); finDuMorceau(); });
-audioLecture.addEventListener('pause', () => { if (S.lecture === 'extrait') { S.enLecture = false; if (!audioLecture.ended && audioLecture.dataset.id === S.joue) S.pauseVoulue = true; majEtat(); } });
+audioLecture.addEventListener('pause', () => { if (S.lecture === 'extrait') { S.enLecture = false; if (!audioLecture.ended && audioLecture.dataset.id === S.joue) marquerPause(); majEtat(); } });
 audioLecture.addEventListener('play', () => { if (S.lecture === 'extrait') { S.enLecture = true; S.pauseVoulue = false; S.bloque = false; majEtat(); } });
 
 function basculerLecture() {
   if (!S.joue) return;
-  if (S.lecture === 'extrait') { if (audioLecture.paused) audioLecture.play().catch(() => {}); else audioLecture.pause(); return; }
+  if (S.lecture === 'extrait') { if (audioLecture.paused) audioLecture.play().catch(() => {}); else { marquerPause(); audioLecture.pause(); } return; }
   if (S.lecture === 'yt' && lecteurPret) {
     const st = lecteur.getPlayerState();
-    if (st === YT.PlayerState.PLAYING) lecteur.pauseVideo(); else lecteur.playVideo();
+    if (st === YT.PlayerState.PLAYING) { marquerPause(); lecteur.pauseVideo(); } else lecteur.playVideo();
   } else jouerMorceau(parId[S.joue]);
 }
 function finDuMorceau() {
@@ -698,6 +704,11 @@ setInterval(() => {
   if (S.lecture !== 'yt' || !lecteurPret || S.finTraitee || !S.joue) return;
   try { if (lecteur.getPlayerState() === YT.PlayerState.ENDED) finDuMorceau(); } catch (e) {}
 }, 1500);
+// une vraie pause : le perso du salon ne déprime qu'au bout de deux secondes et demie (un simple accroc ne compte pas)
+function marquerPause() {
+  S.pauseVoulue = true; S.pauseA = Date.now();
+  clearTimeout(marquerPause.t); marquerPause.t = setTimeout(() => { if (S.pauseVoulue) majSalon(); }, 2600);
+}
 function majSalon() {
   const m = parId[S.joue];
   // au mur : la pochette du morceau qui passe, sinon celle du dernier écouté (ou d'un morceau au hasard)
@@ -705,12 +716,17 @@ function majSalon() {
   const im = affiche && Pochettes.image(affiche);
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
   // entre deux morceaux (le suivant charge, une pub passe), il attend tranquille ; il ne déprime que sur une vraie pause
-  const etat = { joue: S.enLecture, attente: !S.enLecture && !!m && !S.pauseVoulue, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
+  const etat = { joue: S.enLecture, attente: !S.enLecture && !!m && (!S.pauseVoulue || Date.now() - S.pauseA < 2500), bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
     titre: m ? m.affiche : '', artiste: m ? m.artiste : '', note: m && m.note ? typoFr(m.note) : '' };
   window.__salonEtat = etat;                                   // la pièce 3D le lit en arrivant
   if (typeof Salon !== 'undefined') Salon.maj(etat);
   if (window.Piece) window.Piece.maj(etat);
 }
+// ce dont la pièce 3D a besoin : un livret au hasard (un morceau avec le mot d'Amélien), et le lancer
+window.MD = {
+  auHasard() { const l = BANQUE.filter(m => m.note && m.id !== S.joue); const m = l.length && hasard(l); return m ? { id: m.id, titre: m.affiche, artiste: m.artiste, note: typoFr(m.note) } : null; },
+  jouer(id) { if (parId[id]) jouerRadio(id); },
+};
 /* le mode salon : la pièce en grand, la musique continue (Échap pour revenir) */
 function modeSalon(on) {
   const p = $('#salon-plein'); if (!p) return;
@@ -718,7 +734,7 @@ function modeSalon(on) {
   p.hidden = !on;
   const bv = $('.plein-vue'); if (bv && !on) { bv.setAttribute('aria-pressed', 'false'); bv.textContent = 'Plus près'; }
   document.body.classList.toggle('mode-salon', on);
-  majPlein();
+  majPlein(); majPleinPile();
   if (window.Piece) window.Piece.placer();
   placerEcranVideo();
   const b = on ? p.querySelector('.rond-lecture') : $('.salon-agrandir');
@@ -1117,7 +1133,7 @@ function radioStop() {
   clearTimeout(demarrage);
   try { if (S.lecture === 'yt') lecteur.stopVideo(); } catch (e) {}
   audioLecture.pause();
-  S.enLecture = false; S.lecture = null; S.bloque = false; S.pauseVoulue = true;
+  S.enLecture = false; S.lecture = null; S.bloque = false; marquerPause();
   clic(500, 0.05, 0.06);
   majEtat(); majMachine();
 }
@@ -1176,6 +1192,7 @@ function bidouiller(b) {
 }
 /* la pile : ta sélection ou la radio, puis les trois disques */
 function rendreTuner({ repose = false } = {}) {
+  majPleinPile();
   const m = parId[S.joue];
   // la radio ou ta sélection : seulement quand ta sélection a au moins deux morceaux
   const so = $('#sources');
@@ -1206,6 +1223,20 @@ function rendreTuner({ repose = false } = {}) {
   if (repose) { void el.offsetWidth; }
   majPostIt(m);
   majGarde();
+}
+// en mode salon : la même pile, en petit, dans la barre du bas (rappuyer sur celui qui est choisi le lance tout de suite)
+function majPleinPile() {
+  const el = $('#plein-pile'); if (!el) return;
+  if (!S.joue || !S.pile.length) { el.innerHTML = ''; el.hidden = true; return; }
+  el.hidden = false;
+  if (S.auto) { const p = S.pile[0]; el.innerHTML = `<span class="plein-pile-titre">Pilote automatique</span>${p ? `<span class="plein-choix choisi"><span class="plein-choix-mot">ensuite</span><span class="plein-choix-titre">${E(p.m.affiche)}</span></span>` : ''}`; return; }
+  el.innerHTML = `<span class="plein-pile-titre">Ensuite</span>` + S.pile.map((p, i) => {
+    const choisi = i === S.choix, im = Pochettes.image(p.m), mot = p.dir ? ETIQUETTES[p.dir] : 'dans la lignée';
+    return `<button class="plein-choix${choisi ? ' choisi' : ''}" data-action="choisir-disque" data-i="${i}" role="radio" aria-checked="${choisi}" title="${E(p.m.affiche)}, ${E(p.m.artiste)}${choisi ? ' : rappuie pour l\'écouter maintenant' : ''}">
+      <span class="plein-choix-pochette"${im ? ` style="background-image:url('${E(im.src)}')"` : ''}></span>
+      <span class="plein-choix-textes"><span class="plein-choix-mot">${E(mot)}</span><span class="plein-choix-titre">${E(p.m.affiche)}</span></span>
+    </button>`;
+  }).join('');
 }
 /* sans vraie pochette, on en fabrique une, façon label de disques : une image de la vidéo
    en bichromie et le titre composé en grand. Trois maquettes (et une couleur par morceau) */

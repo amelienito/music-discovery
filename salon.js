@@ -288,13 +288,14 @@ const Salon = (() => {
     if (danse >= 6) return 'groove';
     return 'detente';
   }
-  function maj({ joue = false, bpm = 96, energie = 5, danse = 5, pochette = null } = {}) {
+  function maj({ joue = false, attente = false, bpm = 96, energie = 5, danse = 5, pochette = null } = {}) {
     let b = Number(bpm) || 96;
     while (b > 132) b /= 2;
     while (b < 66) b *= 2;
     salons.forEach(el => {
-      el.classList.toggle('joue', !!joue);
-      ['doux', 'energie', 'groove', 'detente'].forEach(h => el.classList.toggle('humeur-' + h, !!joue && humeurDe(energie, danse) === h));
+      // entre deux morceaux, il attend tranquille : la lumière reste chaude, il est détendu
+      el.classList.toggle('joue', !!joue); el.classList.toggle('attente', !joue && !!attente);
+      ['doux', 'energie', 'groove', 'detente'].forEach(h => el.classList.toggle('humeur-' + h, joue ? humeurDe(energie, danse) === h : !!attente && h === 'detente'));
       el.style.setProperty('--battement', (60 / b).toFixed(3) + 's');
       el.style.setProperty('--amplitude', (2.5 + Math.min(10, energie) * .55).toFixed(2) + 'deg');
       const im = el.querySelector('.cadre-pochette');
