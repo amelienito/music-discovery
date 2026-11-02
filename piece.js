@@ -170,7 +170,7 @@ function lancer() {
   }
   // le mur du fond : l'album d'Amélien au-dessus de la colonne de gauche, l'illustration de Massy au-dessus du fauteuil, Kerry James Marshall à côté
   cadreImage('mode-creatif', .46, .46, piece, -2.95, 1.7, FOND + .03, 0, 'Mode Créatif, l’album d’Amélien');
-  cadreImage('massy', .5, .667, piece, -.42, 1.76, FOND + .03, 0, 'Illustration de Massy pour Cul7ure');
+  cadreImage('massy', .62, .827, piece, -.42, 1.75, FOND + .03, 0, 'Illustration de MassyPuster pour 7C');
   cadreImage('marshall', .3, .374, piece, .3, 1.66, FOND + .03, 0, 'Kerry James Marshall');
   // le mur de gauche, entre le coin et la bibliothèque : Seta, Junji Ito, The Boondocks
   cadreImage('seta', .38, .38, piece, -LARG + .03, 1.56, -2.22, Math.PI / 2, 'Seta, chez Cul7ure');
@@ -870,18 +870,24 @@ function lancer() {
     { a: 2.2, c: [-.48, .96, -.6], w: 6.4, h: 2.9, fov: 34 },
   ];
   const DIR = new THREE.Vector3(.07, .3, 1).normalize(), HAUT_Y = new THREE.Vector3(0, 1, 0);
-  const cadreActuel = { c: new THREE.Vector3(), d: 5 };
+  const cadreActuel = { c: new THREE.Vector3(), d: 5, dir: new THREE.Vector3().copy(DIR) }, cadreVise = { c: new THREE.Vector3(), d: 5, dir: new THREE.Vector3().copy(DIR), suit: false };
+  let pres = false, cadrePret = false, derniereCam = 0;
+  const _poitrine = new THREE.Vector3();
   function cadrer() {
     const a = camera.aspect;
     let i = 0; while (i < CADRES.length - 2 && a > CADRES[i + 1].a) i++;
     const A = CADRES[i], B = CADRES[i + 1], f = borne((a - A.a) / (B.a - A.a), 0, 1);
-    const fov = lisse(A.fov, B.fov, f);
+    let fov = lisse(A.fov, B.fov, f);
     let w = lisse(A.w, B.w, f), h = lisse(A.h, B.h, f);
-    cadreActuel.c.set(lisse(A.c[0], B.c[0], f), lisse(A.c[1], B.c[1], f), lisse(A.c[2], B.c[2], f));
-    if (parent === plein && a < 1) cadreActuel.c.y -= .45;    // en grand sur téléphone : la pièce remonte, les commandes sont en bas
-    if (parent === plein && a >= 1) { w = Math.max(w, 6.9); h = Math.max(h, 3.2); cadreActuel.c.x = -.22; cadreActuel.c.y -= .08; }   // en grand sur ordinateur : toute la pièce, porte comprise
+    cadreVise.c.set(lisse(A.c[0], B.c[0], f), lisse(A.c[1], B.c[1], f), lisse(A.c[2], B.c[2], f));
+    cadreVise.dir.copy(DIR); cadreVise.suit = false;
+    if (parent === plein && a >= 1) { w = Math.max(w, 6.9); h = Math.max(h, 3.2); cadreVise.c.set(-.22, .88, -.62); }   // en grand sur ordinateur : toute la pièce, porte comprise
+    // en grand sur téléphone : vue un peu plus plongeante, pour que toute la pièce tienne entre la vidéo et l'afficheur
+    if (parent === plein && a < 1) { w = 6.95; h = 3.4; fov = 50; cadreVise.c.set(-.25, .6, -.35); cadreVise.dir.set(.06, .95, 1).normalize(); }
+    // « plus près » : on se rapproche de lui
+    if (parent === plein && pres) { w = a < 1 ? 1.7 : 2.6; h = 1.75; cadreVise.suit = true; cadreVise.dir.copy(DIR); }
     const tv = Math.tan(fov * Math.PI / 360);
-    cadreActuel.d = Math.max(h / 2 / tv, w / 2 / (tv * a));
+    cadreVise.d = Math.max(h / 2 / tv, w / 2 / (tv * a));
     camera.fov = fov; camera.updateProjectionMatrix();
   }
   let px = 0, py = 0, cx = 0, cy = 0, souris = false;
@@ -892,7 +898,12 @@ function lancer() {
     if (essai) { camera.position.set(...essai.p); camera.lookAt(...essai.l); if (essai.fov && camera.fov !== essai.fov) { camera.fov = essai.fov; camera.updateProjectionMatrix(); } return; }
     if (!souris) { px = ondule(Math.sin(ms / 5200) * .55); py = ondule(Math.sin(ms / 7300) * .3); }
     cx = lisse(cx, px, .05); cy = lisse(cy, py, .05);
-    _dir.copy(DIR).applyAxisAngle(HAUT_Y, cx * .11); _dir.y += cy * .035; _dir.normalize();
+    // on glisse doucement d'un cadre à l'autre (toute la pièce, plus près…)
+    if (cadreVise.suit) { tete.getWorldPosition(_poitrine); _poitrine.y -= .3; cadreVise.c.copy(_poitrine); }
+    const k = !cadrePret || calme ? 1 : 1 - Math.exp(-Math.min(.1, (ms - derniereCam) / 1000) * 3.5);
+    derniereCam = ms; cadrePret = true;
+    cadreActuel.c.lerp(cadreVise.c, k); cadreActuel.d = lisse(cadreActuel.d, cadreVise.d, k); cadreActuel.dir.lerp(cadreVise.dir, k).normalize();
+    _dir.copy(cadreActuel.dir).applyAxisAngle(HAUT_Y, cx * .11); _dir.y += cy * .035; _dir.normalize();
     camera.position.copy(cadreActuel.c).addScaledVector(_dir, cadreActuel.d);
     camera.lookAt(cadreActuel.c);
   }
@@ -902,8 +913,18 @@ function lancer() {
     const w = parent.clientWidth, h = parent.clientHeight;
     if (!w || !h) return;
     rendu.setSize(w, h, false);
-    camera.aspect = w / h;
+    // en grand : la pièce se cadre dans la zone libre, entre la vidéo (sur téléphone) et l'afficheur du bas
+    let haut = 0, bas = h;
+    if (parent === plein) {
+      const r0 = parent.getBoundingClientRect(), autour = parent.parentElement;
+      const barre = autour.querySelector('.plein-barre'), video = autour.querySelector('.plein-video'), vue = autour.querySelector('.plein-vue');
+      if (w / h < 1) haut = Math.max(video ? video.getBoundingClientRect().bottom : 0, vue ? vue.getBoundingClientRect().bottom : 0) - r0.top + 6;
+      if (barre) bas = barre.getBoundingClientRect().top - r0.top + 22;
+      haut = borne(haut, 0, h * .4); bas = borne(bas, haut + 120, h);
+    }
+    camera.aspect = w / (bas - haut);
     cadrer();
+    if (haut > 0 || bas < h) camera.setViewOffset(w, bas - haut, 0, -haut, w, h); else camera.clearViewOffset();
     mesurerPensee();
   }
 
@@ -949,7 +970,7 @@ function lancer() {
   cible(zone(.5, .8, .4, buste, 0, .4, 0), 'Amélien', () => {
     if (!etat.joue) { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
     lancerActivite('salut');
-    return { texte: hasard(['Salut !', 'Ça te plaît ?', 'Toujours le H.I.P.-H.O.P.', 'Monte le son !']) };
+    return { texte: hasard(['Monte le son', 'Toujours le hip hop, ça dégage']) };
   });
   cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return { texte: 'Il pleut dans sa tête.' }; });
   // les passerelles
@@ -957,7 +978,7 @@ function lancer() {
   cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Y aller' }; });
   cible(ordi, 'L’ordi', () => { if (etat.joue && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
   cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; });
-  cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : un terrier de faits vérifiés', lien: ALLER.faits, quoi: 'Ouvrir' }; });
+  cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; });
   // les objets futiles
   cible(chat, 'Le chat', () => { reagir('chat'); return { texte: hasard(['Mrrr…', 'Miaou.', '(il se rendort)']) }; });
   const zoneLampe = zone(.2, 2.2, .2, lampe, 0, 1.1, 0); zone(.44, .3, .44, zoneLampe, -.68, 1.17, .46);
@@ -967,12 +988,12 @@ function lancer() {
     const h = Math.floor((new Date().getHours() + decalageHeure) % 24);
     return { texte: decalageHeure ? `Et s’il était ${h} h ? (pour de faux)` : 'Retour à l’heure qu’il est.' };
   });
-  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.hp.parent, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return { texte: hasard(['Boum.', 'Les voisins vont adorer.', 'Ça, c’est du grave.']) }; }); });
+  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.hp.parent, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return { texte: 'Ça c’est du grave' }; }); });
   cible(zone(.74, .4, .42, chaine, 0, .73, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return { texte: 'Les aiguilles s’affolent.' }; });
   cible(plante, 'La plante', () => { reagir('plante'); return { texte: hasard(['Elle a soif.', 'Elle danse aussi.']) }; });
   cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { const l = hasard(livresMobiles); if (l) { l.userData.sortie = horloge; } return { texte: 'Un livre au hasard…' }; });
   cible(zone(.5, .2, .5, table, 0, .62, 0), 'La carafe', () => { if (etat.joue && !activite) lancerActivite('boire'); return { texte: 'Santé.' }; });
-  cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf.' }; });
+  cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return { texte: 'Awouuu. (le loup de Cul7ure)' }; });
   cible(poster, 'Le poster', () => { poster.userData.penche = !poster.userData.penche; return { texte: etat.titre ? `${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
   CADRES_IMG.forEach(c => cible(c.g, c.legende, () => { c.g.userData.penche = !c.g.userData.penche; return { texte: c.legende }; }));
@@ -1161,6 +1182,7 @@ function lancer() {
     visible = !!cible;
     if (cible && cible !== parent) {
       if (parent) parent.classList.remove('triste');
+      if (cible !== plein) pres = false;
       parent = cible;
       cible.append(toile, pensee, ...points, etiquette, survol);
       taille();
@@ -1190,7 +1212,7 @@ function lancer() {
   (window.requestIdleCallback || (f => setTimeout(f, 400)))(() => {
     CADRES_IMG.forEach(c => chargeur.load(`img/salon/${c.nom}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; c.image.material.map = t; c.image.material.color.set('#ffffff'); c.image.material.needsUpdate = true; }, undefined, () => {}));
   }, { timeout: 1500 });
-  window.Piece = { maj, placer };
+  window.Piece = { maj, placer, vue: () => { pres = !pres && parent === plein; cadrer(); return pres; } };
   window.__pieceDebug = { THREE, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
     // où se trouve un objet touchable à l'écran (pour les vérifications)
     ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },

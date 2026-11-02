@@ -712,6 +712,7 @@ function modeSalon(on) {
   const p = $('#salon-plein'); if (!p) return;
   if (on && !document.body.classList.contains('piece-3d')) return;
   p.hidden = !on;
+  const bv = $('.plein-vue'); if (bv && !on) { bv.setAttribute('aria-pressed', 'false'); bv.textContent = 'Plus près'; }
   document.body.classList.toggle('mode-salon', on);
   majPlein();
   if (window.Piece) window.Piece.placer();
@@ -725,6 +726,22 @@ function majPlein() {
   $('#plein-titre').textContent = m ? m.affiche : 'Rien ne joue';
   $('#plein-artiste').textContent = m ? m.artiste : 'Appuie sur lecture';
   $('#plein-icone').classList.toggle('pause', S.enLecture);
+  majPleinLCD();
+  majDisque();
+}
+// l'écran à cristaux liquides du mode salon : le même que celui de la chaîne, en plus petit
+function majPleinLCD() {
+  if (!document.body.classList.contains('mode-salon')) return;
+  ['piste', 'etat', 'temps'].forEach(k => { const a = $(`#lcd-${k}`), b = $(`#plein-${k}`); if (a && b) b.textContent = a.textContent; });
+  $('#plein-source').textContent = $('#lcd-disque').textContent;
+  const t = $('#lcd-texte').textContent;
+  if ($('#plein-texte').textContent !== t) texteLCD($('#plein-texte'), t);
+}
+// plus près de lui, ou toute la pièce
+function vueSalon(b) {
+  const pres = window.Piece && window.Piece.vue ? window.Piece.vue() : false;
+  b.setAttribute('aria-pressed', pres);
+  b.textContent = pres ? 'Toute la pièce' : 'Plus près';
 }
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
@@ -786,6 +803,7 @@ setInterval(() => {
   if (S.vue !== 'machine' || !S.joue || !S.lecture) return;
   const [t] = tempsActuel();
   $('#lcd-temps').textContent = $('#etq-temps').textContent = `${deux(t / 60)}:${deux(t % 60)}`;
+  const pt = $('#plein-temps'); if (pt) pt.textContent = $('#lcd-temps').textContent;
   if (t >= 40 && S.enLecture) montrerAide();
 }, 500);
 
@@ -989,14 +1007,16 @@ function disqueHTML(k, extra = '') {
 }
 /* le disque imprimé : la pochette du morceau qui passe, en picture disc */
 function majDisque() {
-  const d = $('#disque-tiroir');
   const m = parId[S.joue];
   const img = m && Pochettes.image(m);
-  if (!d) return;
-  d.classList.toggle('disque-image', !!img);
-  d.classList.toggle('disque-yt', !!(img && img.yt));
-  if (img) d.style.setProperty('--pochette', `url("${img.src.replace(/"/g, '%22')}")`);
-  else d.style.removeProperty('--pochette');
+  // le disque de la chaîne, et celui du mode salon
+  [$('#disque-tiroir'), $('#plein-disque')].forEach(d => {
+    if (!d) return;
+    d.classList.toggle('disque-image', !!img);
+    d.classList.toggle('disque-yt', !!(img && img.yt));
+    if (img) d.style.setProperty('--pochette', `url("${img.src.replace(/"/g, '%22')}")`);
+    else d.style.removeProperty('--pochette');
+  });
 }
 // une spirale, pour la vitesse « hypno », et l'anneau stroboscopique du disque
 (function () {
@@ -1334,12 +1354,14 @@ function majAfficheur() {
   document.body.classList.toggle('chaine-allumee', true);
   if (m && m.bpm) document.body.style.setProperty('--battement', `${(60 / (m.bpm > 140 ? m.bpm / 2 : m.bpm)).toFixed(3)}s`);
   lancerSpectre();
+  majPleinLCD();
 }
 /* le petit égaliseur de l'écran : il bat au tempo du morceau (on ne peut pas analyser
    le son de YouTube, alors il danse d'après la fiche : tempo et énergie) */
 const BARRES = 18;
 $('#lcd-spectre').innerHTML = '<i></i>'.repeat(BARRES);
-const barres = $$('#lcd-spectre i');
+if ($('#plein-spectre')) $('#plein-spectre').innerHTML = '<i></i>'.repeat(BARRES);
+const barres = $$('#lcd-spectre i'), barresPlein = $$('#plein-spectre i');
 const pics = new Array(BARRES).fill(0);
 let spectreRAF = null, spectreDernier = 0;
 function lancerSpectre() {
@@ -1351,6 +1373,7 @@ function animerSpectre(t) {
   if (S.vue !== 'machine' || !S.enLecture) {
     spectreRAF = null;
     barres.forEach((b, i) => { b.style.setProperty('--h', '0.06'); pics[i] = 0; b.style.setProperty('--pic', 0); });
+    barresPlein.forEach(b => { b.style.setProperty('--h', '0.06'); b.style.setProperty('--pic', 0); });
     majVU(0, 0);
     return;
   }
@@ -1369,6 +1392,7 @@ function animerSpectre(t) {
     pics[i] = Math.max(h, pics[i] - 0.035);
     b.style.setProperty('--h', h.toFixed(2));
     b.style.setProperty('--pic', ((pics[i] - h) * 52).toFixed(1));
+    if (barresPlein[i]) { barresPlein[i].style.setProperty('--h', h.toFixed(2)); barresPlein[i].style.setProperty('--pic', ((pics[i] - h) * 24).toFixed(1)); }
   });
   majVU(...niveaux());
 }
@@ -1559,6 +1583,7 @@ const ACTIONS = {
   'radio-lecture': radioLecture,
   'mode-salon': () => modeSalon(true),
   'quitter-salon': () => modeSalon(false),
+  'salon-vue': b => vueSalon(b),
   'radio-suivant': radioSuivant,
   'radio-precedent': radioPrecedent,
   'radio-stop': radioStop,

@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=53">
+  <link rel="stylesheet" href="styles.css?v=54">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -252,14 +252,25 @@
     <div class="salon" data-salon data-plein></div>
     <div class="plein-video" data-emplacement="salon"></div>
     <p class="plein-astuce">Touche les objets de la pièce</p>
+    <button class="plein-vue" data-action="salon-vue" aria-pressed="false">Plus près</button>
+    <!-- la face avant de la chaîne, en petit : le disque qui tourne, l'écran à cristaux liquides, les commandes -->
     <div class="plein-barre">
-      <p class="plein-morceau"><strong id="plein-titre"></strong><span id="plein-artiste"></span></p>
+      <p class="plein-morceau visuellement-cache"><strong id="plein-titre"></strong> <span id="plein-artiste"></span></p>
+      <div class="plein-facade">
+        <div class="plein-hublot" aria-hidden="true"><span class="disque disque-hasard plein-disque" id="plein-disque"></span></div>
+        <div class="lcd plein-lcd" aria-hidden="true">
+          <div class="lcd-ligne lcd-haut"><span class="lcd-badge">CD</span><span class="lcd-piste">TRK <b id="plein-piste">--</b></span><span id="plein-temps" class="lcd-temps">--:--</span></div>
+          <div class="lcd-defile"><span id="plein-texte">APPUIE SUR LECTURE</span></div>
+          <div class="lcd-spectre plein-spectre" id="plein-spectre"></div>
+          <div class="lcd-ligne lcd-bas"><span id="plein-source" class="lcd-disque"></span><span id="plein-etat" class="lcd-etat">STOP</span></div>
+        </div>
+      </div>
       <div class="plein-commandes">
         <button class="rond" data-action="radio-precedent" aria-label="Morceau précédent" title="Morceau précédent (←)"><span class="icone icone-prec"></span></button>
         <button class="rond rond-lecture" data-action="radio-lecture" aria-label="Lecture / pause" title="Lecture / pause (Espace)"><span class="icone icone-lecture" id="plein-icone"></span></button>
         <button class="rond" data-action="radio-suivant" aria-label="Morceau suivant" title="Morceau suivant (→)"><span class="icone icone-suiv"></span></button>
       </div>
-      <button class="plein-fermer" data-action="quitter-salon">Revenir à la chaîne</button>
+      <button class="plein-fermer" data-action="quitter-salon"><span aria-hidden="true">✕</span> <span class="plein-fermer-texte">Revenir à la chaîne</span></button>
     </div>
   </div>
 
@@ -324,13 +335,13 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=30"></script>
+  <script src="data.js?v=31"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=8"></script>
-  <script src="app.js?v=56"></script>
-  <script type="module" src="piece.js?v=5"></script>
+  <script src="app.js?v=57"></script>
+  <script type="module" src="piece.js?v=6"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

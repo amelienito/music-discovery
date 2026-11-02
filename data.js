@@ -1360,6 +1360,183 @@ const MORCEAUX = [
     tags: ["rnb", "live", "voix", "tiny desk"],
     energie: 5, etrange: 3, danse: 5 },
 
+
+  /* ─── la table de tri, novembre 2026 : 29 morceaux (le reste des commentaires viendra plus tard) ─── */
+
+  { titre: "Dr. Bird's", artiste: "Griselda", album: "WWCD",
+    lien: "https://music.youtube.com/watch?v=-ynm4H8IyhY", note: "BRRRRRRRR",
+    ambiance: "bitume", style: "Rap de Buffalo, boom bap crasseux", annee: 2019, bpm: 84, voix: "rap",
+    tags: ["rap", "boom bap", "griselda", "buffalo"],
+    energie: 6, etrange: 5, danse: 3 },
+
+  { titre: "Blasé", artiste: "Niro", album: "OX7",
+    lien: "https://music.youtube.com/watch?v=cuV18iAS_EE", note: "",
+    ambiance: "bitume", style: "Rap français sombre", annee: 2017, bpm: 76, voix: "rap",
+    tags: ["rap", "rap français", "sombre"],
+    energie: 5, etrange: 5, danse: 3 },
+
+  { titre: "Sunny Days", artiste: "SahBabii feat. itzMrT3", album: "S.A.N.D.A.S.",
+    lien: "https://music.youtube.com/watch?v=FWCaOMab4QU", note: "AirPods dans l'avion en disant au revoir à la France macronnienne",
+    ambiance: "soleil", style: "Trap mélodique d'Atlanta", annee: 2017, bpm: 136, voix: "rap",
+    tags: ["rap", "trap", "mélodique", "atlanta"],
+    energie: 4, etrange: 6, danse: 5 },
+
+  { titre: "Comme si", artiste: "SCH", album: "A7",
+    lien: "https://music.youtube.com/watch?v=SlBSwK_5xn8", note: "Comment te retrouver ?",
+    ambiance: "bitume", style: "Rap marseillais nocturne", annee: 2015, bpm: 72, voix: "rap",
+    tags: ["rap", "rap français", "marseille", "nuit"],
+    energie: 4, etrange: 3, danse: 4 },
+
+  { titre: "Silkk da Shocka", artiste: "Isaiah Rashad feat. Syd", album: "The Sun's Tirade",
+    lien: "https://music.youtube.com/watch?v=x-kKDPTKuNs", note: "",
+    ambiance: "brume", style: "Rap lo-fi, TDE", annee: 2016, bpm: 80, voix: "rap",
+    tags: ["rap", "lo-fi", "soul", "tde"],
+    energie: 3, etrange: 5, danse: 4 },
+
+  { titre: "Il est fou ce monde", artiste: "Le Rat Luciano", album: "Mode de vie… béton style",
+    lien: "https://music.youtube.com/watch?v=xW0fRKvtIik", note: "Et il est encore plus fou ce monde",
+    ambiance: "bitume", style: "Rap marseillais", annee: 2000, bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "marseille", "fonky family"],
+    energie: 5, etrange: 5, danse: 4 },
+
+  { titre: "Futuristiq Ich Madinina", artiste: "Imhotep Clan", album: "",
+    lien: "https://music.youtube.com/watch?v=-hUsjtPqGIE", note: "",
+    ambiance: "bitume", style: "Rap antillais", bpm: 90, voix: "rap",
+    tags: ["rap", "antilles", "martinique"],
+    energie: 5, etrange: 8, danse: 4 },
+
+  { titre: "Dear Summer", artiste: "Jay-Z", album: "534 (Memphis Bleek)",
+    lien: "https://music.youtube.com/watch?v=KnK0Ra2RWmU", note: "C'était même pas sur son propre album, il fait ça",
+    ambiance: "bitume", style: "Rap new-yorkais, samples soul", annee: 2005, bpm: 88, voix: "rap",
+    tags: ["rap", "samples soul", "just blaze", "new york"],
+    energie: 4, etrange: 3, danse: 4 },
+
+  { titre: "J'suis pas un player", artiste: "Alpha Wann", album: "",
+    lien: "https://music.youtube.com/watch?v=VUmghnF4nYg", note: "",
+    ambiance: "bitume", style: "Rap français technique", bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "egotrip"],
+    energie: 6, etrange: 4, danse: 4 },
+
+  { titre: "Les maux", artiste: "Tandem", album: "Ceux qui le savent m'écoutent",
+    lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "",
+    ambiance: "bitume", style: "Rap du 93", annee: 2001, bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "93", "hardcore"],
+    energie: 6, etrange: 6, danse: 3 },
+
+  { titre: "Des voix dans ma tête", artiste: "Dany Dan", album: "Spécial Dany Dan Vol. 2",
+    lien: "https://music.youtube.com/watch?v=eVauEHssGj8", note: "",
+    ambiance: "bitume", style: "Rap français, Sages Poètes de la Rue", annee: 2004, bpm: 92, voix: "rap",
+    tags: ["rap", "rap français", "boom bap"],
+    energie: 5, etrange: 6, danse: 4 },
+
+  { titre: "La nuit", artiste: "Seth Gueko", album: "Barillet plein",
+    lien: "https://music.youtube.com/watch?v=NEbKHRkBwSc", note: "",
+    ambiance: "bitume", style: "Rap du 95, nocturne", annee: 2008, bpm: 85, voix: "rap",
+    tags: ["rap", "rap français", "nuit", "néochrome"],
+    energie: 5, etrange: 5, danse: 3 },
+
+  { titre: "Can You Keep Up", artiste: "Busta Rhymes feat. Twista", album: "",
+    lien: "https://music.youtube.com/watch?v=veflCk2rHfA", note: "",
+    ambiance: "bitume", style: "Rap à toute vitesse", bpm: 95, voix: "rap",
+    tags: ["rap", "flow rapide", "chicago", "new york"],
+    energie: 9, etrange: 4, danse: 5 },
+
+  { titre: "Best Day Ever", artiste: "Mac Miller", album: "Best Day Ever",
+    lien: "https://music.youtube.com/watch?v=AbV-Q6tz4B8", note: "RIP également", debut: 95,
+    ambiance: "soleil", style: "Rap insouciant de Pittsburgh", annee: 2011, bpm: 90, voix: "rap",
+    tags: ["rap", "samples", "insouciance"],
+    energie: 4, etrange: 3, danse: 5 },
+
+  { titre: "Noir", artiste: "Sexion d'Assaut", album: "En attendant L'Apogée : Les Chroniques du 75",
+    lien: "https://music.youtube.com/watch?v=XOAU2lpoEKw", note: "",
+    ambiance: "bitume", style: "Rap parisien", annee: 2011, bpm: 85, voix: "rap",
+    tags: ["rap", "rap français", "sombre"],
+    energie: 6, etrange: 3, danse: 4 },
+
+  { titre: "Dur d'y croire", artiste: "Salif", album: "Tous ensemble, chacun pour soi",
+    lien: "https://music.youtube.com/watch?v=dIh0RVeuQ_o", note: "",
+    ambiance: "bitume", style: "Rap de Boulogne, introspectif", annee: 2001, bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "introspectif"],
+    energie: 4, etrange: 6, danse: 3 },
+
+  { titre: "Jour 2 tonnerre", artiste: "Ärsenik", album: "Quelques gouttes suffisent…",
+    lien: "https://music.youtube.com/watch?v=qkHhJww1KY4", note: "RIP Calbo",
+    ambiance: "bitume", style: "Rap hardcore de Villiers-le-Bel", annee: 1998, bpm: 92, voix: "rap",
+    tags: ["rap", "rap français", "hardcore", "années 90"],
+    energie: 7, etrange: 4, danse: 3 },
+
+  { titre: "Mockingbird", artiste: "Eminem", album: "Encore",
+    lien: "https://music.youtube.com/watch?v=S9bCLPwzSC0", note: "",
+    ambiance: "brume", style: "Rap intime", annee: 2004, bpm: 84, voix: "rap",
+    tags: ["rap", "intime", "piano"],
+    energie: 3, etrange: 1, danse: 2 },
+
+  { titre: "Surnakkurel 3", artiste: "Nakk", album: "Street Minimum",
+    lien: "https://music.youtube.com/watch?v=UG3YB-fwhfE", note: "Le refrain peut sauver si jamais",
+    ambiance: "bitume", style: "Rap français introspectif", annee: 2006, bpm: 88, voix: "rap",
+    tags: ["rap", "rap français", "introspectif"],
+    energie: 5, etrange: 7, danse: 3 },
+
+  { titre: "Int'l Players Anthem (I Choose You)", artiste: "UGK feat. OutKast", album: "Underground Kingz",
+    lien: "https://music.youtube.com/watch?v=awMIbA34MT8", note: "",
+    ambiance: "soleil", style: "Rap du Sud, cuivres soul", annee: 2007, bpm: 77, voix: "rap",
+    tags: ["rap", "rap du sud", "samples soul", "houston"],
+    energie: 6, etrange: 2, danse: 6 },
+
+  { titre: "Sippin' on Some Syrup", artiste: "Three 6 Mafia feat. UGK & Project Pat", album: "When the Smoke Clears: Sixty 6, Sixty 1",
+    lien: "https://music.youtube.com/watch?v=lOWKGXpl9E0", note: "",
+    ambiance: "bitume", style: "Rap de Memphis", annee: 2000, bpm: 75, voix: "rap",
+    tags: ["rap", "rap du sud", "memphis"],
+    energie: 5, etrange: 4, danse: 6 },
+
+  { titre: "L'unité", artiste: "La Fouine feat. J-Mi Sissoko", album: "Bourré au son",
+    lien: "https://music.youtube.com/watch?v=B51xiSIIaco", note: "",
+    ambiance: "bitume", style: "Rap français", annee: 2005, bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "fraternité"],
+    energie: 6, etrange: 4, danse: 4 },
+
+  { titre: "L'avenir est à nous", artiste: "Kool Shen", album: "Dernier round",
+    lien: "https://music.youtube.com/watch?v=a0iufpPgXtw", note: "",
+    ambiance: "bitume", style: "Rap français", annee: 2004, bpm: 92, voix: "rap",
+    tags: ["rap", "rap français", "ntm"],
+    energie: 6, etrange: 3, danse: 5 },
+
+  { titre: "Quand j'serai grand", artiste: "Fabe", album: "",
+    lien: "https://music.youtube.com/watch?v=-VJsvx2UAR0", note: "Dédicace à ceux qui partent et ceux qui partent pas",
+    ambiance: "bitume", style: "Rap français des années 90", bpm: 90, voix: "rap",
+    tags: ["rap", "rap français", "années 90", "scred"],
+    energie: 4, etrange: 6, danse: 4 },
+
+  { titre: "Candy Shop", artiste: "50 Cent feat. Olivia", album: "The Massacre",
+    lien: "https://music.youtube.com/watch?v=IZKBa6bvUjo", note: "",
+    ambiance: "piste", style: "Rap club, G-Unit", annee: 2005, bpm: 103, voix: "rap",
+    tags: ["rap", "club", "g-unit"],
+    energie: 6, etrange: 1, danse: 8 },
+
+  { titre: "Do for Love (mash-up avec Nujabes)", artiste: "2Pac & Nujabes", album: "",
+    lien: "https://music.youtube.com/watch?v=HrzDZ0imS2Y", note: "Je le remets en souvenir de tous ces remixs pas officiels",
+    ambiance: "brume", style: "Mash-up : 2Pac sur Nujabes", bpm: 90, voix: "rap",
+    tags: ["rap", "nujabes", "jazz rap", "remix"],
+    energie: 3, etrange: 6, danse: 5 },
+
+  { titre: "Symphony 2000", artiste: "EPMD feat. Redman, Method Man & Lady Luck", album: "Out of Business",
+    lien: "https://music.youtube.com/watch?v=A2PMcWSdLjo", note: "",
+    ambiance: "bitume", style: "Rap new-yorkais, posse cut", annee: 1999, bpm: 94, voix: "rap",
+    tags: ["rap", "boom bap", "posse cut", "new york"],
+    energie: 7, etrange: 5, danse: 5 },
+
+  { titre: "One Day", artiste: "UGK", album: "Ridin' Dirty",
+    lien: "https://music.youtube.com/watch?v=rCWH2MmlHQE", note: "",
+    ambiance: "soleil", style: "Rap du Sud, soul", annee: 1996, bpm: 66, voix: "rap",
+    tags: ["rap", "rap du sud", "soul", "houston"],
+    energie: 3, etrange: 5, danse: 4 },
+
+  { titre: "Chanson triste", artiste: "Nakk", album: "Street Minimum",
+    lien: "https://music.youtube.com/watch?v=O5qpCh3fAB0", note: "",
+    ambiance: "brume", style: "Rap français mélancolique", annee: 2006, bpm: 80, voix: "rap",
+    tags: ["rap", "rap français", "mélancolie"],
+    energie: 3, etrange: 7, danse: 3 },
+
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
@@ -1386,4 +1563,5 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=BSHhX8nypcY", // Sherine, Bi Kelma Menak
   "https://music.youtube.com/watch?v=oKjN_WrbbWA", // Release, Minimum (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=SEpJx322NIc", // David Ruffin, I Miss You (Part 1), autre version (le site garde l'autre)
+  "https://music.youtube.com/watch?v=rzRqEWJYwX4", // Ice Cube, You Know How We Do It, autre version (le site garde l'autre, avec son commentaire)
 ];
