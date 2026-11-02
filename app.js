@@ -763,8 +763,21 @@ function vueSalon(b) {
   b.setAttribute('aria-pressed', pres);
   b.textContent = pres ? 'Toute la pièce' : 'Plus près';
 }
+// pendant l'écoute, l'écran reste allumé : sur iPad et iPhone, la mise en veille coupait la vidéo
+// (et Safari rechargeait parfois la page au retour). Sur une vraie pause, l'écran peut de nouveau s'éteindre.
+let verrouEcran = null, verrouDemande = false;
+function garderEcranAllume() {
+  const veut = !!S.joue && (S.enLecture || !S.pauseVoulue);
+  if (!('wakeLock' in navigator)) return;
+  if (veut && !verrouEcran && !verrouDemande && document.visibilityState === 'visible') {
+    verrouDemande = true;
+    navigator.wakeLock.request('screen').then(v => { verrouEcran = v; v.addEventListener('release', () => { verrouEcran = null; }); }).catch(() => {}).finally(() => { verrouDemande = false; });
+  } else if (!veut && verrouEcran) { verrouEcran.release().catch(() => {}); verrouEcran = null; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') garderEcranAllume(); });
 function majEtat() {
   document.body.classList.toggle('en-lecture', S.enLecture);
+  garderEcranAllume();
   majSalon();
   majPlein();
   $('#radio-icone').classList.toggle('pause', S.enLecture);
@@ -1664,7 +1677,7 @@ const ACTIONS = {
     try { await navigator.clipboard.writeText(location.href); toast('Lien copié : colle-le dans ton navigateur.'); }
     catch (e) { toast(location.href, 6000); }
   },
-  'fermer-avis-appli': () => { $('#avis-appli').hidden = true; memoire.ecrire('md-avis-appli', true); },
+  'fermer-avis-appli': () => { $('#avis-appli').hidden = true; $('#avis-appli-fleche').hidden = true; memoire.ecrire('md-avis-appli', true); },
   'ouvrir-bac': () => ouvrirPanneau('bac'),
   'ouvrir-reglages': () => { memoire.ecrire('md-reglages-vu', true); $('.bouton-reglages').classList.remove('brille'); ouvrirPanneau('reglages'); },
   'fermer-panneaux': () => fermerPanneaux(),
@@ -1736,10 +1749,18 @@ if (S.gardes.length || S.croises.length) {
   if ((!appli && !webview) || memoire.lire('md-avis-appli', false)) return;
   const nom = appli ? appli[0] : 'cette appli';
   const android = /Android/i.test(ua);
-  $('#avis-appli').hidden = false;
-  $('#avis-appli-texte').textContent = android
-    ? `Le navigateur intégré à ${nom} lit mal la musique et oublie ta sélection. Ouvre plutôt la page dans Chrome.`
-    : `Le navigateur intégré à ${nom} lit mal la musique et oublie ta sélection. Touche ⋯ ou ↗ (en haut ou en bas de l'écran), puis « Ouvrir dans Safari » ou « Ouvrir dans le navigateur ».`;
+  // comme sur Farfetch : une flèche montre le bouton de l'appli qui ouvre le vrai navigateur
+  // (sur iPhone, Instagram, Facebook et Messenger le mettent en bas à droite ; ailleurs, c'est le menu ⋯ en haut à droite)
+  const enBas = !android && appli && ['Instagram', 'Facebook', 'Messenger'].includes(appli[0]);
+  const navigateur = android ? 'Chrome' : 'Safari';
+  const av = $('#avis-appli');
+  av.hidden = false;
+  av.classList.add(enBas ? 'vers-le-bas' : 'vers-le-haut');
+  const fl = $('#avis-appli-fleche'); fl.hidden = false; fl.classList.add(enBas ? 'vers-le-bas' : 'vers-le-haut');
+  $('#avis-appli-fleche-texte').textContent = enBas ? `Ouvre dans ${navigateur} ici` : `Menu ⋯, puis « Ouvrir dans ${navigateur} »`;
+  $('#avis-appli-texte').textContent = enBas
+    ? `Le navigateur intégré à ${nom} lit mal la musique et oublie ta sélection. Touche l'icône en bas à droite de l'écran pour ouvrir la page dans ${navigateur}.`
+    : `Le navigateur intégré à ${nom} lit mal la musique et oublie ta sélection. Touche ⋯ en haut à droite, puis « Ouvrir dans ${navigateur} » (ou « dans le navigateur »).`;
   if (android) {
     const a = $('#avis-appli-ouvrir');
     a.hidden = false;

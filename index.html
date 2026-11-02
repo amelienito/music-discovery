@@ -13,10 +13,12 @@
     // la pièce en 3D arrive : on ne montre pas le salon dessiné en attendant (il ne revient que si la 3D ne marche pas)
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
+  <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
+  <link rel="modulepreload" href="piece.min.js?v=11">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=57">
+  <link rel="stylesheet" href="styles.css?v=59">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -45,6 +47,7 @@
       <button class="lien-bouton" data-action="fermer-avis-appli">Rester ici</button>
     </div>
   </div>
+  <span class="avis-appli-fleche" id="avis-appli-fleche" aria-hidden="true" hidden><span id="avis-appli-fleche-texte">Ouvre dans ton navigateur</span><svg viewBox="0 0 40 40"><path d="M6 6 C 20 8, 30 16, 32 32 M 22 30 L 32 33 L 35 22" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 
   <main id="scene">
 
@@ -346,13 +349,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=32"></script>
+  <script src="data.js?v=33"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=9"></script>
-  <script src="app.js?v=60"></script>
-  <script type="module" src="piece.js?v=10"></script>
+  <script src="app.js?v=61"></script>
+  <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
+  <script type="module" src="piece.min.js?v=11"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

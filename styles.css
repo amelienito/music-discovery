@@ -894,6 +894,19 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .avis-appli .gros-bouton { min-height: 44px; padding: 0 18px; background: var(--fond); color: var(--encre); box-shadow: none; text-decoration: none; }
 .avis-appli .gros-bouton-plein { background: var(--aiguille); color: var(--sur-aiguille); }
 .avis-appli .lien-bouton { color: inherit; opacity: .75; }
+/* la flèche vers le bouton « ouvrir dans le navigateur » de l'appli : en bas à droite (Instagram, Facebook sur iPhone), sinon en haut à droite */
+.avis-appli-fleche { position: fixed; z-index: 46; right: 10px; display: flex; align-items: flex-end; gap: 4px; color: var(--encre); pointer-events: none;
+  font: 700 13px/1.15 var(--mono); letter-spacing: .04em; text-transform: uppercase; text-align: right; }
+.avis-appli-fleche span { max-width: 170px; padding: 7px 10px; border-radius: 12px; background: var(--fond); box-shadow: 0 8px 22px rgba(0,0,0,.3); }
+.avis-appli-fleche svg { flex: none; width: 40px; height: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+.avis-appli.vers-le-bas { bottom: calc(96px + env(safe-area-inset-bottom)); }
+.avis-appli-fleche[hidden] { display: none; }
+.avis-appli-fleche.vers-le-bas { bottom: calc(10px + env(safe-area-inset-bottom)); animation: pointe-bas 1.1s ease-in-out infinite; }
+.avis-appli-fleche.vers-le-haut { top: calc(10px + env(safe-area-inset-top)); align-items: flex-start; animation: pointe-haut 1.1s ease-in-out infinite; }
+.avis-appli-fleche.vers-le-haut svg { transform: scaleY(-1); }
+@keyframes pointe-bas { 50% { transform: translate(4px, 5px); } }
+@keyframes pointe-haut { 50% { transform: translate(4px, -5px); } }
+@media (prefers-reduced-motion: reduce) { .avis-appli-fleche { animation: none !important; } }
 
 /* ─────────────────────────────── ORDINATEUR ─────────────────────────────── */
 @media (max-width: 1200px) { #teintes-facade { display: none; } }
@@ -1153,7 +1166,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 
 /* ─── la pièce en 3D (piece.js) : elle remplace le salon dessiné quand le navigateur sait faire ───
    En attendant qu'elle arrive, on ne montre pas l'ancien dessin : juste la pièce dans la pénombre. */
-.avec-3d .salon, .salon.en-3d { aspect-ratio: 16 / 7.4; background: linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
+.avec-3d .salon, .salon.en-3d { aspect-ratio: 16 / 7.4; background: url(img/salon/apercu-large.jpg) center / cover, linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }   /* une image de la pièce, le temps que la 3D arrive */
 .avec-3d .salon .salon-svg, .salon.en-3d .salon-svg { visibility: hidden; }
 .piece-toile { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .9s ease, filter 1.6s ease; }
 .piece-toile.prete { opacity: 1; }
@@ -1199,7 +1212,7 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
 .salon-agrandir:active { transform: scale(.97); }
 body.piece-3d .salon-agrandir { display: inline-flex; }
 @media (max-width: 700px) {
-  .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; }
+  .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; background-image: url(img/salon/apercu-haut.jpg), linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
   .piece-pensee { max-width: 70%; }
   .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
   .salon-agrandir { right: 10px; bottom: 10px; min-height: 32px; padding: 0 11px; font-size: 11px; }
@@ -1212,9 +1225,9 @@ body.mode-salon { overflow: hidden; }
 .salon-plein { position: fixed; inset: 0; z-index: 46; background: #15110d; }
 .salon-plein[hidden] { display: none; }
 .salon-plein .salon { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; min-height: 0; margin: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: #15110d; }
-.plein-video { position: absolute; z-index: 1; top: calc(16px + env(safe-area-inset-top)); left: 16px; width: min(300px, 30vw); aspect-ratio: 16 / 9; pointer-events: none; }
+.plein-video { position: absolute; z-index: 1; top: calc(16px + env(safe-area-inset-top)); right: 16px; width: min(300px, 30vw);   /* en haut à droite : à gauche, il y a la chaîne et ce qui est en écoute */ aspect-ratio: 16 / 9; pointer-events: none; }
 body.mode-salon .ecran-video { z-index: 47; border-radius: 12px; box-shadow: 0 14px 30px -10px rgba(0,0,0,.6); }
-.plein-vue { position: absolute; z-index: 2; right: 16px; top: calc(16px + env(safe-area-inset-top)); min-height: 36px; padding: 0 14px; border-radius: 999px;
+.plein-vue { position: absolute; z-index: 2; left: 16px; top: calc(16px + env(safe-area-inset-top)); min-height: 36px; padding: 0 14px; border-radius: 999px;
   background: rgba(20, 16, 12, .62); color: #f3ece0; box-shadow: 0 0 0 1px rgba(243, 236, 224, .2) inset; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .plein-vue[aria-pressed="true"] { background: #f3ece0; color: #1d1a16; }
@@ -1259,8 +1272,8 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
 .plein-fermer:hover { background: rgba(243, 236, 224, .2); }
 /* sur téléphone : la vidéo en haut à gauche, « plus près » en haut à droite, en bas l'afficheur sur toute la largeur et les commandes */
 @media (max-width: 700px) {
-  .plein-video { top: calc(10px + env(safe-area-inset-top)); left: 10px; width: 46vw; }
-  .plein-vue { right: 10px; top: calc(10px + env(safe-area-inset-top)); min-height: 32px; padding: 0 11px; font-size: 11px; }
+  .plein-video { top: calc(10px + env(safe-area-inset-top)); left: 10px; right: auto; width: 46vw; }
+  .plein-vue { right: 10px; left: auto; top: calc(10px + env(safe-area-inset-top)); min-height: 32px; padding: 0 11px; font-size: 11px; }
   .plein-barre { grid-template-columns: 1fr auto; grid-template-areas: "pile pile" "facade facade" "commandes fermer"; gap: 10px 10px; padding: 22px 12px calc(12px + env(safe-area-inset-bottom)); }
   .plein-pile { justify-self: stretch; gap: 6px; margin: 0; }
   .plein-pile-titre { display: none; }

@@ -815,7 +815,7 @@ const MORCEAUX = [
     energie: 5, etrange: 2, danse: 6 },
 
   { titre: "Azucar", artiste: "Earl Sweatshirt", album: "Some Rap Songs",
-    lien: "https://music.youtube.com/watch?v=-hA-81XOCgM", note: "Pitié, guettez la transition sample/morceau", secours: { lien: "https://music.youtube.com/watch?v=188lJwrhmic", note: "La plus grande minute de rap contemporain" },
+    lien: "https://music.youtube.com/watch?v=-hA-81XOCgM", note: "La plus grande minute de rap contemporain", secours: { lien: "https://music.youtube.com/watch?v=188lJwrhmic", note: "La plus grande minute de rap contemporain" },
     ambiance: "ailleurs", style: "Rap abstrait, samples", annee: 2018, bpm: 80, voix: "rap",
     tags: ["rap", "abstrait", "samples", "jazz"],
     energie: 4, etrange: 7, danse: 3 },

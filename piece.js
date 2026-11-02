@@ -31,8 +31,8 @@ function renoncer(e) {
   conteneurs.forEach(c => c.classList.remove('en-3d', 'triste'));
   if (e) console.warn('La pièce 3D ne démarre pas : on garde le salon dessiné.', e);
 }
-// la 3D ne démarre qu'une fois la page chargée, et quand un salon approche de l'écran :
-// le site et la musique passent toujours en premier
+// la 3D démarre dès qu'un salon approche de l'écran, dans un moment de calme du navigateur
+// (sans attendre toutes les pochettes) ; en attendant, une image de la pièce tient la place
 function demarrer() {
   if (demarrer.fait) return; demarrer.fait = true;
   try { lancer(); } catch (e) { renoncer(e); }
@@ -41,12 +41,14 @@ function guetter() {
   const io = new IntersectionObserver(es => {
     if (!es.some(e => e.isIntersecting)) return;
     io.disconnect();
-    (window.requestIdleCallback || (f => setTimeout(f, 200)))(demarrer, { timeout: 900 });
+    (window.requestIdleCallback || (f => setTimeout(f, 120)))(demarrer, { timeout: 500 });
   }, { rootMargin: '400px' });
   conteneurs.forEach(c => io.observe(c));
 }
 if (conteneurs.length && webgl()) {
-  if (document.readyState === 'complete') guetter(); else addEventListener('load', guetter, { once: true });
+  // au plus tard une seconde et demie après l'arrivée, même si des pochettes chargent encore (une image de la pièce tient la place)
+  let parti = false; const go = () => { if (!parti) { parti = true; guetter(); } };
+  if (document.readyState === 'complete') go(); else { addEventListener('load', go, { once: true }); setTimeout(go, 1500); }
 } else renoncer();
 
 function lancer() {
@@ -151,20 +153,48 @@ function lancer() {
   boite(FL + .3, .06, .26, cadre, piece, FX, FY - FH / 2 - .1, FOND + .12);   // le rebord
   const REBORD = FY - FH / 2 - .07;
 
-  /* l'affiche, au-dessus de la chaîne : la pochette du morceau qui passe */
-  const poster = vivant(groupe(piece, -LARG + .03, 2.12, CHAINE.z, Math.PI / 2));
-  boite(.92, .92, .04, M('#1f1a15'), poster, 0, 0, 0);
-  boite(.84, .84, .045, M('#efe7d8'), poster, 0, 0, .002);
+  /* au-dessus de la chaîne, ce qui passe en ce moment : une enseigne au néon « EN ÉCOUTE », et sur une tablette,
+     la pochette du morceau, le vinyle à moitié sorti (il tourne doucement quand ça joue) */
   const vierge = (() => { const { x, t } = toileTexte(64, 64); x.fillStyle = '#c8572f'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#1d1c22'; x.beginPath(); x.arc(32, 32, 18, 0, 7); x.fill(); x.fillStyle = '#efe7d8'; x.beginPath(); x.arc(32, 32, 3, 0, 7); x.fill(); return t; })();
-  const affiche = new THREE.Mesh(new THREE.PlaneGeometry(.74, .74), new THREE.MeshStandardMaterial({ map: vierge, roughness: .6 }));
-  affiche.position.z = .026; poster.add(affiche);
-  const etiquetteDisque = new THREE.MeshStandardMaterial({ map: vierge, roughness: .5 });   // le rond central du vinyle : la même pochette
+  const etiquetteDisque = new THREE.MeshStandardMaterial({ map: vierge, roughness: .5 });   // le rond central des vinyles : la même pochette
+  const poster = vivant(groupe(piece, -LARG + .02, 0, CHAINE.z, Math.PI / 2));
+  boite(1.16, .035, .17, M('#4a2c18', { roughness: .55 }), poster, 0, 1.42, .085);                                // la tablette
+  boite(1.16, .028, .014, M('#c9a24a', { metalness: .75, roughness: .3, flatShading: false }), poster, 0, 1.452, .166);   // son rebord en laiton
+  [-1, 1].forEach(s => { const e = boite(.02, .1, .1, M('#2a180c'), poster, s * .45, 1.37, .05); e.rotation.x = -.6; });   // les équerres
+  const vinyleMural = vivant(groupe(poster, .25, 1.77, .045));
+  {
+    const d = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .006, 44), M('#0d0c0f', { roughness: .22, flatShading: false })); d.rotation.x = Math.PI / 2; vinyleMural.add(d);
+    for (let k = 1; k < 5; k++) { const sillon = new THREE.Mesh(new THREE.TorusGeometry(.12 + k * .04, .0016, 3, 48), M('#2c2a31', { roughness: .3 })); sillon.position.z = .0035; vinyleMural.add(sillon); }
+    const rond = new THREE.Mesh(new THREE.CircleGeometry(.095, 28), etiquetteDisque); rond.position.z = .004; vinyleMural.add(rond);
+  }
+  const pochette = groupe(poster, -.1, 1.775, .072); pochette.rotation.x = -.07;
+  boite(.66, .66, .014, M('#efe7d8', { roughness: .7 }), pochette, 0, 0, 0);
+  const affiche = new THREE.Mesh(new THREE.PlaneGeometry(.645, .645), new THREE.MeshStandardMaterial({ map: vierge, roughness: .55 }));
+  affiche.position.z = .0075; pochette.add(affiche);
+  // l'enseigne au néon : allumée quand ça joue, éteinte (des tubes gris) sur une vraie pause
+  const neon = toileTexte(512, 104);
+  function dessinerNeon(allume) {
+    const x = neon.x; x.clearRect(0, 0, 512, 104);
+    x.font = 'italic 700 60px Georgia, "Times New Roman", serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    if (allume) { x.shadowColor = '#ff4d3d'; x.shadowBlur = 26; x.fillStyle = '#ff8a72'; x.fillText('♪ en écoute', 256, 54); x.shadowBlur = 10; x.fillStyle = '#ffe1d6'; x.fillText('♪ en écoute', 256, 54); }
+    else { x.shadowBlur = 0; x.fillStyle = 'rgba(150,140,132,.8)'; x.fillText('♪ en écoute', 256, 54); }
+    neon.t.needsUpdate = true;
+  }
+  dessinerNeon(false);
+  const enseigne = new THREE.Mesh(new THREE.PlaneGeometry(1.12, .227), new THREE.MeshBasicMaterial({ map: neon.t, transparent: true, toneMapped: false, depthWrite: false }));
+  enseigne.position.set(0, 2.24, .02); poster.add(enseigne);
+  const lueurNeon = new THREE.PointLight('#ff6a55', 0, 1.8, 1.8); lueurNeon.position.set(0, 2.18, .35); poster.add(lueurNeon);
   const chargeur = new THREE.TextureLoader(); chargeur.setCrossOrigin('anonymous');
   let pochetteActuelle = null;
   function majPoster(src) {
     if (!src || src === pochetteActuelle) return;
     pochetteActuelle = src;
-    chargeur.load(src, t => { if (pochetteActuelle !== src) return; t.colorSpace = THREE.SRGBColorSpace; affiche.material.map = t; affiche.material.needsUpdate = true; etiquetteDisque.map = t; etiquetteDisque.needsUpdate = true; }, undefined, () => {});
+    chargeur.load(src, t => {
+      if (pochetteActuelle !== src) { t.dispose(); return; }
+      const avant = affiche.material.map;
+      t.colorSpace = THREE.SRGBColorSpace; affiche.material.map = t; affiche.material.needsUpdate = true; etiquetteDisque.map = t; etiquetteDisque.needsUpdate = true;
+      if (avant && avant !== vierge && avant !== t) avant.dispose();   // la pochette d'avant est libérée : la mémoire ne grossit pas au fil des morceaux
+    }, undefined, () => {});
   }
 
   /* ═══════════════ aux murs : les images d'Amélien, en grand ═══════════════
@@ -527,7 +557,8 @@ function lancer() {
 
   // la tête : visage taillé (mâchoire plus étroite), afro, lunettes rondes, fine moustache
   const tete = groupe(buste, 0, .64, .03);
-  const crane = new THREE.IcosahedronGeometry(.104, 2);
+  // un crâne lisse (une sphère déformée, ombrée en douceur) : le visage n'a plus de facettes bizarres
+  const crane = new THREE.SphereGeometry(.104, 28, 22);
   {
     const pa = crane.attributes.position;
     for (let i = 0; i < pa.count; i++) {
@@ -539,11 +570,12 @@ function lancer() {
     }
     crane.computeVertexNormals();
   }
-  poser(new THREE.Mesh(crane, peau), tete);
-  const nezP = poser(new THREE.Mesh(new THREE.ConeGeometry(.017, .044, 4), peauF), tete, 0, -.006, .108); nezP.rotation.x = Math.PI / 2 + .3;
+  const peauLisse = M('#8c5737', { roughness: .6, flatShading: false }), peauLisseF = M('#76462a', { roughness: .66, flatShading: false });
+  poser(new THREE.Mesh(crane, peauLisse), tete);
+  const nezP = poser(new THREE.Mesh(new THREE.ConeGeometry(.0155, .04, 10), peauLisseF), tete, 0, -.008, .107); nezP.rotation.x = Math.PI / 2 + .32;
   [-1, 1].forEach(s => { const o = bille(.024, peauF, tete, s * .098, -.002, -.008, 0); o.scale.set(.45, 1, .75); });
   const boucleOreille = new THREE.Mesh(new THREE.TorusGeometry(.009, .0025, 4, 10), M('#e3c06a', { metalness: .85, roughness: .25 })); boucleOreille.position.set(.1, -.03, -.005); boucleOreille.rotation.y = Math.PI / 2; tete.add(boucleOreille);
-  const yeux = [-1, 1].map(s => { const o = bille(.0105, sombre, tete, s * .036, .024, .093, 1); o.scale.z = .5; return o; });
+  const yeux = [-1, 1].map(s => { const o = bille(.0095, sombre, tete, s * .035, .023, .094, 2); o.scale.set(1, .9, .45); bille(.0026, M('#fff6ea', { roughness: .2, flatShading: false }), o, s * .003, .004, .008, 0); return o; });   // avec un petit reflet
   const sourcils = [-1, 1].map(s => boite(.036, .0075, .01, poils, tete, s * .037, .057, .1));
   // l'afro : rond, un peu bosselé, plus raisonnable
   const afroGeo = new THREE.IcosahedronGeometry(.16, 3);
@@ -556,7 +588,7 @@ function lancer() {
     }
     afroGeo.computeVertexNormals();
   }
-  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .1, -.078); afro.scale.set(1.08, .97, 1.02);
+  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .088, -.058); afro.scale.set(1.07, .95, 1.0);   // assez en avant pour couvrir le haut du front
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
     const cercle = new THREE.Mesh(new THREE.TorusGeometry(.03, .005, 5, 16), monture); cercle.position.set(s * .037, .024, .108); tete.add(cercle);
@@ -565,8 +597,8 @@ function lancer() {
   boite(.016, .005, .005, monture, tete, 0, .031, .112);
   // la moustache (fine, en chevron) et la barbichette
   [-1, 1].forEach(s => { const m = boite(.032, .0095, .012, poils, tete, s * .0145, -.031, .101); m.rotation.z = -s * .2; });
-  boite(.022, .03, .016, poils, tete, 0, -.084, .081);
-  const bouche = [-1, 1].map(s => boite(.02, .005, .006, M('#3b1a12'), tete, s * .0098, -.051, .094));
+  bille(.011, poils, tete, 0, -.084, .083, 1).scale.set(.75, 1.15, .5);   // la barbichette
+  const bouche = [-1, 1].map(s => boite(.018, .004, .005, M('#3b1a12'), tete, s * .0088, -.05, .095));
 
   // les bras : épaule → coude → main (positionnés par cinématique inverse)
   const L_BRAS = .285, L_AVANT = .265;
@@ -838,7 +870,7 @@ function lancer() {
   }
 
   const barres = new Array(12).fill(0), cretes = new Array(12).fill(0);
-  let vitesseDisque = 0;
+  let vitesseDisque = 0, neonAllume = false;
   function dessinerSpectre(joue) {
     const x = spectre.x, e = Number(etat.energie) || 5;
     x.fillStyle = '#050608'; x.fillRect(0, 0, 256, 64);
@@ -1076,7 +1108,7 @@ function lancer() {
     });
     // le visage : sourcils, bouche, clignements
     sourcils.forEach((s, i) => { const c = i ? 1 : -1; s.rotation.z = c * (so < 0 ? .34 * so : .08 * so); s.position.y = .057 + Math.max(0, -so) * .004; });
-    bouche.forEach((m, i) => { const c = i ? 1 : -1; m.rotation.z = c * .38 * bo; });
+    bouche.forEach((m, i) => { const c = i ? 1 : -1; m.rotation.z = c * .22 * bo; });
     if ((clin -= dt) < 0) { clinT = .12; clin = 2.5 + Math.random() * 4; }
     clinT = Math.max(0, clinT - dt);
     yeux.forEach(o => { o.scale.y = clinT > 0 || fermes > .5 ? .15 : 1; });
@@ -1154,6 +1186,8 @@ function lancer() {
     if (!parent) return;
     const w = parent.clientWidth, h = parent.clientHeight;
     if (!w || !h) return;
+    // pas plus d'environ 2,4 millions de pixels à calculer, même en plein écran sur un grand iPad (moins de mémoire, moins de chaleur)
+    rendu.setPixelRatio(Math.max(1, Math.min(devicePixelRatio || 1, 1.75, Math.sqrt(2.4e6 / (w * h)))));
     rendu.setSize(w, h, false);
     // en grand : la pièce se cadre dans la zone libre, entre la vidéo (sur téléphone) et l'afficheur du bas
     let haut = 0, bas = h;
@@ -1214,7 +1248,7 @@ function lancer() {
     penseeJusqua = horloge + 8;
     if (etat.humeur === 'triste') { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
     lancerActivite('salut');
-    return { texte: hasard(['Monte le son', 'Toujours le hip hop, ça dégage']) };
+    return { texte: 'Monte le son' };
   });
   cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return null; });
   // les passerelles : une petite fenêtre, avec de quoi y aller (nouvel onglet, la musique continue ici)
@@ -1241,7 +1275,7 @@ function lancer() {
   cible(zone(.6, .3, .6, table, 0, .62, 0), 'Son verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
   cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; });
-  cible(poster, 'La pochette', () => { poster.userData.penche = !poster.userData.penche; return { texte: etat.titre ? `${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
+  cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
   CADRES_IMG.forEach(c => cible(c.g, c.legende, () => { c.g.userData.penche = !c.g.userData.penche; return { texte: c.legende }; }));
 
   // l'étiquette qui apparaît là où on a touché, et le nom de l'objet sous la souris
@@ -1275,7 +1309,7 @@ function lancer() {
     const v = viser(ev);
     if (!v) { etiquette.classList.remove('visible'); return; }
     const r = v.c.action();
-    if (r) montrerEtiquette(r, v.point);
+    if (r) montrerEtiquette(r, v.point); else { etiquette.classList.remove('visible'); etiquettePoint = null; }
   });
   let survolPrevu = false;
   toile.addEventListener('pointermove', ev => {
@@ -1322,7 +1356,7 @@ function lancer() {
     const dpl = depuis('plante'); feuilles.rotation.z = dpl < 2 ? Math.sin(dpl * 14) * .12 * (2 - dpl) / 2 : ondule(Math.sin(t * .8) * .01);
     const dpo = depuis('pouf'); pouf.scale.y = 1 - (dpo < .5 ? Math.sin(dpo / .5 * Math.PI) * .12 : 0);
     // les cadres qu'on a mis de travers
-    [poster, ...CADRES_IMG.map(c => c.g)].forEach((g, i) => { const vise = g.userData.penche ? (i % 2 ? .07 : -.07) : 0; g.rotation.z = lisse(g.rotation.z, vise, Math.min(1, dt * 8)); });
+    CADRES_IMG.map(c => c.g).forEach((g, i) => { const vise = g.userData.penche ? (i % 2 ? .07 : -.07) : 0; g.rotation.z = lisse(g.rotation.z, vise, Math.min(1, dt * 8)); });
     // un livre sort un peu, puis rentre
     livresMobiles.forEach(l => { const d = l.userData.sortie === undefined ? 99 : t - l.userData.sortie; if (l.userData.z0 === undefined) l.userData.z0 = l.position.z; l.position.z = l.userData.z0 + (d < 2.4 ? Math.min(1, d * 4, (2.4 - d) * 2) * .11 : 0); });
     // l'éclair dans le petit nuage
@@ -1394,6 +1428,9 @@ function lancer() {
     bobines.forEach((b, i) => { b.rotation.z += dt * vitesseDisque * (i % 2 ? .8 : 1.1); });
     if (etat.joue) aiguilleTuner.position.x = -.08 + Math.sin(t * .09) * .26;
     lueurChaine.intensity = mus * (.6 + nuit * .6);
+    if ((mus > .5) !== neonAllume) { neonAllume = mus > .5; dessinerNeon(neonAllume); }
+    lueurNeon.intensity = mus * (.5 + nuit * .7);
+    vinyleMural.rotation.z -= dt * ((etat.joue ? .55 : 0) + (depuis('pochette') < 1.6 ? 9 * (1.6 - depuis('pochette')) : 0));
     ecranCadran.material.color.setScalar(.25 + mus * .75); ecranSpectre.material.color.setScalar(.35 + mus * .65);
     notes.forEach(n => {
       if (n.vie <= 0) return;
@@ -1487,5 +1524,7 @@ function lancer() {
     ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },
     noms: () => CIBLES.map(c => c.nom) };   // pour les vérifications
   if (window.__salonEtat) maj(window.__salonEtat);
-  placer();
+  const compile = rendu.compileAsync ? rendu.compileAsync(scene, camera).catch(() => {}) : Promise.resolve();
+  compile.then(() => placer());
+  setTimeout(() => placer(), 2500);   // au cas où la compilation traînerait
 }
