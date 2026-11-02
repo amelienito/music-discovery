@@ -77,6 +77,7 @@ const S = {
   joue: null,             // morceau en cours de lecture
   lecture: null,          // 'yt' | 'extrait' | null
   enLecture: false,
+  pauseVoulue: false,     // on a vraiment mis pause (ou stop) : là seulement, le perso du salon déprime
   finTraitee: false,
   erreur: false,          // rien n'a pu être lu
   bloque: false,          // la lecture ne démarre pas toute seule
@@ -537,8 +538,8 @@ window.onYouTubeIframeAPIReady = () => {
       },
       onStateChange: e => {
         if (S.lecture !== 'yt') return;
-        if (e.data === YT.PlayerState.PLAYING) { S.enLecture = true; S.aJoue = true; S.bloque = false; S.echecs = 0; clearTimeout(demarrage); appliquerVolume(); }
-        if (e.data === YT.PlayerState.PAUSED) S.enLecture = false;
+        if (e.data === YT.PlayerState.PLAYING) { S.enLecture = true; S.pauseVoulue = false; S.aJoue = true; S.bloque = false; S.echecs = 0; clearTimeout(demarrage); appliquerVolume(); }
+        if (e.data === YT.PlayerState.PAUSED) { S.enLecture = false; S.pauseVoulue = true; }
         if (e.data === YT.PlayerState.ENDED) { S.enLecture = false; finDuMorceau(); }
         majEtat();
       },
@@ -619,6 +620,7 @@ function jouerMorceau(m, debut = 0) {
   S.erreur = false;
   S.bloque = false;
   S.aJoue = false;
+  S.pauseVoulue = false;
   audioLecture.pause();
   if (!jouable(m)) { jouerExtraitComplet(m); return; }
   bonCommentaire(m, false);
@@ -637,7 +639,7 @@ function jouerExtraitComplet(m, essai = 0) {
   if (lecteur && lecteurPret) { try { lecteur.stopVideo(); } catch (e) {} }
   clearTimeout(demarrage);
   bonCommentaire(m, true); // l'extrait vient des plateformes : c'est la version classique
-  S.lecture = 'extrait'; S.erreur = false; S.enLecture = false;
+  S.lecture = 'extrait'; S.erreur = false; S.enLecture = false; S.pauseVoulue = false;
   majVideo(); majEtat();
   Pochettes.extraitFrais(m).then(url => {
     if (S.joue !== m.id || S.lecture !== 'extrait') return;
@@ -675,8 +677,8 @@ audioLecture.addEventListener('error', () => {
   extraitIntrouvable(m);
 });
 audioLecture.addEventListener('ended', () => { if (S.lecture !== 'extrait') return; S.enLecture = false; majEtat(); finDuMorceau(); });
-audioLecture.addEventListener('pause', () => { if (S.lecture === 'extrait') { S.enLecture = false; majEtat(); } });
-audioLecture.addEventListener('play', () => { if (S.lecture === 'extrait') { S.enLecture = true; S.bloque = false; majEtat(); } });
+audioLecture.addEventListener('pause', () => { if (S.lecture === 'extrait') { S.enLecture = false; if (!audioLecture.ended && audioLecture.dataset.id === S.joue) S.pauseVoulue = true; majEtat(); } });
+audioLecture.addEventListener('play', () => { if (S.lecture === 'extrait') { S.enLecture = true; S.pauseVoulue = false; S.bloque = false; majEtat(); } });
 
 function basculerLecture() {
   if (!S.joue) return;
@@ -701,7 +703,8 @@ function majSalon() {
   const affiche = m || parId[S.historique[S.historique.length - 1]] || (majSalon.hasard = majSalon.hasard || hasard(BANQUE));
   const im = affiche && Pochettes.image(affiche);
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
-  const etat = { joue: S.enLecture, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
+  // entre deux morceaux (le suivant charge, une pub passe), il attend tranquille ; il ne déprime que sur une vraie pause
+  const etat = { joue: S.enLecture, attente: !S.enLecture && !!m && !S.pauseVoulue, bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
     titre: m ? m.affiche : '', artiste: m ? m.artiste : '', note: m && m.note ? typoFr(m.note) : '' };
   window.__salonEtat = etat;                                   // la pièce 3D le lit en arrivant
   if (typeof Salon !== 'undefined') Salon.maj(etat);
@@ -1112,7 +1115,7 @@ function radioStop() {
   clearTimeout(demarrage);
   try { if (S.lecture === 'yt') lecteur.stopVideo(); } catch (e) {}
   audioLecture.pause();
-  S.enLecture = false; S.lecture = null; S.bloque = false;
+  S.enLecture = false; S.lecture = null; S.bloque = false; S.pauseVoulue = true;
   clic(500, 0.05, 0.06);
   majEtat(); majMachine();
 }

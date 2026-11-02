@@ -670,13 +670,14 @@ function lancer() {
   }
 
   /* ═══════════════ l'état de la musique ═══════════════ */
-  const etat = { joue: false, bpm: 96, energie: 5, danse: 5, humeur: 'triste', note: '' };
+  const etat = { joue: false, attente: false, bpm: 96, energie: 5, danse: 5, humeur: 'triste', note: '' };
   const humeurDe = (e, d) => e <= 3 && d <= 4 ? 'doux' : e >= 8 ? 'energie' : d >= 6 ? 'groove' : 'detente';
   let penseeVue = false, bulleW = 0, bulleH = 0;
   function mesurerPensee() { bulleW = pensee.offsetWidth; bulleH = pensee.offsetHeight; }
   function maj(n = {}) {
     Object.assign(etat, n);
-    etat.humeur = etat.joue ? humeurDe(Number(etat.energie) || 5, Number(etat.danse) || 5) : 'triste';
+    // la musique joue : selon le morceau ; entre deux morceaux : détendu, il attend le suivant ; vraie pause : il déprime
+    etat.humeur = etat.joue ? humeurDe(Number(etat.energie) || 5, Number(etat.danse) || 5) : etat.attente ? 'detente' : 'triste';
     if (n.titre !== undefined) { lcdTexte = (n.titre ? `${n.titre} — ${n.artiste || ''}` : 'MUSIC DISCOVERY').toUpperCase(); lcdDecalage = 0; }
     if (n.pochette) majPoster(n.pochette);
     const texte = (etat.note || '').trim();
@@ -968,7 +969,7 @@ function lancer() {
 
   // lui
   cible(zone(.5, .8, .4, buste, 0, .4, 0), 'Amélien', () => {
-    if (!etat.joue) { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
+    if (etat.humeur === 'triste') { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
     lancerActivite('salut');
     return { texte: hasard(['Monte le son', 'Toujours le hip hop, ça dégage']) };
   });
@@ -982,7 +983,7 @@ function lancer() {
     if (onglet) { try { onglet.opener = null; } catch (e) {} return { texte: 'Talya t’emmène dans son jeu : RP Talya (nouvel onglet)' }; }
     return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Y aller' };
   });
-  cible(ordi, 'L’ordi', () => { if (etat.joue && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
+  cible(ordi, 'L’ordi', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
   cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; });
   cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; });
   // les objets futiles
@@ -998,7 +999,7 @@ function lancer() {
   cible(zone(.74, .4, .42, chaine, 0, .73, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return { texte: 'Les aiguilles s’affolent.' }; });
   cible(plante, 'La plante', () => { reagir('plante'); return { texte: hasard(['Elle a soif.', 'Elle danse aussi.']) }; });
   cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { const l = hasard(livresMobiles); if (l) { l.userData.sortie = horloge; } return { texte: 'Un livre au hasard…' }; });
-  cible(zone(.5, .2, .5, table, 0, .62, 0), 'La carafe', () => { if (etat.joue && !activite) lancerActivite('boire'); return { texte: 'Santé.' }; });
+  cible(zone(.5, .2, .5, table, 0, .62, 0), 'La carafe', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return { texte: 'Santé.' }; });
   cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return { texte: 'Awouuu. (le loup de Cul7ure)' }; });
   cible(poster, 'Le poster', () => { poster.userData.penche = !poster.userData.penche; return { texte: etat.titre ? `${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
@@ -1062,7 +1063,7 @@ function lancer() {
   let eveilTalya = 0;
   function animerReactions(t, dt) {
     // il vit sa vie en mode salon : de temps en temps, l'ordi, une gorgée, le téléphone, un étirement
-    if (activite && (t > finActivite || (!etat.joue && activite !== 'salut'))) { activite = null; prochaineActivite = t + 9 + Math.random() * 9; }
+    if (activite && (t > finActivite || (etat.humeur === 'triste' && activite !== 'salut'))) { activite = null; prochaineActivite = t + 9 + Math.random() * 9; }
     if (!activite && parent === plein && etat.joue && !calme && t > prochaineActivite) lancerActivite(hasard(['ordi', 'boire', 'telephone', 'etirement', 'ordi']));
     // l'heure « pour de faux » à la fenêtre
     if (decalageHeure && t > finDecalage) { decalageHeure = 0; cielT = 99; }
