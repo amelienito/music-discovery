@@ -277,6 +277,7 @@ function basculerGarde(id) {
     const b = $('.bouton-trouvailles'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
   }
   if (ajoute) S.aime.add(id);
+  boucle.n = 0;
   memoire.ecrire('md-gardes', S.gardes);
   memoire.ecrire('md-aime', [...S.aime]); memoire.ecrire('md-aime-pas', [...S.aimePas]);
   majGarde();
@@ -1064,6 +1065,7 @@ function choisirSource(k) {
   S.source = k;
   memoire.ecrire('md-source', k);
   S.axeSuivi = null;
+  boucle.n = 0;
   const r = S.reprise[k];
   const ok = r && parId[r.id] && r.id !== S.joue && (k === 'radio' || S.gardes.includes(r.id));
   chargerTiroir(k);
@@ -1077,7 +1079,7 @@ function jouerRadio(id, { debut = 0 } = {}) {
   if (!m) return;
   S.livrets.machine = false;
   croiser(m.id);
-  if (S.historique[S.historique.length - 1] !== m.id) { S.historique.push(m.id); compterEcoute(m); }
+  if (S.historique[S.historique.length - 1] !== m.id) { S.historique.push(m.id); compterEcoute(m); compterTourSelection(); }
   memoire.ecrire('md-historique', S.historique.slice(-60));
   jouerMorceau(m, debut);
   if (++S.joues >= 2) setTimeout(montrerAide, 4000);
@@ -1524,6 +1526,40 @@ function montrerAide() {
   const b = $('#radio-garder'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
   $('.bouton-reglages').classList.add('brille');
 }
+/* « Ma sélection » qui tourne en boucle : au bout de trois tours, une petite fenêtre propose de la débloquer
+   (la radio repart du morceau en cours, dans le sens des coups de cœur). Une fois par visite. */
+const boucle = { n: 0, vue: false };
+function compterTourSelection() {
+  if (S.source !== 'selection' || boucle.vue || S.gardes.length < 2) return;
+  if (++boucle.n >= 3 * S.gardes.length) montrerBoucle();
+}
+function montrerBoucle() {
+  boucle.vue = true;
+  fermerAide();
+  const el = $('#boucle');
+  $('#boucle-n').textContent = `${S.gardes.length} morceaux`;
+  el.hidden = false;
+  requestAnimationFrame(() => el.classList.add('ouverte'));
+}
+function fermerBoucle() {
+  const el = $('#boucle');
+  if (!el || el.hidden) return;
+  el.classList.remove('ouverte');
+  setTimeout(() => { el.hidden = true; }, 250);
+}
+function debloquerSelection() {
+  fermerBoucle();
+  if (S.source !== 'selection') return;
+  // on garde la place dans la sélection, pour y revenir plus tard au même endroit
+  if (S.joue) { const [t] = tempsActuel(); S.reprise.selection = { id: S.joue, t: S.lecture === 'yt' && t > 5 ? Math.floor(t) : 0 }; memoire.ecrire('md-reprise', S.reprise); }
+  S.source = 'radio';
+  memoire.ecrire('md-source', 'radio');
+  S.axeSuivi = null; boucle.n = 0;
+  chargerTiroir('radio');
+  rafraichirSuite();
+  majMachine();
+  toast('La radio prend le relais à partir de ce morceau. Tes nouveaux ♥ rejoindront ta sélection.', 4500);
+}
 function fermerAide() {
   if ($('#aide').hidden) return;
   memoire.ecrire('md-aide-vue-v2', true);
@@ -1570,6 +1606,8 @@ const ACTIONS = {
   'autres-disques': () => autresDisques(),
   'auto': () => basculerAuto(),
   'fermer-aide': () => fermerAide(),
+  'fermer-boucle': () => fermerBoucle(),
+  'debloquer-selection': () => debloquerSelection(),
   'fidget': b => bidouiller(b),
   'source-chaine': b => choisirSource(b.dataset.source),
   'cosmetique': () => basculerCosmetique(),
@@ -1621,7 +1659,7 @@ document.addEventListener('click', e => {
    J (j'aime bien), X (pas trop comme ça), Échap (refermer) */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.body.classList.contains('mode-salon')) { modeSalon(false); return; }
-  if (e.key === 'Escape') { fermerAide(); fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
+  if (e.key === 'Escape') { fermerAide(); fermerBoucle(); fermerPanneaux(); if (document.body.classList.contains('cosmetique')) basculerCosmetique(false); return; }
   if (e.ctrlKey || e.metaKey || e.altKey || S.vue !== 'machine' || !S.joue) return;
   const t = e.target;
   if (t.closest && t.closest('input, textarea, select, [contenteditable="true"], .molette')) return;

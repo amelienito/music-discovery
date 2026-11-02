@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=54">
+  <link rel="stylesheet" href="styles.css?v=55">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -287,6 +287,15 @@
     </ol>
     <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">Compris</button>
   </aside>
+  <!-- « Ma sélection » qui a tourné trois fois : on propose de la débloquer -->
+  <aside class="aide boucle" id="boucle" role="dialog" aria-labelledby="boucle-titre" hidden>
+    <p class="aide-titre" id="boucle-titre">Ça tourne en boucle</p>
+    <p class="boucle-texte">Trois fois le tour de ta sélection (<span id="boucle-n"></span>). Pour la débloquer, laisse la radio repartir de ce morceau&nbsp;: elle va dans le sens de tes coups de cœur, et tes nouveaux ♥ rejoindront ta sélection.</p>
+    <div class="avis-actions">
+      <button class="gros-bouton gros-bouton-plein" data-action="debloquer-selection">Passer à la radio</button>
+      <button class="lien-bouton" data-action="fermer-boucle">Rester sur ma sélection</button>
+    </div>
+  </aside>
   <aside class="bac" id="bac" aria-label="Ma sélection" hidden>
     <div class="bac-tete">
       <div>
@@ -340,7 +349,7 @@
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=8"></script>
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=59"></script>
   <script type="module" src="piece.js?v=9"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>

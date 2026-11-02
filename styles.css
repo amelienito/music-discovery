@@ -1073,6 +1073,9 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 12px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
 }
 .aide .gros-bouton { justify-self: start; min-height: 38px; padding: 0 18px; font-size: 14px; }
+.boucle-texte { font-size: 14.5px; line-height: 1.42; color: var(--encre-2); }
+.boucle .avis-actions { gap: 8px 16px; }
+.boucle .lien-bouton { font-size: 14px; }
 @media (max-width: 640px) { .aide { left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; } }
 /* « Réglages » brille doucement tant qu'on ne l'a jamais ouvert */
 .bouton-reglages.brille { animation: brille 2.6s ease-in-out infinite; }
