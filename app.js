@@ -726,6 +726,8 @@ function majSalon() {
 window.MD = {
   auHasard() { const l = BANQUE.filter(m => m.note && m.id !== S.joue); const m = l.length && hasard(l); return m ? { id: m.id, titre: m.affiche, artiste: m.artiste, note: typoFr(m.note) } : null; },
   jouer(id) { if (parId[id]) jouerRadio(id); },
+  // pour vérifier la pile : à quelle distance du morceau en cours sont les trois disques proposés
+  pile() { const c = parId[S.joue]; return S.pile.map(p => ({ id: p.m.id, dir: p.dir, dist: c ? Moteur.distance(c, p.m) : null, amb: p.m.ambiance })); },
 };
 /* le mode salon : la pièce en grand, la musique continue (Échap pour revenir) */
 function modeSalon(on) {
@@ -926,6 +928,7 @@ function construireSuite(depuis, n = 6) {
    pour que tu puisses continuer dans ce sens. */
 const AXES = [['calme', 'energique'], ['pose', 'dansant'], ['connu', 'confidentiel']];
 const ETIQUETTES = { calme: 'plus calme', energique: 'plus énergique', pose: 'moins groovy', dansant: 'plus groovy', connu: 'plus mainstream', confidentiel: 'plus confidentiel' };
+const motDuDisque = (dir, i) => dir === 'ailleurs' ? ['tout autre chose', 'radicalement ailleurs', 'rien à voir'][i % 3] : dir ? ETIQUETTES[dir] : 'dans la lignée';
 const axeDe = dir => AXES.findIndex(a => a.includes(dir));
 function poolPile(cur) {
   const selection = S.source === 'selection';
@@ -960,6 +963,21 @@ function calculerPile(cur) {
   const selection = S.source === 'selection';
   const pool = poolPile(cur);
   if (!pool.length) return [];
+  // au troisième « Autres disques » (et après) : radicalement ailleurs. Trois disques pris parmi les plus éloignés
+  // de ce qui passe, chacun d'un univers différent (et d'un autre univers que le morceau en cours, quand c'est possible)
+  if (S.tirage >= 3 && pool.length >= 3) {
+    const loin = pool.slice().sort((a, b) => Moteur.distance(cur, b) - Moteur.distance(cur, a)).slice(0, Math.max(6, Math.ceil(pool.length * .3)));
+    for (let i = loin.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [loin[i], loin[j]] = [loin[j], loin[i]]; }
+    const pris = [];
+    for (const passe of [0, 1, 2]) for (const x of loin) {
+      if (pris.length >= 3 || pris.includes(x)) continue;
+      if (pris.some(p => p.version === x.version)) continue;
+      if (passe < 2 && pris.some(p => p.ambiance === x.ambiance)) continue;
+      if (passe < 1 && x.ambiance === cur.ambiance) continue;
+      pris.push(x);
+    }
+    if (pris.length === 3) return pris.map(m => ({ m, dir: 'ailleurs' }));
+  }
   // le milieu : ta sélection garde son ordre, la radio prend le plus proche
   let milieu = null;
   if (selection && !S.tirage) milieu = parId[construireSuite(cur, 1)[0]];
@@ -1114,7 +1132,8 @@ function jouerRadio(id, { debut = 0 } = {}) {
   if (++S.joues >= 2) setTimeout(montrerAide, 4000);
   // on a choisi un côté de la pile : la suivante garde la même échelle pour continuer dans ce sens
   const pris = S.pile.find(p => p.m.id === m.id);
-  S.axeSuivi = pris && pris.dir ? axeDe(pris.dir) : null;
+  const axe = pris && pris.dir ? axeDe(pris.dir) : -1;
+  S.axeSuivi = axe >= 0 ? axe : null;   // « radicalement ailleurs » n'est sur aucune échelle
   S.dejaVus = new Set(); S.tirage = 0;
   poserPile(m);
   rendreTuner();
@@ -1130,10 +1149,56 @@ function radioPrecedent() {
   const [t] = tempsActuel();
   if (S.joue && t > 5) {
     try { if (S.lecture === 'yt') lecteur.seekTo(0, true); else audioLecture.currentTime = 0; } catch (e) {}
-    clic(1100); return;
+    pullUp(); return;
   }
-  if (S.historique.length >= 2) { S.historique.pop(); const id = S.historique.pop(); clic(1100); jouerRadio(id); }
+  if (S.historique.length >= 2) { S.historique.pop(); const id = S.historique.pop(); pullUp(); jouerRadio(id); }
 }
+// pull up ! comme sur la table de tri : on repart du début, le klaxon trois fois, un flash, des étincelles, la chaîne qui tremble
+let klaxon = null, klaxonCharge = null;
+function chargerKlaxon() {
+  const c = audioCtx(); if (!c) return Promise.resolve(null);
+  if (klaxonCharge) return klaxonCharge;
+  klaxonCharge = fetch('son/klaxon.mp3').then(r => r.arrayBuffer())
+    .then(b => new Promise((ok, ko) => c.decodeAudioData(b, ok, ko)))
+    .then(buf => (klaxon = buf)).catch(() => (klaxonCharge = null));
+  return klaxonCharge;
+}
+function sonKlaxon() {
+  if (S.fidget && S.fidget.bip === false) return;
+  const c = audioCtx(); if (!c) return;
+  const jouer = () => {
+    if (!klaxon) return;
+    const t = c.currentTime + 0.02;
+    [[0, 0.26], [0.34, 0.26], [0.68, null]].forEach(([dec, duree]) => {
+      const s = c.createBufferSource(); s.buffer = klaxon;
+      const g = c.createGain(); g.gain.value = 0.55;
+      if (duree) { g.gain.setValueAtTime(0.55, t + dec + duree - 0.03); g.gain.linearRampToValueAtTime(0, t + dec + duree); }
+      s.connect(g); g.connect(c.destination);
+      s.start(t + dec); if (duree) s.stop(t + dec + duree + 0.01);
+    });
+  };
+  klaxon ? jouer() : chargerKlaxon().then(jouer);
+}
+function pullUp() {
+  sonKlaxon();
+  try { navigator.vibrate && navigator.vibrate([20, 40, 20, 40, 60]); } catch (e) {}
+  const fx = $('#pull-fx');
+  if (fx) { fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go'); setTimeout(() => fx.classList.remove('go'), 900); }
+  // les étincelles partent du bouton « précédent » qu'on vient de toucher (sinon du milieu de l'écran)
+  const b = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action=radio-precedent]');
+  const r = b ? b.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2, couleurs = ['#ff2d6f', '#2de2ff', '#ffd23f', '#ffffff', '#6f88ff'];
+  if (!reduitMouvement) for (let k = 0; k < 26; k++) {
+    const e = document.createElement('i'); e.className = 'pull-etincelle';
+    const a = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 160;
+    e.style.cssText = `left:${cx}px;top:${cy}px;--x:${Math.cos(a) * dist * 1.4}px;--y:${Math.sin(a) * dist - 40}px;--c:${couleurs[k % couleurs.length]}`;
+    document.body.appendChild(e); setTimeout(() => e.remove(), 800);
+  }
+  const h = document.documentElement;
+  h.classList.remove('pull-secousse'); void h.offsetWidth; h.classList.add('pull-secousse');
+  setTimeout(() => h.classList.remove('pull-secousse'), 400);
+}
+document.addEventListener('pointerdown', () => { if (!(S.fidget && S.fidget.bip === false)) chargerKlaxon(); }, { once: true });
 function radioLecture() {
   S.echecs = 0;
   if (S.joue && S.lecture) basculerLecture();
@@ -1244,7 +1309,7 @@ function majPleinPile() {
   el.hidden = false;
   if (S.auto) { const p = S.pile[0]; el.innerHTML = `<span class="plein-pile-titre">Pilote automatique</span>${p ? `<span class="plein-choix choisi"><span class="plein-choix-mot">ensuite</span><span class="plein-choix-titre">${E(p.m.affiche)}</span></span>` : ''}`; return; }
   el.innerHTML = `<span class="plein-pile-titre">Ensuite</span>` + S.pile.map((p, i) => {
-    const choisi = i === S.choix, im = Pochettes.image(p.m), mot = p.dir ? ETIQUETTES[p.dir] : 'dans la lignée';
+    const choisi = i === S.choix, im = Pochettes.image(p.m), mot = motDuDisque(p.dir, i);
     return `<button class="plein-choix${choisi ? ' choisi' : ''}" data-action="choisir-disque" data-i="${i}" role="radio" aria-checked="${choisi}" title="${E(p.m.affiche)}, ${E(p.m.artiste)}${choisi ? ' : rappuie pour l\'écouter maintenant' : ''}">
       <span class="plein-choix-pochette"${im ? ` style="background-image:url('${E(im.src)}')"` : ''}></span>
       <span class="plein-choix-textes"><span class="plein-choix-mot">${E(mot)}</span><span class="plein-choix-titre">${E(p.m.affiche)}</span></span>
@@ -1272,7 +1337,7 @@ function pochetteMaison(m) {
 // un disque de la pile : la vraie pochette si on l'a, sinon une pochette maison
 function disquePile({ m, dir }, i) {
   const choisi = i === S.choix;
-  const mot = dir ? ETIQUETTES[dir] : 'dans la lignée';
+  const mot = motDuDisque(dir, i);
   const im = Pochettes.image(m);
   const officielle = im && !im.yt;
   const penche = [-2.4, 1.2, 2.2][i % 3] + ((hache(m.id) % 5) - 2) * 0.4;

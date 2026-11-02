@@ -1296,3 +1296,23 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
 }
 
 
+
+/* ═════ le pull up (comme sur la table de tri) : flash plein écran, rayons, PULL UP en deux couleurs décalées, étincelles ═════ */
+.pull-fx { position: fixed; inset: 0; z-index: 70; pointer-events: none; opacity: 0; display: grid; place-items: center; overflow: hidden; }
+.pull-fx::before { content: ""; position: absolute; inset: -20%; background: repeating-conic-gradient(from 0deg at 50% 55%, rgba(111,136,255,.55) 0 5deg, transparent 5deg 12deg); mask-image: radial-gradient(circle at 50% 55%, transparent 8%, #000 60%); -webkit-mask-image: radial-gradient(circle at 50% 55%, transparent 8%, #000 60%); }
+.pull-fx::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(255,255,255,.95), rgba(111,136,255,.45) 45%, transparent 75%); }
+.pull-fx b { position: relative; z-index: 1; font: 700 clamp(3rem, 17vw, 9rem)/1 var(--texte); letter-spacing: -.05em; color: #fff; text-shadow: -.04em 0 #ff2d6f, .04em 0 #2de2ff, 0 0 40px rgba(111,136,255,.9); }
+.pull-fx.go { animation: pull-flash .85s cubic-bezier(.2,.8,.2,1); }
+.pull-fx.go b { animation: pull-gros .85s cubic-bezier(.2,1.4,.3,1); }
+.pull-fx.go::before { animation: pull-rayons .85s linear; }
+@keyframes pull-flash { 0% { opacity: 1; } 18% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes pull-gros { 0% { transform: scale(2.4) skewX(-12deg); filter: blur(6px); } 22% { transform: scale(1) skewX(0); filter: none; } 40% { transform: translateX(-10px) skewX(4deg); } 55% { transform: translateX(8px); } 100% { transform: scale(.9); } }
+@keyframes pull-rayons { from { transform: rotate(0) scale(1.2); } to { transform: rotate(40deg) scale(1.6); } }
+.pull-etincelle { position: fixed; z-index: 71; width: 9px; height: 9px; border-radius: 50%; pointer-events: none; background: var(--c, #fff); box-shadow: 0 0 10px var(--c, #fff); animation: pull-etincelle .75s cubic-bezier(.1,.7,.3,1) forwards; }
+@keyframes pull-etincelle { from { transform: translate(0,0) scale(1); opacity: 1; } to { transform: translate(var(--x), var(--y)) scale(.2); opacity: 0; } }
+.pull-secousse .hifi, .pull-secousse .plein-barre { animation: pull-secousse .35s ease-out; }
+@keyframes pull-secousse { 0%,100% { transform: none; } 20% { transform: translateX(-6px) skewX(-2deg); } 45% { transform: translateX(5px) skewX(2deg); } 70% { transform: translateX(-2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pull-fx.go b, .pull-fx.go::before, .pull-secousse .hifi, .pull-secousse .plein-barre { animation: none; }
+  .pull-fx.go { animation: pull-flash .4s ease-out; }
+}
