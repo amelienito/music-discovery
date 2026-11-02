@@ -527,10 +527,24 @@ function lancer() {
   const page = toileTexte(256, 168);
   {
     const x = page.x;
-    x.fillStyle = '#f4efe4'; x.fillRect(0, 0, 256, 168); x.fillStyle = '#1b1a17'; x.fillRect(0, 0, 256, 18);
-    x.fillStyle = '#f4efe4'; x.font = '600 10px Georgia, serif'; x.fillText('onsenbranle.fr', 8, 13);
-    x.fillStyle = '#1b1a17'; x.font = '700 21px Georgia, serif'; x.fillText('En vrai,', 12, 50); x.fillText('on s’en branle', 12, 74);
-    x.fillStyle = '#c8572f'; x.fillRect(12, 84, 34, 3); x.fillStyle = '#b8b0a0'; for (let i = 0; i < 5; i++) x.fillRect(12, 96 + i * 13, i % 3 === 2 ? 130 : 220, 5);
+    // onsenbranle.fr, en gros : l'en-tête violet, le titre de l'article, le bandeau bleu nuit
+    const sans = (g, t) => `${g} ${t}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    x.fillStyle = '#7174cc'; x.fillRect(0, 0, 256, 80);
+    x.fillStyle = '#111'; x.font = sans(800, 10); x.textAlign = 'left'; x.fillText('En vrai, on s’en branle.', 8, 14);
+    x.fillStyle = '#3b0f22'; x.font = sans(500, 6); x.textAlign = 'right'; x.fillText('« Bien ou quoooi ? »   Fluxxx', 248, 13);
+    x.fillStyle = '#0a0a0a'; x.font = sans(900, 22); x.textAlign = 'center'; x.fillText('« Bien ou quoooi ? »', 128, 58);
+    x.fillStyle = '#05062e'; x.fillRect(0, 80, 256, 88);
+    x.fillStyle = '#fff'; x.font = sans(800, 11); x.fillText('(dixit le vrai maire de Sevran en', 128, 102);
+    {
+      x.textAlign = 'left';
+      const a = 'découvrant le ', b = 'logiciel Snapchat', la = x.measureText(a).width, lb = x.measureText(b).width, lc = x.measureText(')').width;
+      let cx = 128 - (la + lb + lc) / 2;
+      x.fillText(a, cx, 117); cx += la;
+      x.fillStyle = '#ff2056'; x.fillText(b, cx, 117); x.fillRect(cx, 119, lb, 1.5); cx += lb;
+      x.fillStyle = '#fff'; x.fillText(')', cx, 117);
+    }
+    const dg = x.createLinearGradient(20, 0, 236, 0); ['#c3cf3a', '#3fb6d6', '#7fc24a', '#d9da4a'].forEach((c, i) => dg.addColorStop(i / 3, c));
+    x.fillStyle = dg; x.fillRect(20, 134, 216, 34); x.textAlign = 'left';
   }
   const ecranOrdi = new THREE.Mesh(new THREE.PlaneGeometry(.28, .18), new THREE.MeshBasicMaterial({ map: page.t, toneMapped: false })); ecranOrdi.position.set(0, .104, .001); capot.add(ecranOrdi);
   const autocollant = toileTexte(64, 64);
