@@ -822,6 +822,12 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .bac-tete h2 { font-size: 2rem; }
 .bac-explication { margin-top: 6px; font-size: 14px; color: var(--encre-2); max-width: 34ch; }
 .onglets { display: flex; gap: 6px; padding: 8px 22px 12px; }
+.bac { grid-template-rows: auto auto auto 1fr auto; }
+.bac-recherche { padding: 0 22px 10px; }
+.bac-recherche input { width: 100%; min-height: 42px; padding: 0 14px 0 38px; border: 1px solid var(--trait); border-radius: 999px; background: var(--fond-2) no-repeat 14px 50% / 16px 16px; color: var(--encre); font: 500 15px/1 var(--texte);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l3.5 3.5'/%3E%3C/svg%3E"); }
+.bac-recherche input:focus { outline: 2px solid var(--encre); outline-offset: 1px; }
+.bac-recherche input::placeholder { color: var(--encre-2); }
 .onglet { padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--encre-2); }
 .onglet[aria-selected="true"] { background: var(--encre); color: var(--fond); }
 .bac-liste { list-style: none; margin: 0; padding: 4px 14px 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; gap: 4px; align-content: start; }
@@ -1225,8 +1231,12 @@ body.mode-salon { overflow: hidden; }
 .salon-plein { position: fixed; inset: 0; z-index: 46; background: #15110d; }
 .salon-plein[hidden] { display: none; }
 .salon-plein .salon { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; min-height: 0; margin: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; background: #15110d; }
-.plein-video { position: absolute; z-index: 1; top: calc(16px + env(safe-area-inset-top)); right: 16px; width: min(300px, 30vw);   /* en haut à droite : à gauche, il y a la chaîne et ce qui est en écoute */ aspect-ratio: 16 / 9; pointer-events: none; }
-body.mode-salon .ecran-video { z-index: 47; border-radius: 12px; box-shadow: 0 14px 30px -10px rgba(0,0,0,.6); }
+/* la vidéo vit dans la face avant de la chaîne, à la place du hublot (elle ne cache plus la pièce) */
+.plein-video { display: none; flex: none; height: 104px; aspect-ratio: 16 / 9; border-radius: 9px; background: #000; box-shadow: 0 0 0 1px rgba(255,255,255,.1); pointer-events: none; }
+body.lecture-yt .plein-video { display: block; }
+body.lecture-yt .plein-hublot { display: none; }
+body.lecture-yt .plein-facade { max-width: 560px; }
+body.mode-salon .ecran-video { z-index: 47; border-radius: 9px; overflow: hidden; }
 .plein-vue { position: absolute; z-index: 2; left: 16px; top: calc(16px + env(safe-area-inset-top)); min-height: 36px; padding: 0 14px; border-radius: 999px;
   background: rgba(20, 16, 12, .62); color: #f3ece0; box-shadow: 0 0 0 1px rgba(243, 236, 224, .2) inset; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
@@ -1272,7 +1282,7 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
 .plein-fermer:hover { background: rgba(243, 236, 224, .2); }
 /* sur téléphone : la vidéo en haut à gauche, « plus près » en haut à droite, en bas l'afficheur sur toute la largeur et les commandes */
 @media (max-width: 700px) {
-  .plein-video { top: calc(10px + env(safe-area-inset-top)); left: 10px; right: auto; width: 46vw; }
+  .plein-video { height: 90px; }
   .plein-vue { right: 10px; left: auto; top: calc(10px + env(safe-area-inset-top)); min-height: 32px; padding: 0 11px; font-size: 11px; }
   .plein-barre { grid-template-columns: 1fr auto; grid-template-areas: "pile pile" "facade facade" "commandes fermer"; gap: 10px 10px; padding: 22px 12px calc(12px + env(safe-area-inset-bottom)); }
   .plein-pile { justify-self: stretch; gap: 6px; margin: 0; }
@@ -1284,6 +1294,7 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
   .plein-facade { grid-area: facade; max-width: none; gap: 9px; }
   .plein-hublot { width: 70px; padding: 5px; border-radius: 12px; }
   .plein-lcd { height: 70px; padding: 7px 10px; gap: 3px; grid-template-rows: auto 1fr auto; }
+  body.lecture-yt .plein-lcd { height: 90px; }
   .plein-lcd .lcd-defile { font-size: 16px; align-self: center; }
   .plein-lcd .lcd-temps { font-size: 14px; }
   .plein-lcd .lcd-spectre { display: none; }
@@ -1315,4 +1326,12 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
 @media (prefers-reduced-motion: reduce) {
   .pull-fx.go b, .pull-fx.go::before, .pull-secousse .hifi, .pull-secousse .plein-barre { animation: none; }
   .pull-fx.go { animation: pull-flash .4s ease-out; }
+}
+
+/* ═════ les pensées, plus grandes sur ordinateur (en mode salon aussi) ═════ */
+@media (min-width: 701px) {
+  .piece-pensee { max-width: min(400px, 46%); }
+  .piece-pensee-texte { font-size: 21px; padding: 14px 20px; border-radius: 30px; }
+  [data-plein] .piece-pensee { max-width: min(460px, 36%); }
+  [data-plein] .piece-pensee-texte { font-size: clamp(20px, 1.55vw, 27px); padding: 15px 22px; border-radius: 32px; }
 }

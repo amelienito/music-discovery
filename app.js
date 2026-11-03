@@ -107,7 +107,7 @@ const S = {
   croises: memoire.lire('md-croises', []),
   gardes: memoire.lire('md-gardes', []),
   // vidéos que YouTube a refusées : on les réessaie au bout de deux jours (un refus n'est pas toujours définitif)
-  injouables: (() => { const v = memoire.lire('md-injouables-v2', {}); const t = Date.now(); return new Map(Object.entries(v).filter(([, d]) => t - d < 2 * 864e5)); })(),
+  injouables: (() => { const v = memoire.lire('md-injouables-v2', {}); const t = Date.now(); return new Map(Object.entries(v).filter(([, d]) => t - d < 6 * 36e5)); })(),   // six heures, puis on retente
   son: memoire.lire('md-son', 'complet'),
   onglet: 'gardes',
   livrets: { machine: false },
@@ -243,6 +243,8 @@ function brancherMolette(b) {
 }
 $$('[data-molette="volume"]').forEach(brancherMolette);
 $('#fader-volume').addEventListener('input', e => reglerVolume(+e.target.value));
+// chercher dans ma sélection / l'historique, au fil de la frappe
+{ const c = $('#bac-cherche'); if (c) c.addEventListener('input', () => rendreBac()); }
 
 function appliquerVolume() {
   const m = S.joue ? parId[S.joue] : null;
@@ -550,12 +552,16 @@ window.onYouTubeIframeAPIReady = () => {
         if (e.data === YT.PlayerState.ENDED) { S.enLecture = false; finDuMorceau(); }
         majEtat();
       },
-      onError: () => {
+      onError: e => {
         const m = parId[S.joue];
         if (!m || S.lecture !== 'yt') return;
         clearTimeout(demarrage);
-        S.injouables.set(m.yt, Date.now());
-        memoire.ecrire('md-injouables-v2', Object.fromEntries(S.injouables));
+        // 100 : vidéo retirée ; 101 / 150 : lecture refusée hors de YouTube (souvent une version réservée aux comptes connectés,
+        // ex. un clip non censuré sur un iPad où Safari ne transmet pas la connexion YouTube). On s'en souvient quelques heures
+        // seulement : à la visite suivante, on retente la version choisie. Les autres erreurs (2, 5) sont passagères : pas de mémoire.
+        const code = e && e.data;
+        if (code === 100 || code === 101 || code === 150) { S.injouables.set(m.yt, Date.now()); memoire.ecrire('md-injouables-v2', Object.fromEntries(S.injouables)); }
+        else if (!S.reessai || S.reessai !== m.yt) { S.reessai = m.yt; try { lecteur.stopVideo(); } catch (err) {} setTimeout(() => { if (S.joue === m.id) jouerMorceau(m); }, 600); return; }
         try { lecteur.stopVideo(); } catch (e) {}
         if (basculerSecours(m)) { jouerMorceau(m); return; }
         jouerExtraitComplet(m);
@@ -802,6 +808,11 @@ function tempsActuel() {
    sur la chaîne. Quand on descend, elle reste à sa place et la musique continue. */
 function majVideo() {
   document.body.classList.toggle('video-machine', S.lecture === 'yt' && S.vue === 'machine');
+  const yt = S.lecture === 'yt' && !!S.joue;
+  if (document.body.classList.contains('lecture-yt') !== yt) {
+    document.body.classList.toggle('lecture-yt', yt);   // en mode salon : la vidéo prend la place du hublot
+    requestAnimationFrame(() => dispatchEvent(new Event('md-mise-en-page')));   // la barre du bas a changé de hauteur : la pièce se recadre
+  }
   majGarde();
   placerEcranVideo();
 }
@@ -823,10 +834,15 @@ function placerEcranVideo() {
     return;
   }
   ev.classList.remove('cache');
+  // on ne touche à la vidéo que si sa place a bougé (sinon, la page se recalcule à chaque image et ça saccade)
+  let avant = '';
   const suivre = () => {
-    const r = slot.getBoundingClientRect();
-    ev.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
-    ev.style.width = r.width + 'px'; ev.style.height = r.height + 'px';
+    const r = slot.getBoundingClientRect(), cle = `${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.width)},${Math.round(r.height)}`;
+    if (cle !== avant) {
+      avant = cle;
+      ev.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
+      ev.style.width = Math.round(r.width) + 'px'; ev.style.height = Math.round(r.height) + 'px';
+    }
     suiviRAF = requestAnimationFrame(suivre);
   };
   suivre();
@@ -1536,12 +1552,17 @@ function fermerPanneaux(immediat) {
   const cacher = () => { $('#voile').hidden = true; $('#bac').hidden = true; $('#reglages').hidden = true; };
   if (immediat === true || reduitMouvement) cacher(); else setTimeout(cacher, 320);
 }
+function plat(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, ' ').trim(); }
 function rendreBac() {
   $('#n-gardes').textContent = S.gardes.length;
   $('#n-croises').textContent = S.croises.length;
   $$('#bac .onglet').forEach(o => o.setAttribute('aria-selected', o.dataset.onglet === S.onglet));
-  const ids = S.onglet === 'gardes' ? S.gardes : S.croises;
-  $('#bac-liste').innerHTML = !ids.length
+  const tous = S.onglet === 'gardes' ? S.gardes : S.croises;
+  // la recherche : titre, artiste, album, année, style (sans se soucier des accents ni des majuscules)
+  const champ = $('#bac-cherche'), q = plat(champ ? champ.value : '');
+  if (champ) champ.placeholder = S.onglet === 'gardes' ? 'Chercher dans ma sélection…' : 'Chercher dans l’historique…';
+  const ids = q ? tous.filter(id => { const m = parId[id]; return m && q.split(/\s+/).every(mot => plat(`${m.affiche} ${m.titre} ${m.artiste} ${m.album || ''} ${m.annee || ''} ${m.style || ''}`).includes(mot)); }) : tous;
+  $('#bac-liste').innerHTML = q && !ids.length ? `<li class="bac-vide">Rien ne correspond à « ${E(champ.value.trim())} ».</li>` : !ids.length
     ? `<li class="bac-vide">${S.onglet === 'gardes'
         ? 'Rien dans ta sélection pour l\'instant. Quand un morceau te plaît, appuie sur « ♥ J\'aime bien ».'
         : 'Tout ce qui passe dans la chaîne s\'inscrit ici.'}</li>`
@@ -1566,7 +1587,7 @@ function rendreBac() {
           <button class="bac-garder ${estGarde(m.id) ? 'est-garde' : ''}" data-action="garder" data-id="${m.id}" aria-label="${estGarde(m.id) ? 'Retirer de ma sélection' : 'Ça, j\'aime bien'} : ${E(m.affiche)}" title="${estGarde(m.id) ? 'Retirer de ma sélection' : 'Ça, j\'aime bien'}">${estGarde(m.id) ? '♥' : '♡'}</button>
         </li>`;
       }).join('');
-  $('#bac-liste').classList.toggle('etagere', S.onglet === 'gardes' && !!S.gardes.length);
+  $('#bac-liste').classList.toggle('etagere', S.onglet === 'gardes' && !!ids.length);
   $('#bac-pied').hidden = S.onglet !== 'gardes' || !S.gardes.length;
   const avecYt = S.gardes.map(id => parId[id].yt).filter(Boolean).slice(0, 50);
   $('#lien-playlist').href = `https://www.youtube.com/watch_videos?video_ids=${avecYt.join(',')}`;

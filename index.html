@@ -14,11 +14,11 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=12">
+  <link rel="modulepreload" href="piece.min.js?v=13">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=60">
+  <link rel="stylesheet" href="styles.css?v=61">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -256,13 +256,14 @@
   <!-- ═════════════ LE MODE SALON : la pièce en grand, la musique continue ═════════════ -->
   <div class="salon-plein" id="salon-plein" role="dialog" aria-modal="true" aria-label="Le salon en grand" hidden>
     <div class="salon" data-salon data-plein></div>
-    <div class="plein-video" data-emplacement="salon"></div>
     <p class="plein-astuce">Touche les objets de la pièce</p>
     <button class="plein-vue" data-action="salon-vue" aria-pressed="false">Plus près</button>
     <!-- la face avant de la chaîne, en petit : le disque qui tourne, l'écran à cristaux liquides, les commandes -->
     <div class="plein-barre">
       <p class="plein-morceau visuellement-cache"><strong id="plein-titre"></strong> <span id="plein-artiste"></span></p>
       <div class="plein-facade">
+        <!-- la vidéo, rangée dans la face avant de la chaîne : elle ne cache rien de la pièce -->
+        <div class="plein-video" data-emplacement="salon"></div>
         <div class="plein-hublot" aria-hidden="true"><span class="disque disque-hasard plein-disque" id="plein-disque"></span></div>
         <div class="lcd plein-lcd" aria-hidden="true">
           <div class="lcd-ligne lcd-haut"><span class="lcd-badge">CD</span><span class="lcd-piste">TRK <b id="plein-piste">--</b></span><span id="plein-temps" class="lcd-temps">--:--</span></div>
@@ -316,6 +317,9 @@
       <button class="onglet" role="tab" data-action="onglet" data-onglet="gardes" aria-selected="true">Ma sélection <span id="n-gardes">0</span></button>
       <button class="onglet" role="tab" data-action="onglet" data-onglet="croises" aria-selected="false">Historique <span id="n-croises">0</span></button>
     </div>
+    <div class="bac-recherche">
+      <input type="search" id="bac-cherche" placeholder="Chercher un titre, un artiste, une année…" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-label="Chercher dans la liste">
+    </div>
     <ul class="bac-liste" id="bac-liste"></ul>
     <div class="bac-pied" id="bac-pied">
       <button class="gros-bouton gros-bouton-plein" data-action="ecouter-selection">L'écouter dans la chaîne</button>
@@ -352,14 +356,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=33"></script>
+  <script src="data.js?v=34"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=9"></script>
-  <script src="app.js?v=63"></script>
+  <script src="app.js?v=64"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=12"></script>
+  <script type="module" src="piece.min.js?v=13"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

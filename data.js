@@ -189,12 +189,6 @@ const MORCEAUX = [
     tags: ["electro", "synthés", "minimal", "expérimental"],
     energie: 3, etrange: 7, danse: 2 },
 
-  { titre: "Big City Life", artiste: "Mattafix", album: "Signs of a Struggle",
-    lien: "https://music.youtube.com/browse/MPREb_JvDDGFtLBYc", note: "",
-    ambiance: "soleil", style: "Reggae-pop", annee: 2005, bpm: 95, voix: "chant",
-    tags: ["pop", "reggae", "soul", "solaire"],
-    energie: 5, etrange: 2, danse: 6 },
-
   { titre: "good girl, lassie.", artiste: "is it sunday?", album: "good girl, give them reason to stare.",
     lien: "https://music.youtube.com/watch?v=09hEFrUZrXA", note: "Et c'est même pas le meilleur son de l'album",
     ambiance: "electrique", style: "Indie émo", annee: 2023, bpm: 120, voix: "chant",
@@ -242,12 +236,6 @@ const MORCEAUX = [
     ambiance: "soleil", style: "Chanson seventies", annee: 1977, bpm: 90, voix: "chant",
     tags: ["chanson", "ballade", "cordes", "mélancolique"],
     energie: 2, etrange: 3, danse: 1 },
-
-  { titre: "(v)oOOOOOOooo", artiste: "⣎⡇ꉺლ༽இ•̛)ྀ◞ ༎ຶ ༽ৣৢ؞ৢ؞ؖ ꉺლ", album: "",
-    lien: "https://music.youtube.com/watch?v=29Sh3yEaBP8", note: "Performatif mais pas que",
-    ambiance: "ailleurs", style: "Ambient d'internet", annee: 2018, bpm: 70, voix: "instru",
-    tags: ["ambient", "vaporwave", "expérimental", "glitch"],
-    energie: 2, etrange: 9, danse: 1 },
 
   { titre: "err:log", artiste: "cast heal", album: "err:log",
     lien: "https://music.youtube.com/watch?v=DCcAlLqOM8E", note: "J'ai une passion inexpliquée pour certains titres",
@@ -771,12 +759,6 @@ const MORCEAUX = [
     ambiance: "bitume", style: "Rap sudiste, samples soul", annee: 2002, bpm: 88, voix: "rap",
     tags: ["rap", "sud", "samples soul", "nocturne"],
     energie: 5, etrange: 3, danse: 5 },
-
-  { titre: "La Valse à mille temps", artiste: "Jacques Brel", album: "La Valse à mille temps",
-    lien: "https://music.youtube.com/watch?v=NR5ZOBh7O04", note: "Adolescent, j'adorais ce morceau",
-    ambiance: "electrique", style: "Chanson française", annee: 1959, bpm: 180, voix: "chant",
-    tags: ["chanson", "valse", "orchestre", "rapide"],
-    energie: 8, etrange: 2, danse: 5 },
 
   { titre: "Stay Fly", artiste: "Three 6 Mafia feat. Young Buck, 8Ball & MJG", album: "Most Known Unknowns",
     lien: "https://music.youtube.com/watch?v=U_jq38d3FFI", note: "Top 5 morceaux",
@@ -1306,12 +1288,6 @@ const MORCEAUX = [
     tags: ["japon", "rock", "anime", "naruto"],
     energie: 8, etrange: 3, danse: 4 },
 
-  { titre: "Beautiful", artiste: "Eminem", album: "Relapse",
-    lien: "https://music.youtube.com/watch?v=F4yb0CBd4I4", note: "Je pourrais jamais le détester à 100 % par respect du moi ado qui l'écoutait bcp",
-    ambiance: "bitume", style: "Rap, introspectif", annee: 2009, bpm: 76, voix: "rap",
-    tags: ["rap", "introspectif", "samples"],
-    energie: 5, etrange: 2, danse: 3 },
-
   { titre: "reflection eternal", artiste: "Nujabes", album: "Modal Soul",
     lien: "https://music.youtube.com/watch?v=0n7iUJL-Eiw", note: "Je crois bien qu'Hakim avait rappé sur ça y'a genre un peu moins de 10 ans",
     ambiance: "brume", style: "Hip-hop jazz instrumental", annee: 2005, bpm: 88, voix: "instru",
@@ -1495,23 +1471,11 @@ const MORCEAUX = [
     tags: ["rap", "rap français", "fraternité"],
     energie: 6, etrange: 4, danse: 4 },
 
-  { titre: "L'avenir est à nous", artiste: "Kool Shen", album: "Dernier round",
-    lien: "https://music.youtube.com/watch?v=a0iufpPgXtw", note: "",
-    ambiance: "bitume", style: "Rap français", annee: 2004, bpm: 92, voix: "rap",
-    tags: ["rap", "rap français", "ntm"],
-    energie: 6, etrange: 3, danse: 5 },
-
   { titre: "Quand j'serai grand", artiste: "Fabe", album: "Détournement de son",
     lien: "https://music.youtube.com/watch?v=z5hMSSiRppE", note: "Dédicace à ceux qui partent et ceux qui partent pas", secours: { lien: "https://music.youtube.com/watch?v=-VJsvx2UAR0", note: "Dédicace à ceux qui partent et ceux qui partent pas" },
     ambiance: "bitume", style: "Rap français des années 90", annee: 1998, bpm: 90, voix: "rap",
     tags: ["rap", "rap français", "années 90", "scred"],
     energie: 4, etrange: 6, danse: 4 },
-
-  { titre: "Candy Shop", artiste: "50 Cent feat. Olivia", album: "The Massacre",
-    lien: "https://music.youtube.com/watch?v=RWuW6-OE4VY", note: "", secours: { lien: "https://music.youtube.com/watch?v=IZKBa6bvUjo", note: "" },
-    ambiance: "piste", style: "Rap club, G-Unit", annee: 2005, bpm: 103, voix: "rap",
-    tags: ["rap", "club", "g-unit"],
-    energie: 6, etrange: 1, danse: 8 },
 
   { titre: "Do for Love (mash-up avec Nujabes)", artiste: "2Pac & Nujabes", album: "",
     lien: "https://music.youtube.com/watch?v=HrzDZ0imS2Y", note: "Je le remets en souvenir de tous ces remixs pas officiels",

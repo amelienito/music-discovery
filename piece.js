@@ -7,8 +7,8 @@
    analyseur de spectre, tuner, double cassette, lecteur CD, platine), avec
    une grande colonne de chaque côté : le son lui arrive des deux côtés.
    Au fond, Talya dort dans son panier, le chat sur le rebord de la fenêtre,
-   et la fenêtre montre le vrai moment de la journée (douze tranches de
-   deux heures, chacune avec son ciel).
+   et la fenêtre montre le vrai moment de la journée (onze tranches,
+   chacune avec son ciel).
    Quand la musique joue, la pièce se réchauffe, les boomers poussent l'air,
    des notes partent vers lui, et il vit le morceau. Ton mot devient une
    pensée au-dessus de lui. Sur une vraie pause seulement, tout s'éteint :
@@ -62,6 +62,7 @@ function lancer() {
   const OMBRE = tactile ? 512 : 1024;
   rendu.shadowMap.enabled = true;
   rendu.shadowMap.type = THREE.PCFShadowMap;
+  rendu.shadowMap.autoUpdate = false;   // recalculées environ 30 fois par seconde (voir la boucle)
   rendu.toneMapping = THREE.ACESFilmicToneMapping;
   rendu.toneMappingExposure = 1.1;
   const scene = new THREE.Scene();
@@ -74,7 +75,7 @@ function lancer() {
   const penseeTexte = document.createElement('p');
   penseeTexte.className = 'piece-pensee-texte';
   pensee.appendChild(penseeTexte);
-  const points = [12, 8, 5].map(d => { const p = document.createElement('i'); p.className = 'piece-pensee-point'; p.style.width = p.style.height = d + 'px'; p.dataset.d = d; return p; });
+  const points = (matchMedia('(min-width: 701px)').matches ? [16, 11, 7] : [12, 8, 5]).map(d => { const p = document.createElement('i'); p.className = 'piece-pensee-point'; p.style.width = p.style.height = d + 'px'; p.dataset.d = d; return p; });
 
   /* ═══════════════ matériaux et petits outils ═══════════════ */
   const memo = new Map();
@@ -221,7 +222,7 @@ function lancer() {
   cadreImage('boondocks', .52, .76, piece, LARG - .03, 1.72, .5, -Math.PI / 2, 'The Boondocks');
   cadreImage('seta', .6, .6, piece, LARG - .03, 1.72, 1.3, -Math.PI / 2, 'Seta, chez Cul7ure');
   // sur le rebord de la fenêtre : la photo des Anges déchus
-  const photo = cadreImage('fallen-angels', .3, .168, piece, FX - .36, REBORD + .12, FOND + .15, 0, 'Les Anges déchus, Wong Kar-wai'); photo.rotation.x = -.16;
+  const photo = cadreImage('fallen-angels', .3, .168, piece, FX - .36, REBORD + .12, FOND + .15, 0, 'Vive l’amour, Tsai Ming-liang'); photo.rotation.x = -.16;
   boite(.02, .1, .06, M('#1b1712'), photo, 0, -.05, -.04).rotation.x = .5;
 
   /* la porte du bureau (la pièce de la vitrine), entrouverte, à droite de la fenêtre ; Talya dort devant */
@@ -275,7 +276,7 @@ function lancer() {
   const couvercle = vivant(groupe(curio, 0, .15, -.085));
   boite(.25, .022, .18, M('#4a301e', { roughness: .6 }), couvercle, 0, .011, .085);
   bille(.016, M('#d8b04a', { metalness: .6, roughness: .3 }), curio, 0, .08, .09, 0);
-  const lueurCurio = new THREE.PointLight('#ffd9a0', 0, .8, 1.6); lueurCurio.position.set(0, .16, 0); curio.add(lueurCurio);
+  const lueurCurio = { intensity: 0 };   // (plus une vraie lumière : trop chère pour une si petite lueur)
 
   /* la plante, dans le coin (il faut bien) */
   const plante = vivant(groupe(piece, LARG - .32, 0, -2.2));
@@ -601,9 +602,8 @@ function lancer() {
     const branche = boite(.004, .004, .11, monture, tete, s * .074, .03, .055); branche.rotation.y = s * -.08;
   });
   boite(.016, .005, .005, monture, tete, 0, .031, .112);
-  // la moustache (fine, en chevron) et la barbichette
+  // la moustache (fine, en chevron)
   [-1, 1].forEach(s => { const m = boite(.032, .0095, .012, poils, tete, s * .0145, -.031, .101); m.rotation.z = -s * .2; });
-  bille(.011, poils, tete, 0, -.084, .083, 1).scale.set(.75, 1.15, .5);   // la barbichette
   const bouche = [-1, 1].map(s => boite(.018, .004, .005, M('#3b1a12'), tete, s * .0088, -.05, .095));
 
   // les bras : épaule → coude → main (positionnés par cinématique inverse)
@@ -690,7 +690,7 @@ function lancer() {
   const autocollant = toileTexte(64, 64);
   { const x = autocollant.x; x.fillStyle = '#d06a32'; x.beginPath(); x.arc(32, 32, 30, 0, 7); x.fill(); x.fillStyle = '#1d1a16'; x.font = '800 20px Helvetica, Arial, sans-serif'; x.textAlign = 'center'; x.fillText('OSB', 32, 39); }
   const sticker = new THREE.Mesh(new THREE.CircleGeometry(.03, 16), new THREE.MeshStandardMaterial({ map: autocollant.t, roughness: .7 })); sticker.position.set(.06, .12, -.0085); sticker.rotation.y = Math.PI; capot.add(sticker);
-  const lueurOrdi = new THREE.PointLight('#cfe0ff', 0, 1.2, 1.5); lueurOrdi.position.set(0, .12, .12); capot.add(lueurOrdi);
+  const lueurOrdi = { intensity: 0 };   // (idem)
   ordi.traverse(m => { if (m.isMesh) m.castShadow = true; });
   // au repos, fermé sur la petite table ; il le prend de là, le passe au-dessus de l'accoudoir, et le pose sur ses genoux
   const posRepos = new THREE.Vector3(.8, .555, .76), quatRepos = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 2.0, 0)), posMilieu = new THREE.Vector3(.55, 1.05, .58);
@@ -779,13 +779,22 @@ function lancer() {
   }
   fusionner(piece); if (!window.__pieceSansFusion) { fusionner(habillage); fusionner(pouf); }   // (sans fusion : pour vérifier les collisions)
   vitre.castShadow = false; ecran.castShadow = false; affiche.castShadow = false;
+  {
+    const _s = new THREE.Vector3();
+    scene.updateMatrixWorld(true);
+    scene.traverse(o => {
+      if (!o.isMesh || !o.castShadow) return;
+      if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(_s);
+      if (o.geometry.boundingSphere.radius * Math.max(_s.x, _s.y, _s.z) < .03) o.castShadow = false;
+    });
+  }
 
-  /* ═══════════════ le ciel : la journée en douze tranches de deux heures, chacune avec son ciel ═══════════════
+  /* ═══════════════ le ciel : la journée en onze tranches (de deux heures, minuit passé en dure quatre), chacune avec son ciel ═══════════════
      À 15 h, on n'est pas dans « l'après-midi » : on est dans le début d'après-midi, avec sa montgolfière.
      Le soleil ou la lune avancent dans la tranche ; la pluie arrive par-dessus, sur une vraie pause. */
   const TRANCHES = [
-    { nom: 'minuit passé', haut: '#060a1c', bas: '#141d3c', lune: [[175, 46], [195, 42]], etoiles: 1, fenetres: .45, jour: 0, filante: 1 },
-    { nom: 'le creux de la nuit', haut: '#03050e', bas: '#0b1124', lune: [[205, 62], [222, 82]], etoiles: 1, fenetres: .1, jour: 0, brume: 1 },
+    { nom: 'minuit passé', heures: 4, haut: '#060a1c', bas: '#141d3c', lune: [[175, 46], [222, 82]], etoiles: 1, fenetres: .3, jour: 0, filante: 1 },
     { nom: 'avant l’aube', haut: '#0b1032', bas: '#4a3f72', lune: [[228, 98], [238, 112]], etoiles: .45, fenetres: .22, jour: .06, lisere: 1 },
     { nom: 'le lever du soleil', haut: '#5465a6', bas: '#f6a57c', soleil: [[28, 190], [54, 150]], couleur: '#ff9f5a', fenetres: .12, jour: .45, nuagesRoses: 1 },
     { nom: 'le matin', haut: '#7db3e6', bas: '#e8eff0', soleil: [[66, 124], [94, 98]], couleur: '#fff1c4', jour: .8, oiseaux: 1 },
@@ -800,7 +809,11 @@ function lancer() {
   const IMMEUBLES = [[0, 70], [40, 50], [70, 96], [120, 44], [150, 80], [196, 60], [226, 88]];
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   const mel = (a, b, f) => '#' + hex(a).map((x, i) => Math.round(x + (hex(b)[i] - x) * f).toString(16).padStart(2, '0')).join('');
-  function trancheActuelle() { const d = new Date(), h = d.getHours() + d.getMinutes() / 60; const i = Math.floor(h / 2) % 12; return [i, (h - i * 2) / 2]; }
+  // chaque tranche dure deux heures (minuit passé en dure quatre) : on cherche celle où l'on est, et où l'on en est dedans
+  function trancheActuelle() {
+    const d = new Date(); let h = d.getHours() + d.getMinutes() / 60, debut = 0;
+    for (let i = 0; i < TRANCHES.length; i++) { const n = TRANCHES[i].heures || 2; if (h < debut + n || i === TRANCHES.length - 1) return [i, borne((h - debut) / n, 0, 1)]; debut += n; }
+  }
   let jour = .5, tranche = TRANCHES[0], cibleFenetre = null;
   function dessinerCiel(t, gris) {
     const [i, q] = trancheActuelle(), T = TRANCHES[i];
@@ -1206,20 +1219,21 @@ function lancer() {
     camera.position.copy(cadreActuel.c).addScaledVector(_dir, cadreActuel.d);
     camera.lookAt(cadreActuel.c);
   }
-  let parent = null;
+  let parent = null, tW = 1, tH = 1;   // la taille de la pièce à l'écran, gardée pour ne pas la redemander à chaque image
   function taille() {
     if (!parent) return;
     const w = parent.clientWidth, h = parent.clientHeight;
     if (!w || !h) return;
     // pas plus d'environ 2,4 millions de pixels à calculer, même en plein écran sur un grand iPad (moins de mémoire, moins de chaleur)
-    rendu.setPixelRatio(Math.max(1, Math.min(devicePixelRatio || 1, tactile ? 1.5 : 1.75, Math.sqrt((tactile ? 1.6e6 : 2.4e6) / (w * h)))));
+    rendu.setPixelRatio(Math.max(.7, Math.min(devicePixelRatio || 1, tactile ? 1.5 : 1.75, Math.sqrt((tactile ? 1.6e6 : 2.2e6) / (w * h))) * qualite));
+    tW = w; tH = h;
     rendu.setSize(w, h, false);
     // en grand : la pièce se cadre dans la zone libre, entre la vidéo (sur téléphone) et l'afficheur du bas
     let haut = 0, bas = h;
     if (parent === plein) {
       const r0 = parent.getBoundingClientRect(), autour = parent.parentElement;
-      const barre = autour.querySelector('.plein-barre'), video = autour.querySelector('.plein-video'), vue = autour.querySelector('.plein-vue');
-      if (w / h < 1) haut = Math.max(video ? video.getBoundingClientRect().bottom : 0, vue ? vue.getBoundingClientRect().bottom : 0) - r0.top + 6;
+      const barre = autour.querySelector('.plein-barre'), vue = autour.querySelector('.plein-vue');
+      if (w / h < 1) haut = (vue ? vue.getBoundingClientRect().bottom : 0) - r0.top + 6;   // (la vidéo est rangée dans la barre du bas)
       if (barre) bas = barre.getBoundingClientRect().top - r0.top + 22;
       haut = borne(haut, 0, h * .4); bas = borne(bas, haut + 120, h);
     }
@@ -1227,6 +1241,7 @@ function lancer() {
     cadrer();
     if (haut > 0 || bas < h) camera.setViewOffset(w, bas - haut, 0, -haut, w, h); else camera.clearViewOffset();
     mesurerPensee();
+    if (etiquettePoint) { etiquetteW = etiquette.offsetWidth; etiquetteH = etiquette.offsetHeight; }
   }
 
   /* ═══════════════ la pensée : au-dessus de l'afro, les petits ronds descendent vers lui ═══════════════ */
@@ -1237,7 +1252,7 @@ function lancer() {
     pensee.classList.toggle('visible', montrer);
     points.forEach(p => p.classList.toggle('visible', montrer));
     if (!montrer && !pensee.style.transform) return;
-    const W = toile.clientWidth, H = toile.clientHeight;
+    const W = tW, H = tH;
     tete.localToWorld(_h.set(0, .25, -.06)); _h.project(camera);
     const hx = (_h.x + 1) / 2 * W, hy = (1 - _h.y) / 2 * H;
     const marge = 10;
@@ -1287,7 +1302,7 @@ function lancer() {
   const zoneLampe = zone(.2, 2.2, .2, lampe, 0, 1.1, 0); zone(.44, .3, .44, zoneLampe, -.68, 1.17, .46);
   cible(zoneLampe, 'La lampe', () => { lampeEteinte = !lampeEteinte; return null; });
   cibleFenetre = { obj: vitre, nom: `La fenêtre : ${tranche.nom}`, action: () => null }; CIBLES.push(cibleFenetre);
-  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.e, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return { texte: 'Ça c’est du grave' }; }); });
+  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.e, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return null; }); });
   cible(zone(RW + .1, 1.3, RD, chaine, 0, .66, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return null; });
   cible(plante, 'La plante', () => { reagir('plante'); return null; });
   // la bibliothèque : un livret au hasard, un morceau de la sélection avec le mot d'Amélien, qu'on peut écouter tout de suite
@@ -1306,7 +1321,7 @@ function lancer() {
   // l'étiquette qui apparaît là où on a touché, et le nom de l'objet sous la souris
   const etiquette = document.createElement('div'); etiquette.className = 'piece-etiquette';
   const survol = document.createElement('div'); survol.className = 'piece-survol';
-  let etiquettePoint = null, finEtiquette = 0;
+  let etiquettePoint = null, finEtiquette = 0, etiquetteW = 0, etiquetteH = 0;
   function montrerEtiquette(r, point) {
     etiquette.innerHTML = '';
     const p = document.createElement('span'); p.textContent = r.texte; etiquette.appendChild(p);
@@ -1315,6 +1330,7 @@ function lancer() {
     if (r.faire) { const b = document.createElement('button'); b.type = 'button'; b.textContent = `${r.bouton} ▸`; b.addEventListener('click', e => { e.stopPropagation(); r.faire(); etiquette.classList.remove('visible'); etiquettePoint = null; }); etiquette.appendChild(b); }
     etiquettePoint = point.clone(); finEtiquette = horloge + (r.lien || r.faire ? 8 : 3.2);
     etiquette.classList.add('visible');
+    etiquetteW = etiquette.offsetWidth; etiquetteH = etiquette.offsetHeight;
   }
   const rayon = new THREE.Raycaster(), ptr = new THREE.Vector2();
   function viser(ev) {
@@ -1354,7 +1370,7 @@ function lancer() {
     if (!etiquettePoint) return;
     if (horloge > finEtiquette) { etiquette.classList.remove('visible'); etiquettePoint = null; return; }
     _ep.copy(etiquettePoint).project(camera);
-    const W = toile.clientWidth, H = toile.clientHeight, ew = etiquette.offsetWidth, eh = etiquette.offsetHeight;
+    const W = tW, H = tH, ew = etiquetteW, eh = etiquetteH;
     const x = borne((_ep.x + 1) / 2 * W - ew / 2, 8, W - ew - 8), y = borne((1 - _ep.y) / 2 * H - eh - 14, 8, H - eh - 8);
     etiquette.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
   }
@@ -1390,7 +1406,20 @@ function lancer() {
   }
 
   /* ═══════════════ la boucle ═══════════════ */
-  let visible = false, cielGris = 1, dernier = performance.now(), horloge = 0, prochainBattement = 0, lcdT = 0, cielT = 0, phase = 0, premiere = true;
+  let visible = false, cielGris = 1, dernier = performance.now(), horloge = 0, prochainBattement = 0, lcdT = 0, cielT = 0, phase = 0, premiere = true, derniereOmbre = 0;
+  /* si l'appareil n'arrive plus à suivre (images trop espacées pendant deux secondes), on calcule un peu moins de pixels ;
+     s'il a de la marge pendant longtemps, on remonte. La pièce reste fluide plutôt que nette et saccadée. */
+  let qualite = 1, mesures = [], precedente = 0, aise = 0;
+  function suivreFluidite(ms) {
+    const d = ms - precedente; precedente = ms;
+    if (!etat.joue || d <= 0 || d > 250) { mesures.length = 0; return; }   // sans musique (30 images par seconde) ou après une coupure : on ne juge pas
+    mesures.push(d); if (mesures.length < 120) return;
+    mesures.sort((a, b) => a - b); const med = mesures[60];
+    // (un appareil bridé à 30 images par seconde, comme un iPad en mode économie d'énergie, donne des images régulières : ce n'est pas une saccade)
+    if ((med > 40 || (med > 21 && mesures[12] < 26)) && qualite > .55) { qualite = Math.max(.55, qualite - .15); aise = 0; taille(); }
+    else if (med < 15.5 && qualite < 1 && ++aise >= 4) { qualite = Math.min(1, qualite + .1); aise = 0; taille(); }
+    mesures.length = 0;
+  }
   const niveaux = [0, 0], _t = new THREE.Vector3(), cFroid = new THREE.Color('#6f7fae'), cChaud = new THREE.Color(), cAmpouleOff = new THREE.Color('#3a3128'), cAmpouleOn = new THREE.Color('#ffe2a6'), cVuOff = new THREE.Color('#3b2c18'), cVuOn = new THREE.Color('#ffcf7a');
   dessinerCiel(0, 1); dessinerLcd(true, 0);
   function image(ms) {
@@ -1498,7 +1527,9 @@ function lancer() {
     queueT.rotation.y = eveilTalya ? Math.sin(t * 16) * .55 * eveilTalya : ondule(Math.sin(t * (etat.joue ? 3 : 1.2)) * (etat.joue ? .25 : .08));
 
     placerCamera(ms);
+    if (ms - derniereOmbre > 30 || premiere) { derniereOmbre = ms; rendu.shadowMap.needsUpdate = true; }
     rendu.render(scene, camera);
+    suivreFluidite(ms);
     placerPensee();
     placerEtiquette();
     if (premiere) { premiere = false; requestAnimationFrame(() => toile.classList.add('prete')); }
@@ -1537,7 +1568,7 @@ function lancer() {
     }
   });
   if (window.ResizeObserver) { const ro = new ResizeObserver(() => taille()); conteneurs.forEach(c => ro.observe(c)); }
-  addEventListener('resize', taille);
+  addEventListener('resize', taille); addEventListener('md-mise-en-page', taille);
   document.body.classList.add('piece-3d');
 
   // les images des cadres arrivent après le reste
