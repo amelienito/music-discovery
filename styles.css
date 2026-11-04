@@ -1341,3 +1341,9 @@ body[data-vitesse="hypno"].cd-tourne .plein-disque { animation-duration: 5.5s; }
 .retour-hub:hover { color: var(--encre); border-color: var(--encre-2); background: var(--fond-2); }
 .retour-hub + .marque { margin-right: auto; }
 @media (max-width: 700px) { .retour-hub span { display: none; } .retour-hub { padding: 7px 10px; } }
+
+/* avant « Commencer » : la page ne défile pas, et le bouton fait signe si on essaie */
+html.avant-commencer, html.avant-commencer body { overflow: hidden; overscroll-behavior: none; }
+.interrupteur.appel { animation: appel-commencer .55s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes appel-commencer { 0%, 100% { transform: none; } 30% { transform: translateY(-7px) scale(1.06); } 60% { transform: translateY(2px) scale(.99); } }
+@media (prefers-reduced-motion: reduce) { .interrupteur.appel { animation: none; } }

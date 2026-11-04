@@ -125,6 +125,8 @@ const ecoutable = m => jouable(m) || Pochettes.etat(m) !== 'absent';
 /* ─────────────────────────────── petits sons de la machine ─────────────────────────────── */
 let ctxAudio = null;
 function audioCtx() {
+  // l'iPhone en mode silencieux coupe le son « d'ambiance » des pages : on demande le son d'une lecture (comme la vidéo)
+  try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) {}
   try { ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)(); if (ctxAudio.state === 'suspended') ctxAudio.resume(); } catch (e) {}
   return ctxAudio;
 }
@@ -145,6 +147,7 @@ function clic(freq = 1800, duree = 0.035, volume = 0.05) {
 
 /* ─────────────────────────────── navigation ─────────────────────────────── */
 function aller(vue) {
+  if (vue !== 'allumage') document.documentElement.classList.remove('avant-commencer');   // (on est entré : la page défile)
   const change = S.vue !== vue;
   S.vue = vue;
   const faire = () => {
@@ -1140,6 +1143,7 @@ function choisirSource(k) {
 function jouerRadio(id, { debut = 0 } = {}) {
   const m = parId[id];
   if (!m) return;
+  document.documentElement.classList.remove('avant-commencer');   // un morceau démarre (même sans passer par « Commencer ») : la page défile
   S.livrets.machine = false;
   croiser(m.id);
   if (S.historique[S.historique.length - 1] !== m.id) { S.historique.push(m.id); compterEcoute(m); compterTourSelection(); }
@@ -1696,7 +1700,24 @@ function fermerAide() {
   $('#aide').classList.remove('ouverte');
   setTimeout(() => { $('#aide').hidden = true; }, 250);
 }
+// avant « Commencer », la page ne défile pas : le bouton fait signe. On démarre avec le son, puis on va où on veut.
+document.documentElement.classList.add('avant-commencer');
+function appelerCommencer() {
+  const b = $('.interrupteur'); if (!b) return;
+  b.classList.remove('appel'); void b.offsetWidth; b.classList.add('appel');
+}
+{
+  const libre = t => t && t.closest && t.closest('.bac, .reglages, dialog, .tiroir, [data-molette], .aide, .avis-appli');
+  const retenir = e => {
+    if (!document.documentElement.classList.contains('avant-commencer') || libre(e.target)) return;
+    if (e.cancelable) e.preventDefault();
+    if (!retenir.t || Date.now() - retenir.t > 700) { retenir.t = Date.now(); appelerCommencer(); }
+  };
+  addEventListener('wheel', retenir, { passive: false });
+  addEventListener('touchmove', retenir, { passive: false });
+}
 function allumer() {
+  document.documentElement.classList.remove('avant-commencer');
   audioCtx();
   clic(220, 0.12, 0.12);
   setTimeout(() => clic(2600, 0.02, 0.04), 140);

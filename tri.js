@@ -919,6 +919,7 @@ $('#opt-son').addEventListener('change', () => { try { localStorage.setItem('md-
 let ctxSon = null, klaxon = null, klaxonCharge = null;
 function chargerKlaxon() {
   if (klaxonCharge) return klaxonCharge;
+  try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) {}   // le klaxon passe même iPhone en silencieux
   ctxSon = ctxSon || new (window.AudioContext || window.webkitAudioContext)();
   klaxonCharge = fetch('son/klaxon.mp3').then(r => r.arrayBuffer())
     .then(b => new Promise((ok, ko) => ctxSon.decodeAudioData(b, ok, ko)))
