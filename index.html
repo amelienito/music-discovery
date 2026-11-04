@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=64">
+  <link rel="stylesheet" href="styles.css?v=67">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -101,10 +101,6 @@
           <div class="hifi-haut">
             <span class="hifi-marque">Music&nbsp;Discovery</span>
             <span class="hifi-modele">AG-08 · Compact Disc Micro System</span>
-            <div class="choix-affichage" role="radiogroup" aria-label="Affichage de la chaîne">
-              <button role="radio" data-action="affichage" data-val="ecran" aria-checked="true">Écran</button>
-              <button role="radio" data-action="affichage" data-val="disque" aria-checked="false">Disque</button>
-            </div>
             <button class="bouton-cosmetique" data-action="cosmetique" aria-expanded="false" aria-controls="trappe" title="Les petits réglages inutiles"><span class="bouton-cosmetique-texte">Cosmétique</span></button>
             <span class="hifi-veille" aria-hidden="true"></span>
           </div>
@@ -159,6 +155,13 @@
           <div class="trappe" id="trappe">
             <div class="trappe-tete"><p class="trappe-titre">Cosmétique : des petits réglages inutiles</p><button class="trappe-fermer" data-action="cosmetique" aria-label="Replier les réglages">×</button></div>
             <div class="trappe-panneau">
+              <div class="bidouille">
+                <span class="bidouille-nom">Affichage</span>
+                <div class="segments choix-affichage" role="radiogroup" aria-label="Affichage de la chaîne">
+                  <button role="radio" data-action="affichage" data-val="ecran" aria-checked="true">Écran</button>
+                  <button role="radio" data-action="affichage" data-val="disque" aria-checked="false">Disque qui tourne</button>
+                </div>
+              </div>
               <div class="bidouille">
                 <span class="bidouille-nom">Couleur de l'écran</span>
                 <div class="leds" role="radiogroup" aria-label="Couleur de l'écran">
@@ -221,7 +224,7 @@
           </div>
           <div class="pile-disques" id="pile-disques" role="radiogroup" aria-labelledby="pile-titre" aria-live="polite"></div>
           <div class="pile-pied">
-            <button class="pile-flemme" id="pile-flemme" data-action="auto">Flemme de choisir le son d'après&nbsp;? <u>Clique ici</u></button>
+            <button class="pile-flemme" id="pile-flemme" data-action="auto">Flemme de choisir<span class="masquer-mobile"> le son d'après</span>&nbsp;? <u>Clique ici</u></button>
             <button class="pile-autres" id="pile-autres" data-action="autres-disques" hidden><span aria-hidden="true">↻</span> Autres disques</button>
           </div>
         </section>
@@ -310,7 +313,7 @@
     <div class="bac-tete">
       <div>
         <h2>Ma sélection</h2>
-        <p class="bac-explication">Les morceaux que tu as gardés, et tout ce qui est passé dans la chaîne. C'est enregistré dans ce navigateur, même si tu reviens dans six mois.</p>
+        <p class="bac-explication">Tes coups de cœur, et tout ce qui est passé dans la chaîne. Ça reste dans ce navigateur, même dans six mois.</p>
       </div>
       <button class="lien-bouton" data-action="fermer-panneaux">Fermer</button>
     </div>
@@ -343,13 +346,14 @@
       <button class="choix-son" role="radio" data-action="son" data-son="complet" aria-checked="true">
         <strong>Morceaux complets</strong><span>Via YouTube. Sans pub avec YouTube Premium, si YouTube te reconnaît ici.</span>
       </button>
-      <div class="reglage-premium">
-        <p id="astuce-premium"></p>
-        <a class="lien-bouton" id="connexion-youtube" target="_blank" rel="noopener">Se connecter à YouTube ↗</a>
-      </div>
       <button class="choix-son" role="radio" data-action="son" data-son="extraits" aria-checked="false">
         <strong>Extraits de 30 secondes</strong><span>Zéro pub, sans compte. Idéal pour découvrir vite.</span>
       </button>
+      <div class="reglage-premium">
+        <p class="reglage-premium-titre">T'as YouTube Premium mais des pubs ?</p>
+        <p id="astuce-premium"></p>
+        <a class="lien-bouton" id="connexion-youtube" target="_blank" rel="noopener">Se connecter à YouTube ↗</a>
+      </div>
       <p class="reglage-note">Le livret de chaque morceau a aussi ses liens Deezer, Apple Music, Qobuz et Bandcamp.</p>
     </div>
     <div class="reglage-teinte">
@@ -366,7 +370,7 @@
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=10"></script>
-  <script src="app.js?v=66"></script>
+  <script src="app.js?v=68"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
   <script type="module" src="piece.min.js?v=14"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>

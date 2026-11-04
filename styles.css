@@ -369,12 +369,9 @@ body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0,
 .hifi-veille { margin-left: 4px; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
 body.chaine-allumee .hifi-veille { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
 body[data-dimmer="1"] .hifi-veille { opacity: .5; }
-/* le choix d'affichage et la cosmétique, en haut de la façade */
-.choix-affichage { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); align-self: center; }
-.choix-affichage button { min-height: 28px; padding: 0 11px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; transition: background-color .15s, color .15s; }
-.choix-affichage button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
+/* en haut de la façade, un seul bouton : la cosmétique (le choix écran / disque est rangé dedans) */
 .bouton-cosmetique {
-  align-self: center; display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 9px; white-space: nowrap;
+  margin-left: auto; align-self: center; display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 9px; white-space: nowrap;
   font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
   background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 5px rgba(0,0,0,.35); transition: transform .08s, box-shadow .08s, filter .15s;
@@ -601,6 +598,16 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
   background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(255,255,255,.14) 60%, rgba(0,0,0,.3));
 }
 .pile-reflet { position: absolute; z-index: 2; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.32), rgba(255,255,255,0) 38%); }
+/* le CD, rangé dans son boîtier : celui qui passe ensuite sort à moitié, prêt à jouer */
+.pile-cd {
+  position: absolute; z-index: -1; top: 5%; bottom: 5%; right: 3%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 7%, rgba(255,255,255,.7) 7.5% 9%, #d9dee4 9.5% 15%, rgba(0,0,0,.08) 15.5% 16%, transparent 16.5%),
+              conic-gradient(from 30deg, #e9ecf0, #b9c1cc 12%, #f2e4f3 24%, #bfe2f0 36%, #e3f2d4 48%, #f4e4c4 60%, #c3c9d3 72%, #ecdff2 86%, #e9ecf0);
+  box-shadow: 0 3px 8px rgba(0,0,0,.28), inset 0 0 0 1px rgba(0,0,0,.14);
+  transition: transform .55s cubic-bezier(.2,.9,.3,1.2);
+}
+.disque-pile.choisi .pile-cd { transform: translateX(30%) rotate(50deg); }
+@media (hover: hover) { .disque-pile:not(.choisi):hover .pile-cd { transform: translateX(12%) rotate(20deg); } }
 .pile-scotch {
   position: absolute; z-index: 3; top: -13px; left: 50%; max-width: 112%; transform: translateX(-50%) rotate(-3deg);
   padding: 4px 10px 3px; border-radius: 2px; background: linear-gradient(180deg, #2b2b31, #151518); box-shadow: 0 2px 5px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12);
@@ -736,7 +743,8 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .avis-pub[data-forme="compact"] .avis-pub-fermer { position: static; width: 34px; height: 34px; }
 @media (min-width: 900px) { .avis-pub { left: 24px; right: auto; bottom: 24px; margin: 0; width: 420px; } .avis-pub[data-forme="compact"] { width: auto; } }
 @media (max-width: 899px) { body.mode-salon .avis-pub { bottom: auto; top: calc(12px + env(safe-area-inset-top)); } }   /* en mode salon sur téléphone, les commandes sont en bas : on se met en haut */
-.reglage-premium { display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--fond-2); font-size: 14px; line-height: 1.45; color: var(--encre-2); }
+.reglage-premium { display: grid; gap: 6px; margin-top: 6px; padding: 2px 0 2px 14px; border-left: 2px solid var(--trait); font-size: 14px; line-height: 1.45; color: var(--encre-2); }
+.reglage-premium-titre { font-weight: 600; color: var(--encre); }
 .reglage-premium .lien-bouton { justify-self: start; font-size: 14px; font-weight: 600; color: var(--encre); }
 @media (prefers-reduced-motion: reduce) { .avis-pub, .avis-pub-point { animation: none; } }
 .machine-source { margin-top: -14px; font-size: 14px; color: var(--encre-2); text-align: center; }
@@ -933,7 +941,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 @media (prefers-reduced-motion: reduce) { .avis-appli-fleche { animation: none !important; } }
 
 /* ─────────────────────────────── ORDINATEUR ─────────────────────────────── */
-@media (max-width: 1200px) { #teintes-facade { display: none; } }
+#teintes-facade { display: none; }   /* les teintes se choisissent dans Réglages : la barre du haut reste légère */
 
 @media (min-width: 1100px) and (max-height: 860px) {
   .ecran-machine { padding-top: 10px; }
@@ -1017,8 +1025,9 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .seulement-mobile-inline { display: inline; }
 
   .ecran-allumage { gap: 26px; }
-  .etapes { gap: 8px 14px; }
-  .etapes li { font-size: 13px; gap: 8px; }
+  /* les trois étapes sur une seule ligne : le numéro au-dessus, deux lignes de texte au plus */
+  .etapes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 360px; }
+  .etapes li { display: grid; justify-items: center; align-content: start; gap: 6px; font-size: 13px; line-height: 1.25; text-wrap: balance; }
   .etapes li + li::before { display: none; }
   .panneau-allumage { padding: 20px 24px; gap: 24px; }
   .bouton-rotatif-grand .molette { width: 88px; height: 88px; }
@@ -1040,14 +1049,16 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .lcd { min-height: 0; padding: 10px 12px; grid-template-rows: auto auto; gap: 4px; }
   .lcd .lcd-spectre, .lcd .lcd-suite, .lcd .lcd-bas { display: none; }
   .lcd .lcd-defile { font-size: 17px; }
-  .rond { width: 46px; height: 46px; }
-  .rond-lecture { width: 56px; height: 56px; }
-  .hifi-commandes { gap: 10px; padding-top: 10px; }
-  .hifi-actions { flex: none; flex-wrap: nowrap; gap: 8px; }
-  .hifi-actions .pilule { flex: none; width: 46px; padding: 0; }
-  .pilule-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .pilule-coeur .pilule-icone { font-size: 17px; }
-  .pilule-bof .pouce { width: 18px; height: 18px; }
+  /* les commandes : précédent, lecture, suivant au centre (la pause suffit, pas de stop) ; dessous, ton avis, en toutes lettres */
+  .rond { width: 48px; height: 48px; }
+  .rond-lecture { width: 60px; height: 60px; }
+  .hifi-commandes { gap: 12px; padding-top: 12px; }
+  .transport { justify-content: center; gap: 26px; }
+  .rond[data-action="radio-stop"] { display: none; }
+  .hifi-actions { flex: 1 1 100%; flex-wrap: nowrap; gap: 8px; }
+  .hifi-actions .pilule { flex: 1 1 0; min-width: 0; padding: 0 10px; font-size: 14px; }
+  .pilule-coeur .pilule-icone { font-size: 16px; }
+  .pilule-bof .pouce { width: 17px; height: 17px; }
   .trappe-panneau { gap: 14px 18px; padding: 14px; }
   .glissiere { grid-template-columns: repeat(3, 52px); }
   .glissiere-curseur { width: 46px; transform: translateX(calc(var(--pos) * 52px)); }
@@ -1064,6 +1075,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .pile-titre-m { font-size: 13px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .pile-artiste { font-size: 12px; }
   .pile-maintenant { padding: 0 12px; min-height: 34px; font-size: 12.5px; gap: 6px; }
+  .pile-cd { display: none; }   /* sur téléphone, les boîtiers se touchent : le CD resterait caché (ou dépasserait de l'écran) */
   .pile-maintenant-long { display: none; }
   .pile-pied { font-size: 12.5px; }
   .source-choix { flex: 1; }

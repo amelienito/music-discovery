@@ -279,7 +279,7 @@ function basculerGarde(id) {
     S.gardes.unshift(id);
     S.aimePas.delete(id);
     const n = S.gardes.length;
-    toast(n === 1 ? 'Noté ♥ La suite va dans ce sens.' : n === 2 ? 'Deux coups de cœur : « Ma sélection » apparaît en haut, et tu peux l\'écouter depuis le tuner.' : `Noté ♥ Dans ta sélection (${n}).`, n === 2 ? 5000 : 2400);
+    toast(n === 1 ? 'Noté ♥ La suite va dans ce sens.' : n === 2 ? 'Deux coups de cœur : ta sélection t\'attend en haut ↗' : `Noté ♥ Dans ta sélection (${n}).`, n === 2 ? 3600 : 2400);
     clic(900, 0.08, 0.06);
     const b = $('.bouton-trouvailles'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
   }
@@ -762,7 +762,8 @@ function majSalon() {
   const im = affiche && Pochettes.image(affiche);
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
   // entre deux morceaux (le suivant charge, une pub passe), il attend tranquille ; il ne déprime que sur une vraie pause
-  const etat = { joue: S.enLecture, attente: !S.enLecture && !!m && (!S.pauseVoulue || Date.now() - S.pauseA < 2500), bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
+  // (avant le premier morceau, sur le carton d'entrée, il attend aussi : la pièce ne s'éteint pas avant même d'avoir commencé)
+  const etat = { joue: S.enLecture, attente: !S.enLecture && ((!!m && (!S.pauseVoulue || Date.now() - S.pauseA < 2500)) || !S.joues), bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
     titre: m ? m.affiche : '', artiste: m ? m.artiste : '', note: m && m.note ? typoFr(m.note) : '' };
   window.__salonEtat = etat;                                   // la pièce 3D le lit en arrivant
   if (typeof Salon !== 'undefined') Salon.maj(etat);
@@ -1400,12 +1401,13 @@ function disquePile({ m, dir }, i) {
   const penche = [-2.4, 1.2, 2.2][i % 3] + ((hache(m.id) % 5) - 2) * 0.4;
   return `<div class="disque-pile${choisi ? ' choisi' : ''}" data-id="${m.id}" data-dir="${dir || ''}" style="--penche:${penche.toFixed(1)}deg;--i:${i}">
     <button class="pile-boite" data-action="choisir-disque" data-i="${i}" role="radio" aria-checked="${choisi}" aria-label="${E(mot)} : ${E(m.affiche)}, ${E(m.artiste)}${choisi ? ' (passe ensuite, rappuie pour l\'écouter maintenant)' : ''}">
+      <span class="pile-cd" aria-hidden="true"></span>
       <span class="pile-scotch" aria-hidden="true">${E(mot)}</span>
       ${officielle ? Pochettes.html(m, 'pochette-pile') : pochetteMaison(m)}
       <span class="pile-reflet" aria-hidden="true"></span>
     </button>
     <p class="pile-morceau"><span class="pile-titre-m">${E(m.affiche)}</span><span class="pile-artiste">${E(m.artiste)}</span></p>
-    ${choisi ? `<button class="pile-maintenant" data-action="radio-suivant" title="Passer au suivant (→)"><span><span class="pile-maintenant-long">Écouter </span>maintenant</span><span class="icone icone-suiv" aria-hidden="true"></span></button>` : ''}
+    ${choisi ? `<button class="pile-maintenant" data-action="radio-suivant" title="Passer au suivant (→)"><span>Écouter<span class="pile-maintenant-long"> maintenant</span></span><span class="icone icone-suiv" aria-hidden="true"></span></button>` : ''}
   </div>`;
 }
 // ton mot sur le morceau : un post-it collé sur l'enceinte de droite (sous la chaîne sur petit écran)
