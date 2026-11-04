@@ -706,21 +706,39 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
   .hifi .post-it { grid-area: postit; position: relative; z-index: 5; right: auto; top: auto; justify-self: end; width: auto; max-width: min(380px, 86%); margin: -26px 6% 0 0; }
 }
 
-/* ─── sous la chaîne : « Des pubs ? » une fois, et l'extrait quand YouTube refuse ─── */
-.avis-pub {
-  display: grid; gap: 6px 12px; width: 100%; max-width: 720px; padding: 10px 14px; border-radius: 12px;
-  font-size: 14px; border: 1px dashed var(--trait); animation: sortie .45s cubic-bezier(.2,.9,.3,1.1);
-}
-.avis-titre { font-family: var(--texte); font-weight: 700; font-size: 14px; line-height: 1.1; color: var(--encre); }
-.avis-pub p { line-height: 1.45; }
-.avis-pub p:not(.avis-titre) { color: var(--encre-2); }
 .avis-actions { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 2px; }
-.avis-pub .gros-bouton { min-height: 32px; padding: 0 14px; font-size: 13px; box-shadow: none; }
-.avis-pub .lien-bouton { font-size: 13px; }
-.avis-machine { justify-self: center; max-width: 980px; margin-bottom: -10px; padding: 10px 12px 10px 16px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 16px; }
-.avis-machine .avis-titre, .avis-machine p { grid-column: 1; }
-.avis-machine .avis-actions { grid-column: 2; grid-row: 1 / span 2; margin: 0; flex-wrap: nowrap; }
-@media (max-width: 640px) { .avis-machine { grid-template-columns: minmax(0, 1fr); } .avis-machine .avis-actions { grid-column: 1; grid-row: auto; flex-wrap: wrap; } }
+
+/* ─── une pub YouTube passe : en bas de l'écran, partout (même en mode salon), de quoi l'éviter tout de suite ─── */
+.avis-pub {
+  position: fixed; z-index: 47; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
+  width: auto; max-width: 440px; margin: 0 auto; display: grid; gap: 10px; padding: 16px 18px 16px; border-radius: 18px;
+  background: var(--encre); color: var(--fond); box-shadow: 0 20px 50px rgba(0,0,0,.4);
+  animation: sortie .45s cubic-bezier(.2,.9,.3,1.1) both;
+}
+.avis-pub[hidden] { display: none; }
+.avis-pub-titre { display: flex; align-items: center; gap: 9px; padding-right: 30px; font: 700 16px/1.2 var(--texte); }
+.avis-pub-point { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #ffcc33; box-shadow: 0 0 0 4px rgba(255,204,51,.22); animation: pub-pouls 1.2s ease-in-out infinite; }
+@keyframes pub-pouls { 50% { box-shadow: 0 0 0 7px rgba(255,204,51,0); } }
+.avis-pub-texte { margin-top: -4px; font-size: 15px; line-height: 1.4; opacity: .8; }
+.avis-pub-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.avis-pub .gros-bouton { min-height: 44px; padding: 0 18px; font-size: 15px; background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; }
+.avis-pub .gros-bouton-plein { background: var(--aiguille); color: var(--sur-aiguille); box-shadow: none; }
+.avis-pub-premium { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(127,127,127,.35); font-size: 14px; line-height: 1.45; }
+.avis-pub-premium p { opacity: .85; }
+.avis-pub-premium .lien-bouton { justify-self: start; color: inherit; font-weight: 600; }
+.avis-pub-premium[hidden] { display: none; }
+.avis-pub-fermer { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; font-size: 22px; line-height: 1; color: inherit; opacity: .6; }
+.avis-pub-fermer:hover { opacity: 1; background: rgba(127,127,127,.2); }
+/* une fois refermé : juste une pastille, tant que la pub dure */
+.avis-pub[data-forme="compact"] { grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; max-width: 380px; padding: 8px 8px 8px 16px; border-radius: 999px; }
+.avis-pub[data-forme="compact"] .avis-pub-titre { padding: 0; font-size: 14px; white-space: nowrap; }
+.avis-pub[data-forme="compact"] .gros-bouton { min-height: 38px; padding: 0 14px; font-size: 14px; }
+.avis-pub[data-forme="compact"] .avis-pub-fermer { position: static; width: 34px; height: 34px; }
+@media (min-width: 900px) { .avis-pub { left: 24px; right: auto; bottom: 24px; margin: 0; width: 420px; } .avis-pub[data-forme="compact"] { width: auto; } }
+@media (max-width: 899px) { body.mode-salon .avis-pub { bottom: auto; top: calc(12px + env(safe-area-inset-top)); } }   /* en mode salon sur téléphone, les commandes sont en bas : on se met en haut */
+.reglage-premium { display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--fond-2); font-size: 14px; line-height: 1.45; color: var(--encre-2); }
+.reglage-premium .lien-bouton { justify-self: start; font-size: 14px; font-weight: 600; color: var(--encre); }
+@media (prefers-reduced-motion: reduce) { .avis-pub, .avis-pub-point { animation: none; } }
 .machine-source { margin-top: -14px; font-size: 14px; color: var(--encre-2); text-align: center; }
 
 /* ─────────────────────────────── L'ÉCRAN VIDÉO ───────────────────────────────

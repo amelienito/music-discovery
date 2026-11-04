@@ -97,6 +97,7 @@ const S = {
   auto: memoire.lire('md-auto', false), // « Flemme de choisir » : la radio enchaîne toute seule
   autoDir: null, autoPas: 0, // le pilote automatique glisse doucement dans un sens, puis change
   pub: false,             // une pub YouTube semble passer avant le morceau
+  avisFerme: false,       // … et on a refermé le petit mot pour ce morceau-là
   joues: 0,               // morceaux lancés depuis l'arrivée sur la page
   reprise: memoire.lire('md-reprise', {}),        // où on en était dans chaque source
   fidget: Object.assign({ lcd: 'origine', eq: 'barres', vitesse: '33', loudness: false, dimmer: '3', lumieres: 'tempo', grilles: false, bip: true }, memoire.lire('md-fidget', {})),
@@ -467,16 +468,46 @@ function ouvrirLivret(ou, m) {
 }
 
 // la première fois qu'un morceau passe par YouTube : pourquoi des pubs, et comment s'en passer légalement
-const AVIS_PUB = `
-  <p class="avis-titre">Des pubs ?</p>
-  <p>Je sais que c'est relou, mais c'est lié à YouTube. Si t'as YouTube Premium, il suffit de te connecter ; sinon, passe en mode extraits.</p>
-  <div class="avis-actions">
-    <button class="gros-bouton gros-bouton-plein" data-action="encart-ok">Compris</button>
-    <button class="lien-bouton" data-action="encart-extraits">Passer en mode extraits</button>
-  </div>`;
+/* une pub YouTube passe : on le dit tout de suite, en bas de l'écran (même en mode salon), avec de quoi l'éviter.
+   La première fois, en entier ; une fois refermé, juste une pastille « Passer en extraits » tant que la pub dure. */
+const NAV = (() => {
+  const ua = navigator.userAgent;
+  const ios = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const safari = /Safari\//.test(ua) && !/Chrome\/|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|OPR\//.test(ua);
+  return { ios, safari, firefox: /Firefox\/|FxiOS/.test(ua) };
+})();
+const CONNEXION_YT = 'https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2F';
+// pourquoi YouTube ne voit pas Premium ici, selon le navigateur (le lecteur intégré n'a pas accès à la connexion faite sur youtube.com)
+function astucePremium() {
+  if (NAV.ios || NAV.safari) return `Safari cache ta connexion YouTube aux autres sites, alors ici YouTube ne sait pas que t'as Premium. Pour que ça marche&nbsp;: ${NAV.ios ? 'Réglages › Apps › Safari' : 'Safari › Réglages › Confidentialité'}, décoche «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi. En navigation privée, jamais.`;
+  if (NAV.firefox) return 'Firefox cloisonne ta connexion YouTube&nbsp;: ici, YouTube ne sait pas que t\'as Premium. Le plus simple&nbsp;: les extraits, ou la page dans Chrome.';
+  return 'Connecte-toi à YouTube dans ce navigateur (pas en navigation privée), puis relance le morceau&nbsp;: plus de pub.';
+}
 function majAvis() {
-  const montrer = S.lecture === 'yt' && S.pub && !memoire.lire('md-encart-pub-v2', false);
-  $$('[data-avis]').forEach(a => { if (montrer && !a.innerHTML.trim()) a.innerHTML = AVIS_PUB; a.hidden = !montrer; });
+  const el = $('#avis-pub');
+  if (!el) return;
+  const montrer = S.lecture === 'yt' && S.pub && !S.avisFerme;
+  if (!montrer) { el.hidden = true; el.classList.remove('ouvert'); return; }
+  const compact = memoire.lire('md-encart-pub-v3', false);
+  if (el.dataset.forme !== (compact ? 'compact' : 'entier')) {
+    el.dataset.forme = compact ? 'compact' : 'entier';
+    el.innerHTML = compact
+      ? `<p class="avis-pub-titre"><span class="avis-pub-point" aria-hidden="true"></span>Pub YouTube</p>
+         <button class="gros-bouton gros-bouton-plein" data-action="encart-extraits">Passer en extraits</button>
+         <button class="avis-pub-fermer" data-action="encart-ok" aria-label="Fermer">×</button>`
+      : `<p class="avis-pub-titre"><span class="avis-pub-point" aria-hidden="true"></span>Une pub YouTube passe</p>
+         <p class="avis-pub-texte">Les extraits de 30&nbsp;secondes, eux, n'en ont jamais.</p>
+         <div class="avis-pub-actions">
+           <button class="gros-bouton gros-bouton-plein" data-action="encart-extraits">Passer en extraits</button>
+           <button class="gros-bouton" data-action="encart-premium" aria-expanded="false">J'ai Premium</button>
+         </div>
+         <div class="avis-pub-premium" hidden>
+           <p>${astucePremium()}</p>
+           <a class="lien-bouton" href="${CONNEXION_YT}" target="_blank" rel="noopener">Se connecter à YouTube ↗</a>
+         </div>
+         <button class="avis-pub-fermer" data-action="encart-ok" aria-label="Fermer">×</button>`;
+  }
+  el.hidden = false;
 }
 
 /* ─────────────────────────────── pré-écoutes (30 secondes d'un titre de l'album, dans le livret) ─────────────────────────────── */
@@ -572,19 +603,25 @@ window.onYouTubeIframeAPIReady = () => {
     }
   });
 };
-// une pub avant le morceau : le lecteur tourne, mais le morceau reste à 0 seconde. On prévient (au-dessus de la chaîne)
+// une pub avant le morceau : le lecteur tourne, mais le morceau reste à 0 seconde. On prévient au bout de deux secondes
+// (en bas de l'écran), et le mot s'en va tout seul quand le morceau démarre enfin
 let veillePub = null;
 function surveillerPub(m, debut = 0) {
   clearInterval(veillePub);
-  S.pub = false; majAvis();
+  S.pub = false; S.avisFerme = false; majAvis();
   let immobile = 0, n = 0;
   veillePub = setInterval(() => {
-    if (S.joue !== m.id || S.lecture !== 'yt' || ++n > 120) { clearInterval(veillePub); return; }
+    if (S.joue !== m.id || S.lecture !== 'yt' || ++n > 240) { clearInterval(veillePub); return; }
     let st = -1, t = 0;
     try { st = lecteur.getPlayerState(); t = lecteur.getCurrentTime() || 0; } catch (e) {}
-    if (t > debut + 0.8) { clearInterval(veillePub); return; }
-    if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING) immobile++;
-    if (immobile >= 5 && !S.pub) { S.pub = true; majAvis(); }
+    if (t > debut + 0.8) {
+      clearInterval(veillePub);
+      // la pub est finie : le mot s'en va (sauf si on est en train de lire l'astuce Premium)
+      if (S.pub && !$('#avis-pub.ouvert')) { S.pub = false; majAvis(); }
+      return;
+    }
+    if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING || (st === YT.PlayerState.UNSTARTED && n > 6)) immobile++;
+    if (immobile >= 2 && !S.pub) { S.pub = true; majAvis(); }
   }, 1000);
 }
 // une vidéo qui ne démarre jamais (lecture automatique bloquée, vidéo coincée) ne doit pas tout figer.
@@ -852,7 +889,7 @@ function placerEcranVideo() {
 }
 addEventListener('resize', majVideo);
 
-// le temps qui passe : la chaîne, et la barre des extraits sur la platine
+// le temps qui passe : la chaîne, et la barre des extraits sur la chaîne
 setInterval(() => {
   if (S.vue !== 'machine' || !S.joue || !S.lecture) return;
   const [t] = tempsActuel();
@@ -1803,8 +1840,9 @@ const ACTIONS = {
   'copier-liste': copierListe,
   'son': b => choisirSon(b.dataset.son),
   'teinte': b => appliquerTeinte(b.dataset.teinte, true),
-  'encart-ok': () => { memoire.ecrire('md-encart-pub-v2', true); majAvis(); },
-  'encart-extraits': () => { memoire.ecrire('md-encart-pub-v2', true); majAvis(); choisirSon('extraits'); },
+  'encart-ok': () => { memoire.ecrire('md-encart-pub-v3', true); S.avisFerme = true; majAvis(); },
+  'encart-extraits': () => { memoire.ecrire('md-encart-pub-v3', true); S.avisFerme = true; majAvis(); choisirSon('extraits'); },
+  'encart-premium': b => { const p = $('#avis-pub .avis-pub-premium'), ouvert = p.hidden; p.hidden = !ouvert; b.setAttribute('aria-expanded', ouvert); $('#avis-pub').classList.toggle('ouvert', ouvert); },
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-action]');
@@ -1839,6 +1877,8 @@ appliquerTeinte(teinteActive, false);
 appliquerFidget();
 majMolettes();
 majSon();
+$('#astuce-premium').innerHTML = astucePremium();   // dans les réglages : pourquoi YouTube ne voit pas Premium ici, et comment y remédier
+$('#connexion-youtube').href = CONNEXION_YT;
 majGarde();
 S.suite = construireSuite(null);
 document.body.dataset.affichage = S.affichage;

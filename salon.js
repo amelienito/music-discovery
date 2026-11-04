@@ -4,7 +4,7 @@
    l'heure qu'il est vraiment chez toi (l'aube, le jour, le coucher de
    soleil, la nuit). Quand la musique joue, la pièce se réchauffe : la
    lampe s'allume plus fort, la tête suit le tempo du morceau, le pied
-   tape, le son sort de la platine. Au mur, la pochette du morceau.
+   tape, le son sort de la mini-chaîne CD. Au mur, la pochette du morceau.
    Tout est dessiné ici, en SVG : aucune image à charger.
    ════════════════════════════════════════════════════════════════════ */
 const Salon = (() => {
@@ -107,14 +107,14 @@ const Salon = (() => {
       <!-- au mur : la pochette du morceau qui passe, en grand -->
       <g class="salon-cadre">
         <rect x="590" y="78" width="104" height="104" fill="#1f1a15"/><rect x="595" y="83" width="94" height="94" fill="#efe7d8"/>
-        <rect class="cadre-vide" x="601" y="89" width="82" height="82" fill="#c8572f"/><circle class="cadre-vide" cx="642" cy="130" r="23" fill="#1d1c22"/><circle class="cadre-vide" cx="642" cy="130" r="4" fill="#efe7d8"/>
+        <rect class="cadre-vide" x="601" y="89" width="82" height="82" fill="#c8572f"/><circle class="cadre-vide" cx="642" cy="130" r="23" fill="#cfd4da"/><path class="cadre-vide" d="M642 130 L662 118 A23 23 0 0 1 664 136 Z" fill="#9fd8ff" opacity=".7"/><circle class="cadre-vide" cx="642" cy="130" r="8" fill="#e6eaee"/><circle class="cadre-vide" cx="642" cy="130" r="3" fill="#efe7d8"/>
         <image class="cadre-pochette" x="601" y="89" width="82" height="82" preserveAspectRatio="xMidYMid slice"/>
         <rect x="601" y="89" width="82" height="82" fill="url(#salon-reflet-${id})"/>
       </g>
 
       </g>
       <g class="couche couche-milieu">
-      <!-- le meuble et la platine -->
+      <!-- le meuble et la mini-chaîne CD -->
       <g class="salon-meuble">
         <rect x="574" y="256" width="150" height="70" rx="3" fill="#5a3520"/>
         <rect x="582" y="264" width="66" height="54" fill="#4a2a18"/><rect x="652" y="264" width="64" height="54" fill="#4a2a18"/>

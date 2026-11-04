@@ -4,7 +4,8 @@
    même parquet, mêmes murs, même fenêtre, vu de face comme une maison
    de poupée. Amélien est dans son fauteuil club en velours, les pieds sur
    le pouf, tourné vers sa chaîne japonaise (ampli à gros vu-mètres,
-   analyseur de spectre, tuner, double cassette, lecteur CD, platine), avec
+   analyseur de spectre, tuner, double cassette, écran du lecteur CD, et sur
+   le dessus le lecteur CD à chargement par le dessus, son CD qui tourne), avec
    une grande colonne de chaque côté : le son lui arrive des deux côtés.
    Au fond, Talya dort dans son panier, le chat sur le rebord de la fenêtre,
    et la fenêtre montre le vrai moment de la journée (onze tranches,
@@ -157,23 +158,50 @@ function lancer() {
   const REBORD = FY - FH / 2 - .07;
 
   /* au-dessus de la chaîne, ce qui passe en ce moment : une enseigne au néon « EN ÉCOUTE », et sur une tablette,
-     la pochette du morceau, le vinyle à moitié sorti (il tourne doucement quand ça joue) */
-  const vierge = (() => { const { x, t } = toileTexte(64, 64); x.fillStyle = '#c8572f'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#1d1c22'; x.beginPath(); x.arc(32, 32, 18, 0, 7); x.fill(); x.fillStyle = '#efe7d8'; x.beginPath(); x.arc(32, 32, 3, 0, 7); x.fill(); return t; })();
-  const etiquetteDisque = new THREE.MeshStandardMaterial({ map: vierge, roughness: .5 });   // le rond central des vinyles : la même pochette
+     un boîtier de CD géant avec la pochette du morceau, le CD à moitié sorti (il tourne quand ça joue) */
+  const vierge = (() => { const { x, t } = toileTexte(64, 64); x.fillStyle = '#c8572f'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#d4d8dd'; x.beginPath(); x.arc(32, 32, 20, 0, 7); x.fill(); x.fillStyle = 'rgba(159,216,255,.7)'; x.beginPath(); x.arc(32, 32, 14, -.6, 1.2); x.arc(32, 32, 8, 1.2, -.6, true); x.fill(); x.fillStyle = '#efe7d8'; x.beginPath(); x.arc(32, 32, 3, 0, 7); x.fill(); return t; })();
+  const etiquetteDisque = new THREE.MeshStandardMaterial({ map: vierge, roughness: .4, flatShading: false });   // la sérigraphie du CD du lecteur : la même pochette
+  // la face gravée d'un CD : l'argent, les reflets arc-en-ciel (ils tournent avec lui), le moyeu transparent
+  const faceCD = (() => {
+    const { x, t } = toileTexte(256, 256), c = 128;
+    const base = x.createRadialGradient(c, c, 20, c, c, c); base.addColorStop(0, '#dfe3e8'); base.addColorStop(.7, '#b7bec8'); base.addColorStop(1, '#949cab'); x.fillStyle = base; x.beginPath(); x.arc(c, c, c, 0, 7); x.fill();
+    // deux éventails arc-en-ciel face à face, et un reflet blanc à côté de chacun : c'est à ça qu'on reconnaît un CD
+    if (x.createConicGradient) [.35, .35 + Math.PI].forEach(a0 => {
+      const w = 1.05, f = w / (Math.PI * 2), arc = x.createConicGradient(a0, c, c);
+      ['rgba(255,70,90,0)', 'rgba(255,70,90,.75)', 'rgba(255,200,60,.75)', 'rgba(90,230,120,.75)', 'rgba(60,200,255,.75)', 'rgba(150,90,255,.7)', 'rgba(150,90,255,0)'].forEach((k, i, l) => arc.addColorStop(f * i / (l.length - 1), k));
+      arc.addColorStop(Math.min(.999, f + .001), 'rgba(0,0,0,0)'); arc.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = arc; x.beginPath(); x.arc(c, c, c, 0, 7); x.arc(c, c, 42, 0, 7, true); x.fill();
+      const blanc = x.createConicGradient(a0 - .32, c, c); blanc.addColorStop(0, 'rgba(255,255,255,0)'); blanc.addColorStop(.025, 'rgba(255,255,255,.65)'); blanc.addColorStop(.05, 'rgba(255,255,255,0)'); blanc.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = blanc; x.beginPath(); x.arc(c, c, c, 0, 7); x.arc(c, c, 42, 0, 7, true); x.fill();
+    });
+    x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 1; for (let r = 46; r < c; r += 7) { x.beginPath(); x.arc(c, c, r, 0, 7); x.stroke(); }
+    x.strokeStyle = 'rgba(70,74,84,.5)'; x.lineWidth = 2; x.beginPath(); x.arc(c, c, c - 1.5, 0, 7); x.stroke();
+    x.fillStyle = 'rgba(40,40,48,.35)'; x.font = '600 9px ui-monospace, monospace'; x.textAlign = 'center'; x.fillText('MD-0001 · COMPACT DISC DIGITAL AUDIO', c, c - 48);
+    x.fillStyle = '#d6dadf'; x.beginPath(); x.arc(c, c, 40, 0, 7); x.fill();
+    x.fillStyle = 'rgba(205,214,224,.6)'; x.beginPath(); x.arc(c, c, 30, 0, 7); x.fill();
+    x.fillStyle = '#3a3532'; x.beginPath(); x.arc(c, c, 10, 0, 7); x.fill();
+    return t;
+  })();
   const poster = vivant(groupe(piece, -LARG + .02, 0, CHAINE.z, Math.PI / 2));
   boite(1.16, .035, .17, M('#4a2c18', { roughness: .55 }), poster, 0, 1.42, .085);                                // la tablette
   boite(1.16, .028, .014, M('#c9a24a', { metalness: .75, roughness: .3, flatShading: false }), poster, 0, 1.452, .166);   // son rebord en laiton
   [-1, 1].forEach(s => { const e = boite(.02, .1, .1, M('#2a180c'), poster, s * .45, 1.37, .05); e.rotation.x = -.6; });   // les équerres
-  const vinyleMural = vivant(groupe(poster, .25, 1.77, .045));
+  // le CD, à moitié sorti du boîtier, côté gravé vers nous (l'arc-en-ciel) : il tourne quand ça joue
+  const cdMural = vivant(groupe(poster, .2, 1.765, .052));
   {
-    const d = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .006, 44), M('#0d0c0f', { roughness: .22, flatShading: false })); d.rotation.x = Math.PI / 2; vinyleMural.add(d);
-    for (let k = 1; k < 5; k++) { const sillon = new THREE.Mesh(new THREE.TorusGeometry(.12 + k * .04, .0016, 3, 48), M('#2c2a31', { roughness: .3 })); sillon.position.z = .0035; vinyleMural.add(sillon); }
-    const rond = new THREE.Mesh(new THREE.CircleGeometry(.095, 28), etiquetteDisque); rond.position.z = .004; vinyleMural.add(rond);
+    const d = new THREE.Mesh(new THREE.CylinderGeometry(.27, .27, .004, 56), new THREE.MeshStandardMaterial({ map: faceCD, emissive: '#ffffff', emissiveMap: faceCD, emissiveIntensity: .3, metalness: .15, roughness: .28, flatShading: false }));
+    d.rotation.x = Math.PI / 2; cdMural.add(d);
   }
-  const pochette = groupe(poster, -.1, 1.775, .072); pochette.rotation.x = -.07;
-  boite(.66, .66, .014, M('#efe7d8', { roughness: .7 }), pochette, 0, 0, 0);
-  const affiche = new THREE.Mesh(new THREE.PlaneGeometry(.645, .645), new THREE.MeshStandardMaterial({ map: vierge, roughness: .55 }));
-  affiche.position.z = .0075; pochette.add(affiche);
+  // le boîtier de CD, en grand : le plateau noir, le livret (la pochette), le couvercle en plastique transparent et sa charnière
+  const pochette = groupe(poster, -.12, 1.755, .08); pochette.rotation.x = -.07;
+  boite(.704, .62, .012, M('#141317', { roughness: .35 }), pochette, 0, 0, -.006);                         // le plateau, derrière
+  const affiche = new THREE.Mesh(new THREE.PlaneGeometry(.58, .58), new THREE.MeshStandardMaterial({ map: vierge, roughness: .55 }));
+  affiche.position.set(.04, 0, .002); pochette.add(affiche);
+  const plastique = new THREE.MeshStandardMaterial({ color: '#e8eef5', transparent: true, opacity: .16, roughness: .04, metalness: .1, depthWrite: false, flatShading: false });
+  boite(.704, .62, .008, plastique, pochette, 0, 0, .008).castShadow = false;                              // le couvercle (transparent : pas d'ombre sur la pochette)
+  boite(.05, .62, .02, new THREE.MeshStandardMaterial({ color: '#2a2a30', transparent: true, opacity: .55, roughness: .2 }), pochette, -.327, 0, .004).castShadow = false;   // la charnière
+  [-.25, .25].forEach(y => { boite(.03, .06, .024, M('#1c1c21', { roughness: .3 }), pochette, -.327, y, .004).castShadow = false; });
+  { const reflet = new THREE.Mesh(new THREE.PlaneGeometry(.09, .66), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .07, depthWrite: false })); reflet.position.set(.12, 0, .0125); reflet.rotation.z = -.55; pochette.add(reflet); }
   // l'enseigne au néon : allumée quand ça joue, éteinte (des tubes gris) sur une vraie pause
   const neon = toileTexte(512, 104);
   function dessinerNeon(allume) {
@@ -322,7 +350,7 @@ function lancer() {
 
   /* ═══════════════ la chaîne : une grande chaîne japonaise, en éléments séparés, dans un meuble en noyer ═══════════════
      de bas en haut : l'ampli et ses deux gros vu-mètres, l'analyseur de spectre, le tuner et son cadran éclairé,
-     la double platine cassette, le lecteur CD (l'écran fait défiler le morceau), des vinyles, et la platine dessus */
+     la double cassette, l'écran du lecteur CD (il fait défiler le morceau), une rangée de CD, et le lecteur CD dessus */
   const chaine = groupe(piece, CHAINE.x, 0, CHAINE.z, 1.45);
   const noyerC = M('#5b3a22', { roughness: .55 }), noyerCF = M('#2c1a0d');
   const alu = M('#cfd1d4', { metalness: .62, roughness: .3 }), aluF = M('#8e9095', { metalness: .55, roughness: .4 }), noirHifi = M('#121115', { roughness: .45 });
@@ -372,7 +400,7 @@ function lancer() {
   const aiguilleTuner = vivant(new THREE.Mesh(new THREE.BoxGeometry(.004, .07, .002), lumiere('#ff4a3a')));
   aiguilleTuner.position.set(-.2, .505, zf + .007); chaine.add(aiguilleTuner);
   const accord = cyl(.04, .04, .028, 18, aluF, chaine, .34, .505, zf + .014); accord.rotation.x = Math.PI / 2;
-  // la double platine cassette : deux fenêtres, les bobines tournent quand ça joue
+  // la double cassette : deux fenêtres, les bobines tournent quand ça joue
   zf = facade(.58, .13);
   const bobines = [];
   [-1, 1].forEach(s => {
@@ -380,7 +408,7 @@ function lancer() {
     boite(.19, .06, .004, M('#e9e2d0', { roughness: .6 }), chaine, s * .2, .645, zf + .005);
     [-1, 1].forEach(t => { const b = vivant(groupe(chaine, s * .2 + t * .045, .645, zf + .008)); const r = new THREE.Mesh(new THREE.CylinderGeometry(.016, .016, .003, 6), M('#1c1b20')); r.rotation.x = Math.PI / 2; b.add(r); boite(.02, .004, .004, M('#e9e2d0'), b, 0, 0, .002); bobines.push(b); });
   });
-  // le lecteur CD : le tiroir, l'écran qui fait défiler le morceau
+  // l'écran du lecteur CD : il fait défiler le morceau (le CD, lui, tourne sur le dessus du meuble)
   zf = facade(.73, .1);
   boite(.36, .014, .008, noirHifi, chaine, -.18, .8, zf);
   const lcd = toileTexte(512, 72);   // pour PAUSE et les petits messages
@@ -389,19 +417,27 @@ function lancer() {
   ecran.position.set(.22, .775, zf + .005); chaine.add(ecran);
   boite(.31, .052, .006, noirHifi, chaine, .22, .775, zf + .002);
   for (let k = 0; k < 4; k++) boite(.03, .012, .008, aluF, chaine, -.32 + k * .05, .757, zf + .003);
-  // des vinyles, debout, au-dessus
-  for (let k = 0; k < 18; k++) { const v = boite(.016, .2, .3, M(COULEURS[(k * 7 + 3) % 12]), chaine, -.4 + k * .047, .945, -.03); v.rotation.z = -.06 + (k % 3) * .03; }
-  // la platine vinyle, posée sur le meuble : le disque tourne, le bras se pose dessus quand ça joue
-  const platine = groupe(chaine, 0, 1.125, 0);
-  boite(.62, .1, .42, M('#3a2416', { roughness: .45 }), platine, 0, .05, 0);
-  boite(.6, .012, .4, alu, platine, 0, .1, 0);
-  cyl(.165, .165, .02, 28, aluF, platine, -.06, .115, 0);
-  const disque = vivant(groupe(platine, -.06, .128, 0));
-  poser(new THREE.Mesh(new THREE.CylinderGeometry(.155, .155, .006, 32), M('#0d0c0f', { roughness: .25, flatShading: false })), disque);
-  const rondDisque = poser(new THREE.Mesh(new THREE.CircleGeometry(.052, 24), etiquetteDisque), disque, 0, .0035, 0); rondDisque.rotation.x = -Math.PI / 2;
-  const brasPlatine = vivant(groupe(platine, .2, .14, -.13));
-  cyl(.022, .026, .03, 10, aluF, brasPlatine, 0, -.005, 0);
-  boite(.008, .008, .26, alu, brasPlatine, 0, .01, .12); boite(.025, .012, .035, noirHifi, brasPlatine, 0, .005, .255);
+  // des CD, au-dessus : une longue rangée de boîtiers debout (les tranches de couleur), et deux piles couchées au bout
+  // (les mêmes matières que le reste de la pièce : elles se fusionnent avec, rien de plus à dessiner pour les ombres)
+  for (let k = 0; k < 50; k++) { const v = boite(.0104, .124, .142, M(COULEURS[(k * 7 + 3) % 12]), chaine, -.435 + k * .0118, .893, .12); if (k % 17 === 16) v.rotation.z = .07; }
+  [[.228, 9], [.372, 6]].forEach(([x, n], p) => { for (let k = 0; k < n; k++) { const v = boite(.142, .0104, .124, M(COULEURS[(k * 5 + p * 4 + 1) % 12]), chaine, x, .8362 + k * .0106, .12); v.rotation.y = (k % 3 - 1) * .05 + p * .04; } });
+  // le lecteur CD, posé sur le meuble, à chargement par le dessus : le CD (la pochette imprimée dessus) tourne sous son palet en alu
+  const lecteurCD = groupe(chaine, 0, 1.125, 0);
+  boite(.5, .085, .38, noirHifi, lecteurCD, 0, .0425, 0);
+  boite(.49, .008, .37, alu, lecteurCD, 0, .089, 0);
+  cyl(.068, .068, .012, 36, noirHifi, lecteurCD, -.07, .09, 0);                                    // le puits
+  const disque = vivant(groupe(lecteurCD, -.07, .0975, 0));
+  poser(new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, .0012, 48), etiquetteDisque), disque).castShadow = false;
+  const bordCD = poser(new THREE.Mesh(new THREE.TorusGeometry(.059, .0012, 4, 48), M('#d9dde2', { metalness: .6, roughness: .2, flatShading: false })), disque); bordCD.rotation.x = Math.PI / 2; bordCD.castShadow = false;   // le bord argenté
+  cyl(.017, .017, .0016, 24, new THREE.MeshStandardMaterial({ color: '#cfd8e2', transparent: true, opacity: .75, roughness: .1 }), disque, 0, .0002, 0).castShadow = false;   // le moyeu transparent
+  cyl(.022, .024, .014, 24, M('#c9ccd1', { metalness: .7, roughness: .25, flatShading: false }), disque, 0, .008, 0);   // le palet
+  boite(.004, .002, .03, M('#8e9095', { metalness: .6 }), disque, 0, .0155, .006);                                     // un repère sur le palet (on le voit tourner)
+  // le couvercle coulissant en plexi fumé, repoussé derrière ; l'écran bleu et quatre touches devant
+  boite(.2, .006, .18, new THREE.MeshStandardMaterial({ color: '#2b2f38', transparent: true, opacity: .4, roughness: .05, metalness: .2 }), lecteurCD, -.07, .1, -.1).castShadow = false;
+  const ecranHaut = toileTexte(256, 48);
+  { const x = ecranHaut.x; x.fillStyle = '#05121c'; x.fillRect(0, 0, 256, 48); x.fillStyle = '#8fdcff'; x.font = 'bold 22px ui-monospace, monospace'; x.fillText('CD  ▶  01', 16, 32); x.font = 'bold 13px ui-monospace, monospace'; x.fillText('1×', 210, 31); }
+  const vfd = new THREE.Mesh(new THREE.PlaneGeometry(.13, .026), new THREE.MeshBasicMaterial({ map: ecranHaut.t, toneMapped: false })); vfd.position.set(.12, .045, .191); lecteurCD.add(vfd);
+  for (let k = 0; k < 4; k++) boite(.022, .01, .006, aluF, lecteurCD,-.18 + k * .04, .045, .192);
   // la lueur de la chaîne (les cadrans éclairent un peu la pièce quand ça joue)
   const lueurChaine = new THREE.PointLight('#ffb35a', 0, 2.4, 1.6); lueurChaine.position.set(0, .5, .6); chaine.add(lueurChaine);
 
@@ -1475,16 +1511,15 @@ function lancer() {
       o.m.material.opacity = Math.max(0, o.vie) * .32 * mus;
       if (o.vie <= 0) o.m.visible = false;
     });
-    // la chaîne vit : le disque tourne, le bras se pose, les bobines défilent, l'aiguille du tuner cherche, les cadrans éclairent
-    vitesseDisque = lisse(vitesseDisque, etat.joue ? 3.49 : 0, Math.min(1, dt * 1.5));
+    // la chaîne vit : le CD tourne, les bobines défilent, l'aiguille du tuner cherche, les cadrans éclairent
+    vitesseDisque = lisse(vitesseDisque, etat.joue ? 5.5 : 0, Math.min(1, dt * 1.5));
     disque.rotation.y -= dt * vitesseDisque;
-    brasPlatine.rotation.y = lisse(brasPlatine.rotation.y, etat.joue ? -.42 : 0, Math.min(1, dt * 2));
-    bobines.forEach((b, i) => { b.rotation.z += dt * vitesseDisque * (i % 2 ? .8 : 1.1); });
+    bobines.forEach((b, i) => { b.rotation.z += dt * vitesseDisque * .63 * (i % 2 ? .8 : 1.1); });
     if (etat.joue) aiguilleTuner.position.x = -.08 + Math.sin(t * .09) * .26;
     lueurChaine.intensity = mus * (.6 + nuit * .6);
     if ((mus > .5) !== neonAllume) { neonAllume = mus > .5; dessinerNeon(neonAllume); }
     lueurNeon.intensity = mus * (.5 + nuit * .7);
-    vinyleMural.rotation.z -= dt * ((etat.joue ? .55 : 0) + (depuis('pochette') < 1.6 ? 9 * (1.6 - depuis('pochette')) : 0));
+    cdMural.rotation.z -= dt * ((etat.joue ? 1.1 : 0) + (depuis('pochette') < 1.6 ? 9 * (1.6 - depuis('pochette')) : 0));
     ecranCadran.material.color.setScalar(.25 + mus * .75);
     notes.forEach(n => {
       if (n.vie <= 0) return;

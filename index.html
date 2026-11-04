@@ -14,11 +14,11 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=13">
+  <link rel="modulepreload" href="piece.min.js?v=14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=63">
+  <link rel="stylesheet" href="styles.css?v=64">
   <link rel="stylesheet" href="teintes.css?v=15">
 </head>
 <body>
@@ -48,6 +48,8 @@
       <button class="lien-bouton" data-action="fermer-avis-appli">Rester ici</button>
     </div>
   </div>
+  <!-- une pub YouTube passe : tout de suite, en bas de l'écran (même en mode salon), de quoi l'éviter -->
+  <aside class="avis-pub" id="avis-pub" role="status" aria-live="polite" hidden></aside>
   <span class="avis-appli-fleche" id="avis-appli-fleche" aria-hidden="true" hidden><span id="avis-appli-fleche-texte">Ouvre dans ton navigateur</span><svg viewBox="0 0 40 40"><path d="M6 6 C 20 8, 30 16, 32 32 M 22 30 L 32 33 L 35 22" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 
   <main id="scene">
@@ -85,8 +87,6 @@
          Une micro-chaîne CD du milieu des années 2000 : le lecteur (écran ou disque,
          la vidéo, les commandes), le tuner pour orienter la suite, deux enceintes. -->
     <section class="ecran ecran-machine" data-ecran="machine" hidden>
-      <!-- une pub YouTube passe avant le morceau : un petit mot, au-dessus de la chaîne -->
-      <div class="avis-pub avis-machine" data-avis hidden></div>
       <div class="hifi">
         <div class="hifi-enceinte hifi-enceinte-g" aria-hidden="true">
           <span class="hp-plaque">AG-08<small>2 voies</small></span>
@@ -182,8 +182,8 @@
               <div class="bidouille">
                 <span class="bidouille-nom">Vitesse du disque</span>
                 <div class="glissiere" role="radiogroup" aria-label="Vitesse du disque">
-                  <button role="radio" data-action="fidget" data-cle="vitesse" data-val="33">33</button>
-                  <button role="radio" data-action="fidget" data-cle="vitesse" data-val="45">45</button>
+                  <button role="radio" data-action="fidget" data-cle="vitesse" data-val="33">1×</button>
+                  <button role="radio" data-action="fidget" data-cle="vitesse" data-val="45">2×</button>
                   <button role="radio" data-action="fidget" data-cle="vitesse" data-val="hypno">Hypno</button>
                   <span class="glissiere-curseur" aria-hidden="true"></span>
                 </div>
@@ -341,8 +341,12 @@
     <div class="reglage-son" role="radiogroup" aria-label="Comment écouter">
       <p class="reglage-titre">Comment écouter</p>
       <button class="choix-son" role="radio" data-action="son" data-son="complet" aria-checked="true">
-        <strong>Morceaux complets</strong><span>Via YouTube. Sans pub avec YouTube Premium (connecté dans ce navigateur).</span>
+        <strong>Morceaux complets</strong><span>Via YouTube. Sans pub avec YouTube Premium, si YouTube te reconnaît ici.</span>
       </button>
+      <div class="reglage-premium">
+        <p id="astuce-premium"></p>
+        <a class="lien-bouton" id="connexion-youtube" target="_blank" rel="noopener">Se connecter à YouTube ↗</a>
+      </div>
       <button class="choix-son" role="radio" data-action="son" data-son="extraits" aria-checked="false">
         <strong>Extraits de 30 secondes</strong><span>Zéro pub, sans compte. Idéal pour découvrir vite.</span>
       </button>
@@ -361,10 +365,10 @@
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
-  <script src="salon.js?v=9"></script>
-  <script src="app.js?v=65"></script>
+  <script src="salon.js?v=10"></script>
+  <script src="app.js?v=66"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=13"></script>
+  <script type="module" src="piece.min.js?v=14"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>
