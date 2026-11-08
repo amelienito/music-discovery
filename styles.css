@@ -325,7 +325,16 @@ body.cd-tourne .plateau-reflet { animation-play-state: running; }
    Une micro-chaîne CD du milieu des années 2000 : deux enceintes, et entre elles
    le lecteur (écran ou disque, la vidéo, les commandes) posé sur le tuner qui
    oriente la suite. Alu brossé le jour, laque noire la nuit, encre en Papier. */
-.ecran-machine { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(30px, 4vw, 56px); padding-top: clamp(18px, 2.6vw, 36px); }
+.ecran-machine { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(30px, 4vw, 56px); padding-top: clamp(18px, 2.6vw, 36px); }
+/* la lueur de la pochette en cours, derrière la chaîne : elle change doucement à chaque morceau */
+.ecran-machine::before {
+  content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: -60px; height: 900px; pointer-events: none;
+  background: radial-gradient(62% 52% at 50% 36%, color-mix(in srgb, var(--halo, transparent) 55%, transparent), transparent 72%);
+  opacity: 0; transition: opacity 1.2s ease, background 1.2s ease;
+}
+body.avec-halo .ecran-machine::before { opacity: 1; }
+[data-teinte="nuit"] .ecran-machine::before { background: radial-gradient(62% 52% at 50% 36%, color-mix(in srgb, var(--halo, transparent) 32%, transparent), transparent 72%); }
+[data-teinte="papier"] .ecran-machine::before { display: none; }
 .hifi {
   position: relative; isolation: isolate;
   display: grid; grid-template-columns: minmax(110px, 168px) minmax(0, 1000px) minmax(110px, 168px);
@@ -1052,6 +1061,10 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 }
 
 /* ─────────────────────────────── TABLETTE ─────────────────────────────── */
+/* quand les enceintes s'effacent (tablette, téléphone), leurs réglages s'effacent aussi de Cosmétique */
+@media (max-width: 1099px) {
+  .bidouille-enceintes, .interrupteur-mini[data-cle="loudness"], .interrupteur-mini[data-cle="grilles"] { display: none !important; }
+}
 @media (max-width: 1099px) {
   /* les enceintes s'effacent : la place va au lecteur, l'écran et la vidéo restent côte à côte */
   .hifi { grid-template-columns: minmax(0, 1fr); grid-template-areas: "corps" "postit" "tuner"; max-width: 980px; }
@@ -1121,8 +1134,9 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .etiquette-haut { font-size: 10px; }
   .etiquette-titre { font-size: 1.05rem; -webkit-line-clamp: 2; }
   .etiquette-artiste { font-size: .9rem; }
-  .lcd { min-height: 0; padding: 10px 12px; grid-template-rows: auto auto; gap: 4px; }
-  .lcd .lcd-spectre, .lcd .lcd-suite, .lcd .lcd-bas { display: none; }
+  .lcd { min-height: 0; padding: 10px 12px; grid-template-rows: auto auto auto; gap: 5px; }
+  .lcd .lcd-suite, .lcd .lcd-bas { display: none; }
+  .lcd .lcd-spectre { height: 18px; gap: 2px; }   /* l'égaliseur reste là, en petit : le réglage de Cosmétique se voit */
   .lcd .lcd-defile { font-size: 17px; }
   /* les commandes : précédent, lecture, suivant au centre (la pause suffit, pas de stop) ; dessous, ton avis, en toutes lettres */
   .rond { width: 48px; height: 48px; }
@@ -1288,7 +1302,7 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
   opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
 .piece-pensee.visible, .piece-pensee-point.visible { opacity: 1; }
 .piece-pensee-texte { margin: 0; padding: 12px 16px; border-radius: 26px; background: rgba(252, 249, 242, .95); color: #1d1a16;
-  font: italic 400 17px/1.22 var(--voix); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
+  font: italic 400 17px/1.22 var(--voix); text-align: center; text-wrap: balance; overflow-wrap: break-word; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
 .piece-pensee-point { position: absolute; z-index: 2; left: 0; top: 0; border-radius: 50%; background: rgba(252, 249, 242, .95);
   box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
 /* ce qu'on touche dans la pièce : une étiquette (et parfois une passerelle vers une autre création) ; le nom de l'objet sous la souris */
@@ -1302,17 +1316,27 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
 .piece-etiquette small { flex: 1 0 100%; order: 2; margin-top: -4px; color: #6b6156; font: 600 11.5px/1.2 var(--mono); letter-spacing: .03em; text-transform: uppercase; }
 .piece-etiquette button { order: 3; flex: none; min-height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: #c8572f; color: #fff7ee; font: 700 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .piece-etiquette button:hover { background: #1d1a16; }
+/* le CD sorti de la bibliothèque : une petite légende sous le boîtier, pas un grand panneau */
+.piece-livret { position: absolute; z-index: 4; left: 0; top: 0; width: max-content; max-width: min(300px, 86%); padding: 10px 12px 10px; border-radius: 12px;
+  background: rgba(20, 16, 12, .82); color: #f3ece0; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 14px 30px -12px rgba(0,0,0,.6);
+  opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center; }
+.piece-livret.visible { opacity: 1; pointer-events: auto; }
+.piece-livret p { margin: 0; }
+.piece-livret-titre { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.piece-livret-artiste { font-size: 12.5px; opacity: .75; margin-top: 1px !important; }
+.piece-livret-mot { font: italic 400 14.5px/1.25 var(--voix); margin-top: 6px !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.piece-livret-actions { display: flex; justify-content: center; gap: 6px; margin-top: 9px; }
+.piece-livret-actions button { min-height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: rgba(243, 236, 224, .12); color: #f3ece0; }
+.piece-livret-actions .piece-livret-ecouter { background: #f3ece0; color: #1d1a16; }
+.piece-livret-actions .piece-livret-fermer { padding: 0 10px; font-size: 16px; }
 .piece-survol { position: absolute; z-index: 3; left: 0; top: 0; padding: 4px 8px; border-radius: 999px; background: rgba(20, 16, 12, .72); color: #f3ece0;
   font: 600 12.5px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; will-change: transform; }
 /* en mode salon, la pensée se fait plus discrète (elle part au bout de quelques secondes, revient quand on le touche) */
 [data-plein] .piece-pensee { max-width: min(260px, 38%); }
 [data-plein] .piece-pensee-texte { padding: 10px 14px; font-size: 15.5px; }
 .piece-survol.visible { opacity: 1; }
-.plein-astuce { position: absolute; z-index: 2; left: 50%; top: calc(18px + env(safe-area-inset-top)); transform: translateX(-50%); margin: 0; padding: 7px 14px; border-radius: 999px;
-  background: rgba(20, 16, 12, .62); color: #f3ece0; font: 600 12px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; pointer-events: none;
-  animation: astuce 7s ease forwards; }
 @keyframes astuce { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
-@media (max-width: 700px) { .plein-astuce { top: auto; bottom: calc(250px + env(safe-area-inset-bottom)); } .piece-etiquette { font-size: 13px; } }
+@media (max-width: 700px) { .piece-etiquette { font-size: 13px; } }
 /* le bouton pour passer la pièce en grand */
 .salon-agrandir { display: none; position: absolute; z-index: 3; right: 12px; bottom: 12px; align-items: center; gap: 7px;
   min-height: 34px; padding: 0 13px; border-radius: 999px; background: rgba(20, 16, 12, .62); color: #f3ece0;
@@ -1324,8 +1348,8 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
 body.piece-3d .salon-agrandir { display: inline-flex; }
 @media (max-width: 700px) {
   .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; background-image: url(img/salon/apercu-haut.jpg), linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
-  .piece-pensee { max-width: 70%; }
-  .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
+  .piece-pensee, [data-plein] .piece-pensee { max-width: min(270px, 68%); }
+  .piece-pensee-texte, [data-plein] .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
   .salon-agrandir { right: 10px; bottom: 10px; min-height: 32px; padding: 0 11px; font-size: 11px; }
 }
 

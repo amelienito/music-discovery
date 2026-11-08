@@ -755,11 +755,43 @@ function marquerPause() {
   S.pauseVoulue = true; S.pauseA = Date.now();
   clearTimeout(marquerPause.t); marquerPause.t = setTimeout(() => { if (S.pauseVoulue) majSalon(); }, 2600);
 }
+function hsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+  if (mx === mn) return [0, 0, l];
+  const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+  const h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+/* la couleur de la pochette en cours : une lueur douce derrière la chaîne (la page prend un peu la couleur du disque) */
+function majHalo(src) {
+  if (!src || src === majHalo.src) return;
+  majHalo.src = src;
+  const im = new Image(); im.crossOrigin = 'anonymous';
+  im.onload = () => {
+    if (majHalo.src !== src) return;
+    try {
+      const c = document.createElement('canvas'); c.width = c.height = 12;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0, 12, 12);
+      const d = x.getImageData(0, 0, 12, 12).data;
+      // la moyenne des pixels assez colorés (sinon une pochette noire et blanche donne un gris sale)
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < d.length; i += 4) { const mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]), poids = (mx - mn) / 255 + .08; r += d[i] * poids; g += d[i + 1] * poids; b += d[i + 2] * poids; n += poids; }
+      if (!n) return;
+      // un peu plus vive et claire que la moyenne : une lueur, pas une tache boueuse
+      const [h, , l] = hsl(r / n, g / n, b / n), sat = .55, lum = Math.min(.68, Math.max(.5, l));
+      document.documentElement.style.setProperty('--halo', `hsl(${Math.round(h)} ${Math.round(sat * 100)}% ${Math.round(lum * 100)}%)`);
+      document.body.classList.add('avec-halo');
+    } catch (e) {}
+  };
+  im.src = src;
+}
 function majSalon() {
   const m = parId[S.joue];
   // au mur : la pochette du morceau qui passe, sinon celle du dernier écouté (ou d'un morceau au hasard)
   const affiche = m || parId[S.historique[S.historique.length - 1]] || (majSalon.hasard = majSalon.hasard || hasard(BANQUE));
   const im = affiche && Pochettes.image(affiche);
+  if (m && im) majHalo(im.src);
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
   // entre deux morceaux (le suivant charge, une pub passe), il attend tranquille ; il ne déprime que sur une vraie pause
   // (avant le premier morceau, sur le carton d'entrée, il attend aussi : la pièce ne s'éteint pas avant même d'avoir commencé)
@@ -772,6 +804,9 @@ function majSalon() {
 // ce dont la pièce 3D a besoin : un livret au hasard (un morceau avec le mot d'Amélien), et le lancer
 window.MD = {
   auHasard() { const l = BANQUE.filter(m => m.note && m.id !== S.joue); const m = l.length && hasard(l); return m ? { id: m.id, titre: m.affiche, artiste: m.artiste, note: typoFr(m.note) } : null; },
+  halo: src => majHalo(src),   // (pour les vérifications)
+  // la pochette d'un morceau (tout de suite si on l'a déjà, sinon dès qu'elle arrive)
+  pochette(id, cb) { const m = parId[id]; if (!m) return; const im = Pochettes.image(m); if (im) cb(im.src); else Pochettes.demander(m, () => { const j = Pochettes.image(m); if (j) cb(j.src); }); },
   jouer(id) { if (parId[id]) jouerRadio(id); },
   // pour vérifier la pile : à quelle distance du morceau en cours sont les trois disques proposés
   pile() { const c = parId[S.joue]; return S.pile.map(p => ({ id: p.m.id, dir: p.dir, dist: c ? Moteur.distance(c, p.m) : null, amb: p.m.ambiance })); },
@@ -1654,7 +1689,7 @@ function choisirSon(son) {
 
 /* ─────────────────────────────── TEINTES ─────────────────────────────── */
 const TEINTES = [
-  { id: 'salon',  nom: 'Salon',  couleur: '#e4e1db', pastille: 'conic-gradient(#1f3fd1 0 33%, #6e4429 0 66%, #e4e1db 0)' },
+  { id: 'salon',  nom: 'Salon',  couleur: '#e7e1d7', pastille: 'conic-gradient(#1f3fd1 0 33%, #6e4429 0 66%, #e7e1d7 0)' },
   { id: 'nuit',   nom: 'Nuit',   couleur: '#121115', pastille: 'conic-gradient(#6178ff 0 33%, #4b2e1b 0 66%, #121115 0)' },
   { id: 'papier', nom: 'Papier', couleur: '#dfe4d7', pastille: 'linear-gradient(135deg, #dfe4d7 50%, #1d2a4d 50%)' },
 ];

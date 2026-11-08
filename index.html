@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Music Discovery</title>
   <meta name="description" content="Music Discovery : allume la chaîne, choisis la suite, garde ce qui te plaît.">
-  <meta name="theme-color" content="#e4e1db">
+  <meta name="theme-color" content="#e7e1d7">
   <script>
     // la teinte est posée tout de suite (évite un flash de la mauvaise couleur) ; sans choix, on suit le mode sombre du téléphone
     try { var t = JSON.parse(localStorage.getItem('md-teinte-v5')), anc = { ambre: 'nuit', signal: 'salon', vide: 'salon', fievre: 'salon' };
@@ -14,12 +14,12 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=14">
+  <link rel="modulepreload" href="piece.min.js?v=15">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=68">
-  <link rel="stylesheet" href="teintes.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=69">
+  <link rel="stylesheet" href="teintes.css?v=17">
 </head>
 <body>
 
@@ -201,7 +201,7 @@
                   <button role="radio" data-action="fidget" data-cle="dimmer" data-val="1">Nuit</button>
                 </div>
               </div>
-              <div class="bidouille">
+              <div class="bidouille bidouille-enceintes">
                 <span class="bidouille-nom">Lumières des enceintes</span>
                 <div class="segments" role="radiogroup" aria-label="Lumières des enceintes">
                   <button role="radio" data-action="fidget" data-cle="lumieres" data-val="eteint">Éteintes</button>
@@ -262,7 +262,6 @@
   <!-- ═════════════ LE MODE SALON : la pièce en grand, la musique continue ═════════════ -->
   <div class="salon-plein" id="salon-plein" role="dialog" aria-modal="true" aria-label="Le salon en grand" hidden>
     <div class="salon" data-salon data-plein></div>
-    <p class="plein-astuce">Touche les objets de la pièce</p>
     <button class="plein-vue" data-action="salon-vue" aria-pressed="false">Plus près</button>
     <!-- la face avant de la chaîne, en petit : le disque qui tourne, l'écran à cristaux liquides, les commandes -->
     <div class="plein-barre">
@@ -367,14 +366,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=34"></script>
+  <script src="data.js?v=35"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=10"></script>
-  <script src="app.js?v=69"></script>
+  <script src="app.js?v=70"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=14"></script>
+  <script type="module" src="piece.min.js?v=15"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

@@ -126,9 +126,12 @@ function lancer() {
   for (let i = 0; i < 14; i++) boite(.5, .06, AVANT - FOND, bois[i % 4], piece, -3.25 + i * .5, -.03, (AVANT + FOND) / 2);
   const peinture = M('#d8c7a6', { flatShading: false }), plinthe = M('#efe6d3');
   boite(2 * LARG + .24, HAUT, .12, peinture, piece, 0, HAUT / 2, FOND - .06);
+  // les murs de côté sont à part : quand on tourne autour de la pièce, celui qui est entre nous et elle s'efface
+  const MURS = { '-1': [], '1': [] };
   [-1, 1].forEach(s => {
-    boite(.12, HAUT, AVANT - FOND + .12, peinture, piece, s * (LARG + .06), HAUT / 2, (AVANT + FOND) / 2 - .06);
-    boite(.05, .12, AVANT - FOND, plinthe, piece, s * (LARG - .025), .06, (AVANT + FOND) / 2);
+    const mur = vivant(groupe(piece)); MURS[s].push(mur);
+    boite(.12, HAUT, AVANT - FOND + .12, peinture, mur, s * (LARG + .06), HAUT / 2, (AVANT + FOND) / 2 - .06);
+    boite(.05, .12, AVANT - FOND, plinthe, mur, s * (LARG - .025), .06, (AVANT + FOND) / 2);
   });
   boite(2 * LARG, .12, .05, plinthe, piece, 0, .06, FOND + .025);
 
@@ -182,7 +185,7 @@ function lancer() {
     x.fillStyle = '#3a3532'; x.beginPath(); x.arc(c, c, 10, 0, 7); x.fill();
     return t;
   })();
-  const poster = vivant(groupe(piece, -LARG + .02, 0, CHAINE.z, Math.PI / 2));
+  const poster = vivant(groupe(piece, -LARG + .02, 0, CHAINE.z, Math.PI / 2)); MURS[-1].push(poster);
   boite(1.16, .035, .17, M('#4a2c18', { roughness: .55 }), poster, 0, 1.42, .085);                                // la tablette
   boite(1.16, .028, .014, M('#c9a24a', { metalness: .75, roughness: .3, flatShading: false }), poster, 0, 1.452, .166);   // son rebord en laiton
   [-1, 1].forEach(s => { const e = boite(.02, .1, .1, M('#2a180c'), poster, s * .45, 1.37, .05); e.rotation.x = -.6; });   // les équerres
@@ -243,12 +246,12 @@ function lancer() {
   }
   // le mur du fond : Massy en grand, l'album d'Amélien, Kerry James Marshall
   cadreImage('massy', .9, 1.2, piece, -1.05, 1.8, FOND + .03, 0, 'Illustration de MassyPuster pour 7C');
-  cadreImage('mode-creatif', .56, .56, piece, -.18, 2.02, FOND + .03, 0, 'Mode Créatif, l’album d’Amélien');
+  cadreImage('mode-creatif', .56, .56, piece, -.18, 2.02, FOND + .03, 0, 'Mode Créatif (dispo partout)');
   cadreImage('marshall', .4, .5, piece, -.18, 1.24, FOND + .03, 0, 'Kerry James Marshall');
   // le mur de droite : Junji Ito, The Boondocks, Seta
-  cadreImage('junji', .5, .83, piece, LARG - .03, 1.76, -.3, -Math.PI / 2, 'Junji Ito');
-  cadreImage('boondocks', .52, .76, piece, LARG - .03, 1.72, .5, -Math.PI / 2, 'The Boondocks');
-  cadreImage('seta', .6, .6, piece, LARG - .03, 1.72, 1.3, -Math.PI / 2, 'Seta, chez Cul7ure');
+  MURS[1].push(cadreImage('junji', .5, .83, piece, LARG - .03, 1.76, -.3, -Math.PI / 2, 'Junji Ito'));
+  MURS[1].push(cadreImage('boondocks', .52, .76, piece, LARG - .03, 1.72, .5, -Math.PI / 2, 'The Boondocks'));
+  MURS[1].push(cadreImage('seta', .6, .6, piece, LARG - .03, 1.72, 1.3, -Math.PI / 2, 'Seta, chez Cul7ure'));
   // sur le rebord de la fenêtre : la photo des Anges déchus
   const photo = cadreImage('fallen-angels', .3, .168, piece, FX - .36, REBORD + .12, FOND + .15, 0, 'Vive l’amour, Tsai Ming-liang'); photo.rotation.x = -.16;
   boite(.02, .1, .06, M('#1b1712'), photo, 0, -.05, -.04).rotation.x = .5;
@@ -595,11 +598,26 @@ function lancer() {
   poser(new THREE.Mesh(torseGeo, pull), buste).scale.z = .66;
   poser(new THREE.Mesh(new THREE.CylinderGeometry(.193, .196, .055, 20), cotes), buste, 0, .035, 0).scale.z = .68;
   const epaulettes = [-1, 1].map(s => { const b = poser(new THREE.Mesh(new THREE.SphereGeometry(.08, 14, 10), pull), buste, s * .185, .43, -.005); b.scale.set(1.02, .8, .92); return b; });
-  poser(new THREE.Mesh(new THREE.TorusGeometry(.06, .014, 8, 20), cotes), buste, 0, .49, .008).rotation.x = Math.PI / 2;
+  const creme = M('#efe6cf', { roughness: .9 });
+  poser(new THREE.Mesh(new THREE.TorusGeometry(.06, .014, 8, 20), creme), buste, 0, .49, .008).rotation.x = Math.PI / 2;
+  const rayure = poser(new THREE.Mesh(new THREE.TorusGeometry(.069, .005, 6, 20), cotes), buste, 0, .482, .008); rayure.rotation.x = Math.PI / 2; rayure.castShadow = false;
+  const bas = poser(new THREE.Mesh(new THREE.CylinderGeometry(.1955, .1985, .014, 20), creme), buste, 0, .07, 0); bas.scale.z = .68; bas.castShadow = false;   // une rayure crème au bas du pull
+  // son casque, toujours autour du cou : l'arceau derrière la nuque, les deux écouteurs posés sur les clavicules
+  {
+    const casqueN = M('#18171b', { roughness: .4 }), casqueA = M('#c9cbcf', { metalness: .6, roughness: .3, flatShading: false }), mousse = M('#2b292e', { roughness: 1 });
+    const arceau = poser(new THREE.Mesh(new THREE.TorusGeometry(.098, .012, 6, 22, Math.PI * 1.15), casqueN), buste, 0, .5, -.018);
+    arceau.rotation.set(Math.PI / 2 + .35, 0, Math.PI + (Math.PI * 1.15 - Math.PI) / 2 - .08);
+    [-1, 1].forEach(c => {
+      const e = groupe(buste, c * .093, .468, .07); e.rotation.set(-.95, c * .5, 0);
+      cyl(.044, .044, .028, 18, casqueN, e, 0, 0, 0);
+      cyl(.034, .034, .03, 16, casqueA, e, 0, .0035, 0).castShadow = false;
+      cyl(.04, .04, .012, 16, mousse, e, 0, -.019, 0).castShadow = false;
+    });
+  }
   poser(new THREE.Mesh(new THREE.CylinderGeometry(.051, .056, .1, 12), peauF), buste, 0, .525, .012);
 
   // la tête : visage taillé (mâchoire plus étroite), afro, lunettes rondes, fine moustache
-  const tete = groupe(buste, 0, .64, .03);
+  const tete = groupe(buste, 0, .645, .03); tete.scale.setScalar(1.08);
   // un crâne lisse (une sphère déformée, ombrée en douceur) : le visage n'a plus de facettes bizarres
   const crane = new THREE.SphereGeometry(.104, 28, 22);
   {
@@ -620,21 +638,23 @@ function lancer() {
   const boucleOreille = new THREE.Mesh(new THREE.TorusGeometry(.009, .0025, 4, 10), M('#e3c06a', { metalness: .85, roughness: .25 })); boucleOreille.position.set(.1, -.03, -.005); boucleOreille.rotation.y = Math.PI / 2; tete.add(boucleOreille);
   const yeux = [-1, 1].map(s => { const o = bille(.0095, sombre, tete, s * .035, .023, .094, 2); o.scale.set(1, .9, .45); bille(.0026, M('#fff6ea', { roughness: .2, flatShading: false }), o, s * .003, .004, .008, 0); return o; });   // avec un petit reflet
   const sourcils = [-1, 1].map(s => boite(.036, .0075, .01, poils, tete, s * .037, .057, .1));
-  // l'afro : rond, un peu bosselé, plus raisonnable
-  const afroGeo = new THREE.IcosahedronGeometry(.16, 3);
-  {
-    const pa = afroGeo.attributes.position;
-    for (let i = 0; i < pa.count; i++) {
-      const x = pa.getX(i), y = pa.getY(i), z = pa.getZ(i);
-      const n = 1 + Math.sin(x * 181.7 + y * 97.3 + z * 63.9) * .035 + Math.sin(x * 73.1 - z * 117.7 + y * 31.3) * .03 + Math.sin(y * 41.3 + z * 29.1) * .02;
-      pa.setXYZ(i, x * n, y * n, z * n);
+  // l'afro : le même volume, mais en grosses boucles serrées (des petites boules à la surface) :
+  // une silhouette à lui, qu'on reconnaît de loin, pas la boule lisse des personnages tout faits
+  const afroGeo = (() => {
+    const morceaux = [[new THREE.IcosahedronGeometry(.13, 2), new THREE.Matrix4()]];
+    const N = 52, or = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+      const y = 1 - (i / (N - 1)) * 1.4, r = Math.sqrt(Math.max(0, 1 - y * y)), a = i * or;   // répartis sur la sphère (sauf en dessous)
+      const x = Math.cos(a) * r, z = Math.sin(a) * r, taille = .036 + ((i * 37) % 7) * .003;
+      if (z > .45 && y < .2) continue;   // rien qui descende sur le front : les yeux et les lunettes restent visibles
+      morceaux.push([new THREE.IcosahedronGeometry(taille, 1), new THREE.Matrix4().makeTranslation(x * .13, y * .13, z * .13)]);
     }
-    afroGeo.computeVertexNormals();
-  }
-  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .088, -.058); afro.scale.set(1.07, .95, 1.0);   // assez en avant pour couvrir le haut du front
+    const g = fusionGeos(morceaux); g.computeVertexNormals(); return g;
+  })();
+  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .1, -.062); afro.scale.set(1.08, .96, 1.0);   // assez en avant pour couvrir le haut du front
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
-    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.03, .005, 5, 16), monture); cercle.position.set(s * .037, .024, .108); tete.add(cercle);
+    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.033, .0068, 6, 20), monture); cercle.position.set(s * .039, .024, .109); tete.add(cercle);
     const branche = boite(.004, .004, .11, monture, tete, s * .074, .03, .055); branche.rotation.y = s * -.08;
   });
   boite(.016, .005, .005, monture, tete, 0, .031, .112);
@@ -649,7 +669,8 @@ function lancer() {
     poser(new THREE.Mesh(new THREE.CapsuleGeometry(.059, L_BRAS, 4, 12), pull), epaule, 0, -L_BRAS / 2, 0);
     const coude = groupe(epaule, 0, -L_BRAS, 0);
     poser(new THREE.Mesh(new THREE.CapsuleGeometry(.053, L_AVANT - .04, 4, 12), pull), coude, 0, -(L_AVANT - .04) / 2, 0);
-    poser(new THREE.Mesh(new THREE.CylinderGeometry(.047, .05, .045, 12), cotes), coude, 0, -L_AVANT + .03, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.047, .05, .045, 12), creme), coude, 0, -L_AVANT + .03, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.0485, .0505, .008, 12), cotes), coude, 0, -L_AVANT + .036, 0).castShadow = false;
     const main = groupe(coude, 0, -L_AVANT, 0);
     boite(.068, .062, .03, peau, main, 0, -.031, 0);
     const doigts = boite(.062, .05, .026, peau, main, 0, -.078, .006); doigts.rotation.x = .28;
@@ -674,8 +695,9 @@ function lancer() {
     poser(new THREE.Mesh(new THREE.CapsuleGeometry(.08, L_CUISSE, 4, 12), pant), hanche, 0, -L_CUISSE / 2, 0);
     const genou = groupe(hanche, 0, -L_CUISSE, 0);
     poser(new THREE.Mesh(new THREE.CapsuleGeometry(.07, L_TIBIA - .05, 4, 12), pant), genou, 0, -L_TIBIA / 2 + .02, 0);
-    poser(new THREE.Mesh(new THREE.CylinderGeometry(.071, .075, .06, 12), pant), genou, 0, -L_TIBIA + .045, 0);   // le bas du pantalon, un peu large
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.076, .078, .05, 12), pant), genou, 0, -L_TIBIA + .085, 0);   // le bas du pantalon, un peu large, retroussé
     const cheville = groupe(genou, 0, -L_TIBIA, 0);
+    cyl(.05, .05, .07, 10, M('#d9a23a', { roughness: .95 }), cheville, 0, .035, 0).castShadow = false;   // les chaussettes moutarde, qu'on voit sous l'ourlet
     const p = groupe(cheville);
     cyl(.046, .048, .05, 8, noirS, p, 0, -.01, 0);                                   // le col, noir
     boite(.104, .012, .29, noirS, p, 0, -.091, .055);                                // la semelle d'usure
@@ -736,6 +758,19 @@ function lancer() {
   boite(.072, .145, .009, M('#16161a', { roughness: .3 }), tel, 0, 0, 0);
   const ecranTel = new THREE.Mesh(new THREE.PlaneGeometry(.064, .132), new THREE.MeshBasicMaterial({ color: '#9fc4ff', toneMapped: false })); ecranTel.position.z = .005; tel.add(ecranTel);
   tel.rotation.x = -1.2; tel.visible = false;
+
+  // le carnet, ouvert sur ses genoux, et le stylo dans la main qui écrit (il note ce qu'il écoute, pour de faux)
+  const carnet = vivant(groupe(fauteuil, -.01, .755, .23)); carnet.rotation.set(-.55, Math.PI, 0); carnet.visible = false;
+  {
+    const couvC = M('#2f4a5a', { roughness: .7 }), papier = M('#f4eedd', { flatShading: false }), encre = M('#2a2c33');
+    [-1, 1].forEach(c => { boite(.11, .006, .15, couvC, carnet, c * .056, 0, 0); boite(.104, .008, .144, papier, carnet, c * .054, .005, 0); });
+    for (let l = 0; l < 6; l++) boite(.075, .0012, .003, encre, carnet, -.056, .0098, -.05 + l * .019);   // des lignes déjà écrites, page de gauche
+    for (let l = 0; l < 3; l++) boite(.06 - l * .012, .0012, .003, encre, carnet, .05, .0098, -.05 + l * .019);
+    cyl(.0045, .0045, .15, 6, M('#1d1c22'), carnet, 0, .006, 0).rotation.x = Math.PI / 2;   // la spirale
+    carnet.traverse(o => { if (o.isMesh) o.castShadow = false; });
+  }
+  const stylo = vivant(groupe(bras[1].main, -.01, -.07, .03)); stylo.visible = false;
+  { const c = cyl(.0042, .0042, .13, 6, M('#c8572f', { roughness: .4 }), stylo, 0, 0, 0); c.rotation.x = 1.15; const pointe = cyl(.0012, .0042, .014, 6, M('#c9cbcf', { metalness: .6 }), stylo, 0, -.026, .059); pointe.rotation.x = 1.15 + Math.PI; c.castShadow = pointe.castShadow = false; }
 
   /* ═══════════════ le petit nuage (sans musique) ═══════════════ */
   const nuage = new THREE.Group(); nuage.visible = false; scene.add(nuage);
@@ -963,6 +998,7 @@ function lancer() {
   const humeurDe = (e, d) => e <= 3 && d <= 4 ? 'doux' : e >= 8 ? 'energie' : d >= 6 ? 'groove' : 'detente';
   let penseeVue = false, bulleW = 0, bulleH = 0;
   function mesurerPensee() { bulleW = pensee.offsetWidth; bulleH = pensee.offsetHeight; }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => mesurerPensee());   // la police de la pensée arrive parfois après le texte
   function maj(n = {}) {
     Object.assign(etat, n);
     // la musique joue : selon le morceau ; entre deux morceaux : détendu, il attend le suivant ; vraie pause : il déprime
@@ -1042,6 +1078,16 @@ function lancer() {
         pied: surPouf, polePied: [0, 1, .2], tangage: -1.05, lacet: .18, sourcils: .25, bouche: gorgee ? 0 : .5,
       };
     },
+    // il écrit dans son carnet : la tête penchée dessus, une main le tient, l'autre griffonne (et s'arrête pour réfléchir)
+    ecrire: (t) => {
+      const pense = ondule(Math.max(0, Math.sin(t * .55))) > .85 ? 1 : 0;   // de temps en temps, il lève le stylo
+      const gx = ondule(Math.sin(t * 9.5)) * .022 * (1 - pense), gz = ondule(Math.sin(t * 4.7 + 1)) * .012 * (1 - pense);
+      return {
+        buste: [-.08, 0, 0], tete: [.55 - pense * .35, pense * .15, 0], epaules: 0,
+        main: s => s < 0 ? ['F', -.08, .775, .22] : ['F', .03 + gx + ((t * .35) % 1) * .03, .79 + pense * .05, .225 + gz], pole: s => [s, -.6, -.2],
+        pied: surPouf, polePied: [0, 1, .2], tangage: -1.05, lacet: .18, sourcils: .2 + pense * .3, bouche: .2,
+      };
+    },
     // il regarde son téléphone
     telephone: (t) => ({
       buste: [-.24, 0, 0], tete: [.45, -.06, 0], epaules: 0,
@@ -1089,7 +1135,7 @@ function lancer() {
   const HUMEURS = Object.keys(P);
   const poids = Object.fromEntries(HUMEURS.map(h => [h, h === 'triste' ? 1 : 0]));
   let activite = null, finActivite = 0, debutActivite = 0, prochaineActivite = 12;
-  const DUREES = { ordi: 13, boire: 5.6, telephone: 9, etirement: 3.4, salut: 2.8, malcolm: 7, savourer: 8, claquer: 7 };
+  const DUREES = { ordi: 13, boire: 5.6, telephone: 9, etirement: 3.4, salut: 2.8, malcolm: 7, savourer: 8, claquer: 7, ecrire: 12 };
   function lancerActivite(nom) { activite = nom; debutActivite = horlogeCorps; finActivite = horlogeCorps + DUREES[nom]; }
   const avancement = nom => activite === nom ? borne((horlogeCorps - debutActivite) / DUREES[nom], 0, 1) : 1;
   let horlogeCorps = 0;
@@ -1189,6 +1235,8 @@ function lancer() {
     // le livre et le verre
     livre.visible = poids.doux > .15; livre.scale.setScalar(Math.max(.001, borne((poids.doux - .15) * 1.6, 0, 1)));
     tel.visible = poids.telephone > .45;
+    carnet.visible = poids.ecrire > .3; carnet.scale.setScalar(Math.max(.001, borne((poids.ecrire - .3) * 2, 0, 1)) * 1.45);
+    stylo.visible = poids.ecrire > .45;
     // l'ordi : du tapis jusqu'à ses genoux (en passant au-dessus de l'accoudoir), le capot s'ouvre
     const wo = borne(poids.ordi, 0, 1), u = 1 - wo;   // une courbe qui passe devant l'accoudoir, bien au-dessus
     ordi.position.set(0, 0, 0).addScaledVector(posRepos, u * u).addScaledVector(posMilieu, 2 * u * wo).addScaledVector(posGenoux, wo * wo);
@@ -1251,11 +1299,51 @@ function lancer() {
     const k = !cadrePret || calme ? 1 : 1 - Math.exp(-Math.min(.1, (ms - derniereCam) / 1000) * 3.5);
     derniereCam = ms; cadrePret = true;
     cadreActuel.c.lerp(cadreVise.c, k); cadreActuel.d = lisse(cadreActuel.d, cadreVise.d, k); cadreActuel.dir.lerp(cadreVise.dir, k).normalize();
-    _dir.copy(cadreActuel.dir).applyAxisAngle(HAUT_Y, cx * .11); _dir.y += cy * .035; _dir.normalize();
-    camera.position.copy(cadreActuel.c).addScaledVector(_dir, cadreActuel.d);
+    // ce qu'on a tourné à la main (on glisse doucement vers la position voulue)
+    const ko = calme ? 1 : 1 - Math.exp(-Math.min(.1, (ms - (orbite.t || ms)) / 1000) * 9); orbite.t = ms;
+    orbite.lacet = lisse(orbite.lacet, orbite.lacetVise, ko); orbite.tangage = lisse(orbite.tangage, orbite.tangageVise, ko); orbite.recul = lisse(orbite.recul, orbite.reculVise, ko);
+    _dir.copy(cadreActuel.dir).applyAxisAngle(HAUT_Y, cx * .11 + orbite.lacet);
+    const az = Math.atan2(_dir.x, _dir.z), el = borne(Math.atan2(_dir.y, Math.hypot(_dir.x, _dir.z)) + cy * .035 + orbite.tangage, .04, 1.38);
+    _dir.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+    camera.position.copy(cadreActuel.c).addScaledVector(_dir, cadreActuel.d * orbite.recul);
     camera.lookAt(cadreActuel.c);
+    // le mur qui est entre nous et la pièce s'efface (comme une maison de poupée qu'on fait tourner)
+    MURS[1].forEach(o => { o.visible = camera.position.x < LARG + .1; });
+    MURS[-1].forEach(o => { o.visible = camera.position.x > -LARG - .1; });
   }
-  let parent = null, tW = 1, tH = 1;   // la taille de la pièce à l'écran, gardée pour ne pas la redemander à chaque image
+  /* on fait tourner la pièce en la faisant glisser (à la souris ou au doigt) ; en grand, on zoome aussi (molette, deux doigts).
+     Un double-clic (ou « Toute la pièce ») remet la vue de face. */
+  const orbite = { lacet: 0, lacetVise: 0, tangage: 0, tangageVise: 0, recul: 1, reculVise: 1, t: 0 };
+  function remettreVue() { orbite.lacetVise = 0; orbite.tangageVise = 0; orbite.reculVise = 1; }
+  const doigts = new Map(); let glisse = null, aGlisse = false, ecartDoigts = 0;
+  function lierOrbite(t) {
+    t.addEventListener('pointerdown', e => {
+      doigts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (doigts.size === 1) { glisse = { x: e.clientX, y: e.clientY, lacet: orbite.lacetVise, tangage: orbite.tangageVise, bouge: false }; aGlisse = false; }
+      if (doigts.size === 2) { const [a, b] = [...doigts.values()]; ecartDoigts = Math.hypot(a.x - b.x, a.y - b.y); glisse = null; }
+    });
+    t.addEventListener('pointermove', e => {
+      if (!doigts.has(e.pointerId)) return;
+      doigts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (doigts.size === 2 && parent === plein) {
+        const [a, b] = [...doigts.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (ecartDoigts) orbite.reculVise = borne(orbite.reculVise * ecartDoigts / d, .55, 1.35);
+        ecartDoigts = d; aGlisse = true; return;
+      }
+      if (!glisse) return;
+      const dx = e.clientX - glisse.x, dy = e.clientY - glisse.y;
+      if (!glisse.bouge && Math.hypot(dx, dy) < 7) return;
+      glisse.bouge = aGlisse = true;
+      t.style.cursor = 'grabbing';
+      orbite.lacetVise = borne(glisse.lacet - dx * .0065, -1.3, 1.3);
+      if (parent === plein || e.pointerType === 'mouse') orbite.tangageVise = borne(glisse.tangage + dy * .0045, -.25, .75);
+    });
+    const fin = e => { doigts.delete(e.pointerId); if (!doigts.size) { glisse = null; t.style.cursor = ''; } ecartDoigts = 0; };
+    t.addEventListener('pointerup', fin); t.addEventListener('pointercancel', fin);
+    t.addEventListener('dblclick', () => remettreVue());
+    t.addEventListener('wheel', e => { if (parent !== plein) return; e.preventDefault(); orbite.reculVise = borne(orbite.reculVise * Math.exp(e.deltaY * .0012), .55, 1.35); }, { passive: false });
+  }
+  let parent = null, tW = 1, tH = 1, hautPensee = 10;   // la taille de la pièce à l'écran, gardée pour ne pas la redemander à chaque image
   function taille() {
     if (!parent) return;
     const w = parent.clientWidth, h = parent.clientHeight;
@@ -1272,7 +1360,9 @@ function lancer() {
       if (w / h < 1) haut = (vue ? vue.getBoundingClientRect().bottom : 0) - r0.top + 6;   // (la vidéo est rangée dans la barre du bas)
       if (barre) bas = barre.getBoundingClientRect().top - r0.top + 22;
       haut = borne(haut, 0, h * .4); bas = borne(bas, haut + 120, h);
-    }
+      // la pensée ne passe pas sous le bouton « Plus près / Toute la pièce »
+      hautPensee = vue ? vue.getBoundingClientRect().bottom - r0.top + 8 : 10;
+    } else hautPensee = 10;
     camera.aspect = w / (bas - haut);
     cadrer();
     if (haut > 0 || bas < h) camera.setViewOffset(w, bas - haut, 0, -haut, w, h); else camera.clearViewOffset();
@@ -1294,7 +1384,7 @@ function lancer() {
     const marge = 10;
     let cxB = hx + Math.min(bulleW * .3, W * .12), basB = hy - Math.max(30, H * .07);
     cxB = borne(cxB, bulleW / 2 + marge, W - bulleW / 2 - marge);
-    basB = Math.max(basB, bulleH + marge);
+    basB = Math.max(basB, bulleH + hautPensee);
     pensee.style.transform = `translate(${Math.round(cxB - bulleW / 2)}px, ${Math.round(basB - bulleH)}px)`;
     const ax = borne(hx, cxB - bulleW / 2 + 22, cxB + bulleW / 2 - 22), ay = basB - 4;
     const dx = ax - hx, dy = ay - (hy - 6), loin = Math.hypot(dx, dy) > 26;
@@ -1341,18 +1431,82 @@ function lancer() {
   haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.e, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return null; }); });
   cible(zone(RW + .1, 1.3, RD, chaine, 0, .66, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return null; });
   cible(plante, 'La plante', () => { reagir('plante'); return null; });
-  // la bibliothèque : un livret au hasard, un morceau de la sélection avec le mot d'Amélien, qu'on peut écouter tout de suite
-  cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => {
-    const l = hasard(livresMobiles); if (l) l.userData.sortie = horloge;
-    const m = window.MD && window.MD.auHasard && window.MD.auHasard();
-    if (!m) return null;
-    return { texte: `Un livret au hasard : « ${m.note} »`, detail: `${m.titre}, ${m.artiste}`, bouton: 'L’écouter', faire: () => window.MD.jouer(m.id) };
-  });
+  // la bibliothèque : on en sort un CD au hasard (un morceau avec le mot d'Amélien) ; il vient flotter devant nous
+  cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { sortirCD(); return null; });
   cible(zone(.6, .3, .6, table, 0, .62, 0), 'Son verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
   cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; });
   cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
   CADRES_IMG.forEach(c => cible(c.g, c.legende, () => { c.g.userData.penche = !c.g.userData.penche; return { texte: c.legende }; }));
+
+  /* ═══════════════ un CD sorti de la bibliothèque, comme un objet qu'on inspecte dans un jeu vidéo ═══════════════
+     Le boîtier quitte l'étagère, vient flotter devant nous et tourne doucement, pochette en face ; dessous, une petite
+     légende : le titre, ton mot, « Écouter », « Un autre ». On le range en touchant ailleurs (ou Échap). */
+  const inspect = new THREE.Group(); inspect.visible = false; scene.add(inspect);
+  const boitierI = new THREE.Group(); inspect.add(boitierI);
+  const couvI = new THREE.MeshBasicMaterial({ color: '#ffffff', map: vierge });
+  {
+    const plateauI = new THREE.Mesh(new THREE.BoxGeometry(.3, .27, .02), new THREE.MeshStandardMaterial({ color: '#141317', roughness: .35 })); plateauI.position.z = -.004; boitierI.add(plateauI);
+    const disqueI = new THREE.Mesh(new THREE.CylinderGeometry(.118, .118, .004, 48), new THREE.MeshStandardMaterial({ map: faceCD, metalness: .4, roughness: .2, emissive: '#ffffff', emissiveMap: faceCD, emissiveIntensity: .25 }));
+    disqueI.rotation.x = Math.PI / 2; disqueI.position.set(.11, 0, -.016); boitierI.add(disqueI);   // le disque, à moitié sorti derrière
+    const c = new THREE.Mesh(new THREE.PlaneGeometry(.255, .255), couvI); c.position.set(.016, 0, .0075); boitierI.add(c);
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(.3, .27, .004), new THREE.MeshStandardMaterial({ color: '#e8eef5', transparent: true, opacity: .14, roughness: .04, depthWrite: false }));
+    lid.position.z = .01; boitierI.add(lid);
+    const charniere = new THREE.Mesh(new THREE.BoxGeometry(.022, .27, .022), new THREE.MeshStandardMaterial({ color: '#2a2a30', roughness: .25 })); charniere.position.set(-.139, 0, .002); boitierI.add(charniere);
+    const reflet = new THREE.Mesh(new THREE.PlaneGeometry(.035, .28), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .1, depthWrite: false })); reflet.position.set(.06, 0, .013); reflet.rotation.z = -.18; boitierI.add(reflet);
+  }
+  const legendeI = document.createElement('div'); legendeI.className = 'piece-livret';
+  let cdSorti = null, cdDebut = 0, cdFin = 0;
+  const _dep = new THREE.Vector3(), _arr = new THREE.Vector3(), _fw = new THREE.Vector3(), _up = new THREE.Vector3(), _qc = new THREE.Quaternion(), _qw = new THREE.Quaternion();
+  function sortirCD() {
+    const m = window.MD && window.MD.auHasard && window.MD.auHasard();
+    if (!m) return;
+    const l = hasard(livresMobiles); if (l) l.userData.sortie = horloge;
+    cdSorti = m; cdDebut = horloge; cdFin = 0;
+    couvI.map = vierge; couvI.needsUpdate = true;
+    if (window.MD.pochette) window.MD.pochette(m.id, src => chargeur.load(src, t => {
+      if (cdSorti !== m) { t.dispose(); return; }
+      t.colorSpace = THREE.SRGBColorSpace; const avant = couvI.map; couvI.map = t; couvI.needsUpdate = true; if (avant && avant !== vierge) avant.dispose();
+    }, undefined, () => {}));
+    (l || biblio).getWorldPosition(_dep);
+    legendeI.innerHTML = '';
+    const t = document.createElement('p'); t.className = 'piece-livret-titre'; t.textContent = m.titre; legendeI.appendChild(t);
+    const a = document.createElement('p'); a.className = 'piece-livret-artiste'; a.textContent = m.artiste; legendeI.appendChild(a);
+    if (m.note) { const n = document.createElement('p'); n.className = 'piece-livret-mot'; n.textContent = m.note; legendeI.appendChild(n); }
+    const actions = document.createElement('div'); actions.className = 'piece-livret-actions';
+    const bouton = (texte, classe, faire) => { const b = document.createElement('button'); b.type = 'button'; b.className = classe; b.textContent = texte; b.addEventListener('click', e => { e.stopPropagation(); faire(); }); actions.appendChild(b); };
+    bouton('Écouter ▸', 'piece-livret-ecouter', () => { window.MD.jouer(m.id); rangerCD(); });
+    bouton('Un autre', 'piece-livret-autre', () => sortirCD());
+    bouton('×', 'piece-livret-fermer', () => rangerCD());
+    actions.lastChild.setAttribute('aria-label', 'Ranger le CD');
+    legendeI.appendChild(actions);
+    etiquette.classList.remove('visible'); etiquettePoint = null;
+    inspect.visible = true;
+  }
+  function rangerCD() { if (cdSorti && !cdFin) cdFin = horloge; legendeI.classList.remove('visible'); }
+  addEventListener('keydown', e => { if (e.key === 'Escape' && cdSorti) rangerCD(); });
+  function animerCD() {
+    if (!cdSorti) return;
+    // où il flotte : bien devant nous, un peu au-dessus du milieu (la légende va dessous)
+    camera.getWorldDirection(_fw); _up.copy(camera.up).applyQuaternion(camera.quaternion);
+    const pres = Math.max(.75, .8 * (camera.fov > 50 ? 1.15 : 1));
+    _arr.copy(camera.position).addScaledVector(_fw, pres).addScaledVector(_up, .07);
+    const aller = doux3((horloge - cdDebut) / .7), retour = cdFin ? doux3((horloge - cdFin) / .45) : 0, k = aller * (1 - retour);
+    inspect.position.lerpVectors(_dep, _arr, k);
+    // d'abord sur la tranche (comme rangé), puis face à nous ; il tourne doucement de gauche à droite
+    _qc.copy(camera.quaternion);
+    _qw.setFromEuler(new THREE.Euler(Math.sin(horloge * .9) * .08, (1 - k) * 1.5 + Math.sin(horloge * .7) * .35, 0));
+    inspect.quaternion.copy(_qc).multiply(_qw);
+    inspect.scale.setScalar(.25 + .75 * k);
+    legendeI.classList.toggle('visible', aller > .9 && !cdFin);
+    if (aller > .9 && !cdFin) {
+      _ep.copy(_arr).addScaledVector(_up, -.16).project(camera);
+      const lw = legendeI.offsetWidth, lh = legendeI.offsetHeight;
+      const x = borne((_ep.x + 1) / 2 * tW - lw / 2, 8, tW - lw - 8), y = borne((1 - _ep.y) / 2 * tH, 8, tH - lh - 8);
+      legendeI.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    }
+    if (cdFin && retour >= 1) { cdSorti = null; inspect.visible = false; }
+  }
 
   // l'étiquette qui apparaît là où on a touché, et le nom de l'objet sous la souris
   const etiquette = document.createElement('div'); etiquette.className = 'piece-etiquette';
@@ -1383,6 +1537,8 @@ function lancer() {
     return mieux && { c: mieux, point };
   }
   toile.addEventListener('click', ev => {
+    if (aGlisse) { aGlisse = false; return; }   // on a fait tourner la pièce, pas touché un objet
+    if (cdSorti && !cdFin) { rangerCD(); return; }   // le CD sorti se range d'abord
     const v = viser(ev);
     if (!v) { etiquette.classList.remove('visible'); return; }
     const r = v.c.action();
@@ -1415,8 +1571,9 @@ function lancer() {
   let eveilTalya = 0;
   function animerReactions(t, dt) {
     // il vit sa vie en mode salon : de temps en temps, l'ordi, une gorgée, le téléphone, un étirement
-    if (activite && (t > finActivite || (etat.humeur === 'triste' && activite !== 'salut'))) { activite = null; prochaineActivite = t + 9 + Math.random() * 9; }
-    if (!activite && parent === plein && etat.joue && !calme && t > prochaineActivite) lancerActivite(hasard(['ordi', 'boire', 'telephone', 'etirement', 'malcolm', 'savourer', 'claquer', 'boire']));
+    if (activite && (t > finActivite || (etat.humeur === 'triste' && activite !== 'salut'))) { activite = null; prochaineActivite = t + (parent === plein ? 9 + Math.random() * 9 : 18 + Math.random() * 18); }
+    // en mode salon il vit sa vie souvent ; dans la page, de temps en temps (sinon il garde l'attitude du morceau)
+    if (!activite && etat.joue && !calme && t > prochaineActivite) lancerActivite(hasard(['ordi', 'ecrire', 'telephone', 'etirement', 'malcolm', 'savourer', 'claquer', 'boire', 'ecrire']));
     // la porte s'ouvre un peu plus, puis revient
     const dp = depuis('porte'); battant.rotation.y = .42 + (dp < 4 ? Math.sin(Math.min(1, dp * 3) * Math.PI / 2) * .5 * Math.min(1, (4 - dp) * 1.5) : 0);
     // Talya relève la tête et remue la queue
@@ -1567,6 +1724,7 @@ function lancer() {
     suivreFluidite(ms);
     placerPensee();
     placerEtiquette();
+    animerCD();
     if (premiere) { premiere = false; requestAnimationFrame(() => toile.classList.add('prete')); }
   }
   let boucle = null;
@@ -1582,7 +1740,10 @@ function lancer() {
       if (parent) parent.classList.remove('triste');
       if (cible !== plein) pres = false;
       parent = cible;
-      cible.append(toile, pensee, ...points, etiquette, survol);
+      cible.append(toile, pensee, ...points, etiquette, survol, legendeI);
+      remettreVue();
+      // dans la page, un glissement vertical fait défiler la page ; en grand, tous les gestes tournent la pièce
+      toile.style.touchAction = cible === plein ? 'none' : 'pan-y';
       taille();
     }
     if (visible) relancer();
@@ -1610,11 +1771,12 @@ function lancer() {
   (window.requestIdleCallback || (f => setTimeout(f, 400)))(() => {
     CADRES_IMG.forEach(c => chargeur.load(`img/salon/${c.nom}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; c.image.material.map = t; c.image.material.color.set('#ffffff'); c.image.material.needsUpdate = true; }, undefined, () => {}));
   }, { timeout: 1500 });
-  window.Piece = { maj, placer, vue: () => { pres = !pres && parent === plein; cadrer(); return pres; } };
+  lierOrbite(toile);
+  window.Piece = { maj, placer, vue: () => { pres = !pres && parent === plein; remettreVue(); cadrer(); return pres; } };
   window.__pieceDebug = { THREE, rendu, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
     // où se trouve un objet touchable à l'écran (pour les vérifications)
     ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },
-    noms: () => CIBLES.map(c => c.nom) };   // pour les vérifications
+    noms: () => CIBLES.map(c => c.nom), cd: () => ({ sorti: !!cdSorti, visible: inspect.visible, pos: inspect.position.toArray(), cam: camera.position.toArray() }), sortirCD, finirCD: () => { cdDebut = horloge - 5; }, orbite };   // pour les vérifications
   if (window.__salonEtat) maj(window.__salonEtat);
   const compile = rendu.compileAsync ? rendu.compileAsync(scene, camera).catch(() => {}) : Promise.resolve();
   compile.then(() => placer());

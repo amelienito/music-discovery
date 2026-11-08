@@ -292,7 +292,7 @@ const MORCEAUX = [
     energie: 3, etrange: 6, danse: 4 },
 
   { titre: "At Doom's Gate", artiste: "Mick Gordon", album: "DOOM (Original Game Soundtrack)",
-    lien: "https://music.youtube.com/watch?v=Lp-TdtDYGAA", note: "DOOM 2016 m'a fait changer mon regard sur ce handicap qu'est le metal",
+    lien: "https://music.youtube.com/watch?v=Lp-TdtDYGAA", note: "",
     ambiance: "epopee", style: "Metal de jeu vidéo", annee: 2016, bpm: 140, voix: "instru",
     tags: ["metal", "bo", "guitares", "synthés"],
     energie: 10, etrange: 5, danse: 2 },
@@ -434,12 +434,6 @@ const MORCEAUX = [
     ambiance: "soleil", style: "Motown", annee: 1969, bpm: 110, voix: "chant",
     tags: ["soul", "motown", "cordes", "solaire"],
     energie: 3, etrange: 1, danse: 5 },
-
-  { titre: "Outstanding", artiste: "The Gap Band", album: "Gap Band IV",
-    lien: "https://music.youtube.com/watch?v=xBcpaB8lq44", note: "",
-    ambiance: "soleil", style: "Boogie funk", annee: 1982, bpm: 98, voix: "chant",
-    tags: ["funk", "boogie", "synthés", "solaire"],
-    energie: 4, etrange: 2, danse: 7 },
 
   { titre: "Come Outside", artiste: "ScarLip", album: "Come Outside",
     lien: "https://music.youtube.com/watch?v=q34xnPe-C1g", note: "Les fous et les folles sauveront le rap",
@@ -651,12 +645,6 @@ const MORCEAUX = [
     ambiance: "brume", style: "Concerto impressionniste", annee: 1931, bpm: 60, voix: "instru",
     tags: ["classique", "piano", "orchestre", "ballade"],
     energie: 1, etrange: 2, danse: 0 },
-
-  { titre: "Le Sable", artiste: "Alpha Wann", album: "",
-    lien: "https://music.youtube.com/watch?v=U-GdqWtYspU", note: "",
-    ambiance: "bitume", style: "Rap français, hors projet", annee: 2023, bpm: 90, voix: "rap",
-    tags: ["rap", "france", "boom bap"],
-    energie: 6, etrange: 3, danse: 5 },
 
   { titre: "I Thought I Saw Your Face Today", artiste: "She & Him", album: "Volume One",
     lien: "https://music.youtube.com/watch?v=HJstyRBLqBQ", note: "",
@@ -1300,23 +1288,11 @@ const MORCEAUX = [
     tags: ["rap", "west coast", "nineties"],
     energie: 5, etrange: 1, danse: 5 },
 
-  { titre: "Saleté de rap", artiste: "Georgio", album: "",
-    lien: "https://music.youtube.com/watch?v=f9GTm7kAJTQ", note: "Dites-vous que Zlatan venait d'arriver à Paris (ça date)",
-    ambiance: "bitume", style: "Rap français", bpm: 90, voix: "rap",
-    tags: ["rap", "france", "paris"],
-    energie: 6, etrange: 4, danse: 4 },
-
   { titre: "Bang Bang", artiste: "MANI", album: "",
     lien: "https://music.youtube.com/watch?v=Et3xz3Ltm2c", note: "C'était un banger",
     ambiance: "bitume", style: "Rap", bpm: 140, voix: "rap",
     tags: ["rap", "banger"],
     energie: 7, etrange: 5, danse: 6 },
-
-  { titre: "Funky Rhytms", artiste: "DJ Logilo", album: "",
-    lien: "https://music.youtube.com/watch?v=QFR1Io4T8Rk", note: "Fun fact : j'étais allé retrouver la face B d'un freestyle de Nekfeu qui aujourd'hui n'a que 2000 vues",
-    ambiance: "bitume", style: "Instru boom bap", bpm: 90, voix: "instru",
-    tags: ["boom bap", "instru", "samples", "funk"],
-    energie: 5, etrange: 6, danse: 5 },
 
   { titre: "Max B (feat. Starring Max B)", artiste: "Ateyaba", album: "",
     lien: "https://music.youtube.com/watch?v=hCwT8-HbBf8", note: "Tokyo>Kyoto",
@@ -1375,9 +1351,9 @@ const MORCEAUX = [
     tags: ["rap", "rap français", "marseille", "fonky family"],
     energie: 5, etrange: 5, danse: 4 },
 
-  { titre: "Futuristiq Ich Madinina", artiste: "Imhotep Clan", album: "",
+  { titre: "Ich Madinina", artiste: "Futuristiq", album: "Demain, c'est maintenant",
     lien: "https://music.youtube.com/watch?v=-hUsjtPqGIE", note: "",
-    ambiance: "bitume", style: "Rap antillais", bpm: 90, voix: "rap",
+    ambiance: "bitume", style: "Rap français", annee: 2001, bpm: 90, voix: "rap",
     tags: ["rap", "antilles", "martinique"],
     energie: 5, etrange: 8, danse: 4 },
 
@@ -1399,12 +1375,6 @@ const MORCEAUX = [
     tags: ["rap", "rap français", "93", "hardcore"],
     energie: 6, etrange: 6, danse: 3 },
 
-  { titre: "Des voix dans ma tête", artiste: "Dany Dan", album: "Jusqu'à l'amour (Les Sages Poètes de la Rue)",
-    lien: "https://music.youtube.com/watch?v=-Vs9LO83SKA", note: "", secours: { lien: "https://music.youtube.com/watch?v=eVauEHssGj8", note: "" },
-    ambiance: "bitume", style: "Rap français, Sages Poètes de la Rue", annee: 1998, bpm: 92, voix: "rap",
-    tags: ["rap", "rap français", "boom bap"],
-    energie: 5, etrange: 6, danse: 4 },
-
   { titre: "La nuit", artiste: "Seth Gueko", album: "Barillet plein",
     lien: "https://music.youtube.com/watch?v=NEbKHRkBwSc", note: "",
     ambiance: "bitume", style: "Rap du 95, nocturne", annee: 2008, bpm: 85, voix: "rap",
@@ -1422,12 +1392,6 @@ const MORCEAUX = [
     ambiance: "soleil", style: "Rap insouciant de Pittsburgh", annee: 2011, bpm: 90, voix: "rap",
     tags: ["rap", "samples", "insouciance"],
     energie: 4, etrange: 3, danse: 5 },
-
-  { titre: "Noir", artiste: "Sexion d'Assaut", album: "En attendant L'Apogée : Les Chroniques du 75",
-    lien: "https://music.youtube.com/watch?v=XOAU2lpoEKw", note: "",
-    ambiance: "bitume", style: "Rap parisien", annee: 2011, bpm: 85, voix: "rap",
-    tags: ["rap", "rap français", "sombre"],
-    energie: 6, etrange: 3, danse: 4 },
 
   { titre: "Dur d'y croire", artiste: "Salif", album: "Tous ensemble, chacun pour soi",
     lien: "https://music.youtube.com/watch?v=uxCdfgDZx-I", note: "", secours: { lien: "https://music.youtube.com/watch?v=dIh0RVeuQ_o", note: "" },
@@ -1528,4 +1492,11 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=oKjN_WrbbWA", // Release, Minimum (audio, remplacé par le clip)
   "https://music.youtube.com/watch?v=SEpJx322NIc", // David Ruffin, I Miss You (Part 1), autre version (le site garde l'autre)
   "https://music.youtube.com/watch?v=rzRqEWJYwX4", // Ice Cube, You Know How We Do It, autre version (le site garde l'autre, avec son commentaire)
+  "https://music.youtube.com/watch?v=xBcpaB8lq44", // The Gap Band, Outstanding (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=U-GdqWtYspU", // Alpha Wann, Le Sable (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=f9GTm7kAJTQ", // Georgio, Saleté de rap (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=QFR1Io4T8Rk", // DJ Logilo, Funky Rhytms (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=-Vs9LO83SKA", // Dany Dan, Des voix dans ma tête (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=XOAU2lpoEKw", // Sexion d'Assaut, Noir (retiré le 8 nov.)
+  "https://music.youtube.com/watch?v=F4yb0CBd4I4", // Eminem, Beautiful (retiré le 3 nov.)
 ];

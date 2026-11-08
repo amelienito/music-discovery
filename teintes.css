@@ -28,10 +28,10 @@
   --display-etirement: 112%;
   --display-interlettre: -0.02em;
 
-  --fond: #e4e1db;
-  --fond-2: #eeebe6;
-  --fond-3: #f7f5f1;
-  --fond-image: radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.75), transparent 60%);
+  --fond: #e7e1d7;
+  --fond-2: #f0ebe3;
+  --fond-3: #f9f6f1;
+  --fond-image: radial-gradient(120% 60% at 50% -20%, rgba(255,250,240,.8), transparent 60%), radial-gradient(60% 40% at 100% 100%, rgba(214,140,80,.08), transparent 70%);
   --encre: #17171a;
   --encre-2: #5d5a57;
   --encre-3: rgba(23, 23, 26, .22);
