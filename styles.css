@@ -15,11 +15,14 @@ body {
   min-height: 100vh;
   background-color: var(--fond);
   background-image: var(--fond-image, none);
+  background-repeat: no-repeat;
   color: var(--encre);
   font-family: var(--texte);
   font-size: 16px;
   line-height: 1.5;
+  font-feature-settings: "ss01" 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   transition: background-color .5s ease, color .5s ease;
   overflow-x: hidden;
@@ -29,7 +32,7 @@ a { color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, p { margin: 0; }
 :focus-visible { outline: 2px solid var(--aiguille); outline-offset: 3px; border-radius: 6px; }
-h1, h2, .marque {
+h1, h2 {
   font-family: var(--display);
   font-weight: var(--display-poids);
   font-stretch: var(--display-etirement, 100%);
@@ -39,134 +42,191 @@ h1, h2, .marque {
 /* des lignes équilibrées, pas de mot tout seul en fin de paragraphe */
 h1, h2, h3, .avis-titre { text-wrap: balance; }
 p, li, .livret-texte { text-wrap: pretty; }
+/* les inscriptions sérigraphiées : petites capitales larges, bien espacées */
+.serigraphie { font-family: var(--etiquette); font-stretch: 125%; font-weight: 600; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; }
 
 /* ─────────────────────────────── LA FAÇADE (barre du haut) ─────────────────────────────── */
 .facade-haut {
   position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-  height: 76px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 0 20px;
-  padding-top: env(safe-area-inset-top);
-  background: var(--fond);
+  height: calc(64px + env(safe-area-inset-top));
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: env(safe-area-inset-top) clamp(14px, 2.4vw, 28px) 0;
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  -webkit-backdrop-filter: saturate(1.3) blur(14px); backdrop-filter: saturate(1.3) blur(14px);
   border-bottom: 1px solid var(--trait);
   transition: background-color .5s ease;
 }
 body[data-vue="allumage"] .facade-droite { visibility: hidden; }
-.marque { font-size: 19px; line-height: .92; letter-spacing: -.01em; text-align: left; }
-.allumage-texte h1 em, .marque em { font-style: italic; }
-.facade-droite { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+/* la marque : un petit CD et le nom, sérigraphiés comme sur l'appareil */
+.marque { display: inline-flex; align-items: center; gap: 10px; margin-right: auto; padding: 6px 2px; border-radius: 8px; color: var(--encre); }
+.marque-cd { flex: none; width: 20px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle, var(--fond) 0 15%, rgba(0,0,0,.25) 16% 19%, transparent 20%), conic-gradient(from 40deg, #dfe2e6, #b9bfc8, #f1e9f2, #c4e1ea, #e6efd8, #efe2c8, #c6ccd4, #dfe2e6);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.marque-nom { font-family: var(--etiquette); font-stretch: 125%; font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+body[data-vue="allumage"] .marque { visibility: hidden; }   /* sur l'accueil, le nom est déjà en grand */
+.facade-droite { display: flex; align-items: center; gap: 8px; }
 .bouton-facade {
-  height: 42px; padding: 0 16px; border-radius: 999px; white-space: nowrap;
-  background: var(--fond-2); box-shadow: var(--relief);
-  font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px;
-  transition: transform .12s;
+  height: 38px; padding: 0 14px; border-radius: var(--rayon-bouton); white-space: nowrap;
+  background: var(--fond-3); box-shadow: var(--relief);
+  font-weight: 600; font-size: 14px; letter-spacing: -.005em; display: flex; align-items: center; gap: 8px;
+  transition: transform .12s, background-color .2s;
 }
+.bouton-facade:hover { background: color-mix(in srgb, var(--fond-3) 70%, #fff); }
 .bouton-facade:active { transform: translateY(1px); }
-.bouton-trouvailles { padding-right: 10px; }
+.bouton-trouvailles { padding-right: 8px; }
 /* « Ma sélection » n'apparaît qu'à partir de deux morceaux */
 body.sans-selection .bouton-trouvailles { display: none; }
 /* l'icône des réglages reprend les couleurs de la teinte active */
-.icone-teinte { width: 18px; height: 18px; border-radius: 50%; flex: none; background: conic-gradient(var(--aiguille) 0 34%, var(--encre) 0 67%, var(--fond-3) 0); box-shadow: inset 0 0 0 1px var(--trait), 0 0 0 1px rgba(0,0,0,.08); }
+.icone-teinte { width: 16px; height: 16px; border-radius: 50%; flex: none; background: conic-gradient(var(--aiguille) 0 34%, var(--encre) 0 67%, var(--fond-2) 0); box-shadow: inset 0 0 0 1px var(--trait), 0 0 0 1px rgba(0,0,0,.08); }
 .seulement-mobile-inline { display: none; }
 /* le petit CD-R du bouton « Ma sélection » */
-.mini-cdr { width: 18px; height: 18px; border-radius: 50%; flex: none; background: radial-gradient(circle, var(--fond-2) 0 16%, rgba(0,0,0,.25) 17% 20%, transparent 21%), conic-gradient(#e9ecef, #c4cad1, #f7f8f9, #c8ced5, #e9ecef); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.mini-cdr { width: 16px; height: 16px; border-radius: 50%; flex: none; background: radial-gradient(circle, var(--fond-3) 0 16%, rgba(0,0,0,.25) 17% 20%, transparent 21%), conic-gradient(#e9ecef, #c4cad1, #f7f8f9, #c8ced5, #e9ecef); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
 .bouton-trouvailles.pulse .mini-cdr { animation: tourne .8s cubic-bezier(.3,.6,.3,1); }
 .compteur {
-  min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
+  min-width: 22px; height: 22px; padding: 0 6px; border-radius: 6px;
   display: inline-grid; place-items: center;
-  background: var(--encre); color: var(--fond); font-size: 13px;
+  background: var(--encre); color: var(--fond); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
 }
 .bouton-trouvailles.pulse .compteur { animation: pulse .5s cubic-bezier(.3,1.8,.5,1); }
 @keyframes pulse { 50% { transform: scale(1.45); } }
 
-/* les pastilles de teinte : visibles en façade, et en grand dans Réglages */
+/* les pastilles de teinte : en grand dans Réglages */
 .teintes { display: flex; gap: 4px; align-items: center; }
 .pastille { position: relative; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; transition: box-shadow .2s; }
 .pastille span { display: block; width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.22); transition: transform .15s; }
 .pastille em { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.pastille:hover span { transform: scale(1.15); }
+.pastille:hover span { transform: scale(1.08); }
 .pastille[aria-checked="true"] { box-shadow: 0 0 0 2px var(--aiguille); }
 .teintes-grandes { flex-wrap: wrap; gap: 8px; }
-.teintes-grandes .pastille { width: auto; height: auto; min-width: 74px; padding: 10px 8px 8px; border-radius: 14px; gap: 6px; }
-.teintes-grandes .pastille span { width: 42px; height: 42px; }
+.teintes-grandes .pastille { width: auto; height: auto; min-width: 84px; padding: 12px 10px 10px; border-radius: var(--rayon-bouton); gap: 8px; box-shadow: inset 0 0 0 1px var(--trait); }
+.teintes-grandes .pastille span { width: 40px; height: 40px; }
 .teintes-grandes .pastille em { position: static; width: auto; height: auto; clip: auto; font-style: normal; font-size: 13px; font-weight: 600; }
-.teintes-grandes .pastille[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--aiguille); background: var(--fond-2); }
+.teintes-grandes .pastille[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--aiguille); background: var(--fond-3); }
 
-/* ─────────────────────────────── LA MOLETTE DE VOLUME (carton d'entrée) ─────────────────────────────── */
-.bouton-rotatif { display: grid; justify-items: center; gap: 4px; }
-.bouton-rotatif-nom { font-size: 12px; color: var(--encre-2); white-space: nowrap; }
+/* ─────────────────────────────── LA MOLETTE DE VOLUME (carton d'entrée) ───────────────────────────────
+   Une molette d'alu usinée : stries sur la tranche, cercles concentriques sur le dessus, un repère bleu. */
+.bouton-rotatif { display: grid; justify-items: center; gap: 6px; }
+.bouton-rotatif-nom { font-family: var(--etiquette); font-stretch: 125%; font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--hifi-encre); opacity: .7; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .molette {
   --rot: -135deg;
   position: relative; width: 44px; height: 44px; border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 40%, var(--capuchon-haut) 0 50%, transparent 51%),
-    repeating-conic-gradient(var(--capuchon-bas) 0 6deg, var(--capuchon-haut) 6deg 12deg);
-  box-shadow: 0 5px 12px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.18);
+    radial-gradient(circle at 50% 50%, transparent 0 66%, rgba(0,0,0,.18) 67% 68%, transparent 69%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.35) 0 1px, rgba(0,0,0,.03) 1px 2px),
+    radial-gradient(circle at 50% 30%, #fbfaf8, #d7d5d0 70%),
+    repeating-conic-gradient(#bdbab4 0 4deg, #f2f1ee 4deg 8deg);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.9) inset, 0 4px 6px rgba(0,0,0,.18), 0 12px 22px -10px rgba(0,0,0,.4);
   cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
 }
 .molette.saisie { cursor: grabbing; }
 .molette-repere { position: absolute; inset: 0; transform: rotate(var(--rot)); transition: transform .12s ease-out; }
 .molette-repere::before {
-  content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 30%;
+  content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 26%;
   margin-left: -1.5px; border-radius: 2px; background: var(--aiguille);
 }
 /* l'arc qui montre le niveau du volume */
-.molette-arc { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); transform: rotate(135deg); pointer-events: none; }
-.molette-arc circle { fill: none; stroke: var(--aiguille); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 45 100; transition: stroke-dasharray .1s; }
-.bouton-rotatif-grand .molette { width: 112px; height: 112px; cursor: pointer; }
-.bouton-rotatif-grand .molette-repere::before { top: 10px; width: 4px; margin-left: -2px; height: 24%; }
-.bouton-rotatif-grand .bouton-rotatif-nom { font-size: 15px; font-weight: 600; color: var(--encre); margin-top: 8px; }
+.molette-arc { position: absolute; inset: -7px; width: calc(100% + 14px); height: calc(100% + 14px); transform: rotate(135deg); pointer-events: none; }
+.molette-arc circle { fill: none; stroke: var(--aiguille); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 45 100; transition: stroke-dasharray .1s; }
+.bouton-rotatif-grand .molette { width: 74px; height: 74px; cursor: pointer; }
+.bouton-rotatif-grand .molette-repere::before { top: 8px; width: 3px; margin-left: -1.5px; height: 20%; }
 /* sur iPhone, le volume ne se pilote pas depuis une page web : on cache la molette */
 .ios [data-molette="volume"] { display: none !important; }
 
-#scene { padding-top: 76px; min-height: 100vh; }
-.ecran { min-height: calc(100vh - 76px); padding: clamp(20px, 4vw, 56px); padding-bottom: 120px; }
+#scene { padding-top: calc(64px + env(safe-area-inset-top)); min-height: 100vh; }
+.ecran { min-height: calc(100vh - 64px); padding: clamp(20px, 4vw, 56px); padding-bottom: 120px; }
 
-/* ─────────────────────────────── LE CARTON D'ENTRÉE ─────────────────────────────── */
-.ecran-allumage { display: grid; place-content: center; justify-items: center; gap: 34px; text-align: center; }
-.allumage-texte h1 { font-size: clamp(2.5rem, 6vw, 5.2rem); line-height: .95; max-width: none; margin: 0 auto; text-wrap: balance; }
-.allumage-texte h1 .ligne { display: inline-block; text-wrap: balance; }
-.allumage-texte .surtitre { margin-bottom: 18px; font-size: 13.65px; }
-.surtitre { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--encre-2); }
-.etapes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
-.etapes li { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
-.etapes b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fond-2); box-shadow: var(--relief); font-size: 13px; }
-.etapes li + li::before { content: ""; width: 26px; height: 1px; margin-right: 14px; background: var(--encre-3); }
+/* ─────────────────────────────── LE CARTON D'ENTRÉE ───────────────────────────────
+   Tout tient dans l'écran (la page ne défile pas avant « Commencer ») : sur ordinateur,
+   le nom et la façade à gauche, la pièce à droite ; sur téléphone, l'un sous l'autre. */
+.ecran-allumage {
+  height: calc(100vh - 64px - env(safe-area-inset-top)); height: calc(100dvh - 64px - env(safe-area-inset-top)); min-height: 0;
+  display: grid; grid-template-columns: minmax(300px, 420px) minmax(0, 1fr); grid-template-rows: auto auto;
+  grid-template-areas: "texte salon" "commandes salon";
+  column-gap: clamp(32px, 5vw, 80px); row-gap: 28px; align-items: end; align-content: center;
+}
+.ecran.ecran-allumage { padding: clamp(24px, 4vh, 48px) clamp(20px, 4vw, 56px); }
+.allumage-texte { grid-area: texte; display: grid; gap: clamp(20px, 3.4vh, 34px); align-self: end; }
+.allumage-texte h1 {
+  font-family: var(--etiquette); font-stretch: 125%; font-weight: 800; text-transform: uppercase;
+  font-size: clamp(2.4rem, 4.6vw, 4.4rem); line-height: .9; letter-spacing: -.02em;
+}
+.allumage-texte h1 span { display: block; color: var(--aiguille); }
+[data-teinte="papier"] .allumage-texte h1 { font-family: var(--display); font-stretch: 100%; text-transform: none; font-weight: 500; letter-spacing: -.035em; }
+[data-teinte="papier"] .allumage-texte h1 span { font-style: italic; }
+.etapes { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--trait); }
+.etapes li { display: flex; align-items: baseline; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--trait); font-weight: 500; font-size: 16px; letter-spacing: -.005em; }
+.etapes b { flex: none; width: 22px; font-family: var(--etiquette); font-stretch: 125%; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--encre-2); font-variant-numeric: tabular-nums; }
+.etapes b::before { content: "0"; }
+/* la pièce, assez large pour qu'on voie la chaîne, le fauteuil et la fenêtre */
+#scene .ecran-allumage .salon { grid-area: salon; align-self: center; justify-self: end; width: 100%; max-width: 1040px; height: auto; max-height: 100%; min-height: 0; aspect-ratio: 16 / 10.5; margin: 0; border-radius: var(--rayon-objet); }
+.allumage-commandes { grid-area: commandes; display: grid; gap: 14px; justify-items: start; }
+/* la façade d'entrée : une plaque d'alu, la molette et la touche « Commencer » */
 .panneau-allumage {
-  display: flex; align-items: center; gap: clamp(28px, 6vw, 64px);
-  padding: 26px 36px; border-radius: var(--rayon-objet);
-  background: var(--fond-2); box-shadow: var(--relief);
+  display: flex; align-items: center; gap: 22px; width: 100%;
+  padding: 18px 18px 18px 26px; border-radius: var(--rayon-objet);
+  background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
 }
-.allumage-conseil { font-size: 14px; color: var(--encre-2); max-width: 52ch; }
-.allumage-retour { font-size: 15px; color: var(--aiguille); font-weight: 600; }
-.allumage-libre { font-size: 13px; color: var(--encre-2); max-width: 44ch; }
+.panneau-allumage .bouton-rotatif { padding-bottom: 2px; }
+.allumage-conseil { font-size: 13.5px; line-height: 1.45; color: var(--encre-2); max-width: 46ch; }
+.allumage-retour { font-size: 14.5px; line-height: 1.4; color: var(--aiguille); font-weight: 600; max-width: 46ch; }
+.allumage-libre { font-size: 12.5px; line-height: 1.45; color: var(--encre-2); opacity: .8; max-width: 46ch; }
+/* la touche « Commencer » : bleu Klein anodisé, une diode qui s'allume */
 .interrupteur {
-  width: 132px; height: 132px; border-radius: 50%;
-  background: var(--fond-3);
-  box-shadow: var(--relief-fort);
-  display: grid; place-items: center; align-content: center; gap: 10px;
-  transition: transform .12s ease, box-shadow .12s ease;
+  flex: 1; min-width: 0; height: 64px; padding: 0 22px; border-radius: var(--rayon-bouton);
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.28) inset, 0 -2px 0 rgba(0,0,0,.18) inset, 0 10px 22px -10px rgba(20,30,110,.7);
+  transition: transform .12s ease, box-shadow .12s ease, filter .2s;
 }
-.interrupteur:active, body.allume .interrupteur { transform: translateY(2px) scale(.98); box-shadow: var(--relief-enfonce); }
-.interrupteur-led { width: 10px; height: 10px; border-radius: 50%; background: var(--verre-eteint); box-shadow: inset 0 1px 2px rgba(0,0,0,.4); transition: background .2s, box-shadow .2s; }
-body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12px 2px var(--aiguille); }
-.interrupteur-label { font-weight: 600; font-size: 15px; }
+.interrupteur:hover { filter: brightness(1.08); }
+.interrupteur:active, body.allume .interrupteur { transform: translateY(1px); box-shadow: 0 0 0 1px rgba(0,0,0,.3), inset 0 3px 8px rgba(0,0,0,.35); }
+.interrupteur-led { flex: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.35); box-shadow: inset 0 1px 1px rgba(0,0,0,.3); transition: background .2s, box-shadow .2s; }
+body.allume .interrupteur-led, .interrupteur:hover .interrupteur-led { background: #9fe6ff; box-shadow: 0 0 10px 2px rgba(140,220,255,.8); }
+.interrupteur-label { font-weight: 650; font-size: 17px; letter-spacing: -.005em; }
+[data-teinte="papier"] .interrupteur { box-shadow: none; }
+@media (max-width: 860px) {
+  .ecran-allumage {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "texte" "salon" "commandes";
+    row-gap: clamp(14px, 2.6vh, 22px); align-items: stretch;
+  }
+  .ecran.ecran-allumage { padding: clamp(14px, 2.4vh, 22px) 16px calc(16px + env(safe-area-inset-bottom)); }
+  .allumage-texte { gap: clamp(12px, 2vh, 18px); }
+  .allumage-texte h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
+  .allumage-texte h1 span { display: inline; }
+  /* les trois étapes sur une seule ligne */
+  .etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 0; gap: 8px; }
+  .etapes li { display: grid; align-content: start; gap: 4px; padding: 8px 0 0; border-bottom: 0; border-top: 1px solid var(--encre); font-size: 13.5px; line-height: 1.25; text-wrap: balance; }
+  .etapes b { width: auto; font-size: 10px; }
+  #scene .ecran-allumage .salon { align-self: stretch; justify-self: stretch; max-width: none; max-height: none; aspect-ratio: auto; min-height: 150px; border-radius: 12px; }
+  .allumage-commandes { gap: 10px; justify-items: stretch; }
+  .panneau-allumage { padding: 12px 12px 12px 18px; gap: 16px; }
+  .ios .panneau-allumage { padding: 0; background: none; box-shadow: none; }
+  .bouton-rotatif-grand .molette { width: 58px; height: 58px; }
+  .interrupteur { height: 58px; }
+  .allumage-conseil, .allumage-libre { font-size: 12.5px; }
+}
+@media (max-width: 860px) and (max-height: 700px) {
+  .allumage-libre { display: none; }
+  .etapes li { font-size: 12.5px; }
+}
 
 /* ─────────────────────────────── BOUTONS ─────────────────────────────── */
 .gros-bouton {
-  display: inline-flex; align-items: center; justify-content: center; text-align: center;
-  min-height: 54px; padding: 0 26px; border-radius: 999px;
-  font-size: clamp(.98rem, 1.3vw, 1.1rem); letter-spacing: 0; line-height: 1.15;
-  background: var(--fond-2); box-shadow: var(--relief);
-  transition: transform .12s ease, box-shadow .12s ease;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: var(--rayon-bouton);
+  font-size: 15px; font-weight: 600; letter-spacing: -.005em; line-height: 1.15;
+  background: var(--fond-3); box-shadow: var(--relief);
+  transition: transform .12s ease, box-shadow .12s ease, filter .2s;
 }
-.gros-bouton:active { transform: translateY(2px); box-shadow: var(--relief-enfonce); }
-.gros-bouton-plein { background: var(--encre); color: var(--fond); box-shadow: var(--relief-plein); }
+.gros-bouton:active { transform: translateY(1px); box-shadow: var(--relief-enfonce); }
+.gros-bouton-plein { background: var(--aiguille); color: var(--sur-aiguille); box-shadow: var(--relief-plein); }
+.gros-bouton-plein:hover { filter: brightness(1.08); }
 .lien-bouton {
   font-size: 15px; font-weight: 500; color: var(--encre-2);
-  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; cursor: pointer;
+  text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: var(--encre-3); text-underline-offset: 4px; cursor: pointer;
+  transition: color .15s, text-decoration-color .15s;
 }
-.lien-bouton:hover { color: var(--encre); }
+.lien-bouton:hover { color: var(--encre); text-decoration-color: currentColor; }
 
 /* ─────────────────────────────── POCHETTES ─────────────────────────────── */
 .pochette {
@@ -226,7 +286,7 @@ body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12p
   conic-gradient(from 0deg, #e9ecef, #cfd5db, #f7f8f9, #c8ced5, #eef0f2, #d3d8dd, #f5f6f7, #cdd3d9, #e9ecef); }
 .disque-main {
   position: absolute; left: 50%; top: 14%; transform: translateX(-50%) rotate(-8deg); white-space: nowrap;
-  font-family: var(--display); font-style: italic; font-weight: 400; font-size: 15px; font-size: 13cqw; line-height: 1; color: var(--amb-encre);
+  font-family: var(--voix); font-style: italic; font-weight: 400; font-size: 15px; font-size: 13cqw; line-height: 1; color: var(--amb-encre);
 }
 @keyframes tourne { to { transform: rotate(360deg); } }
 /* le picture disc : la pochette du morceau imprimée sur le disque, des sillons, un anneau
@@ -265,42 +325,48 @@ body.cd-tourne .plateau-reflet { animation-play-state: running; }
    Une micro-chaîne CD du milieu des années 2000 : deux enceintes, et entre elles
    le lecteur (écran ou disque, la vidéo, les commandes) posé sur le tuner qui
    oriente la suite. Alu brossé le jour, laque noire la nuit, encre en Papier. */
-.ecran-machine { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(26px, 3.5vw, 44px); padding-top: clamp(14px, 2.2vw, 30px); }
+.ecran-machine { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: center; gap: clamp(30px, 4vw, 56px); padding-top: clamp(18px, 2.6vw, 36px); }
 .hifi {
   position: relative; isolation: isolate;
-  display: grid; grid-template-columns: minmax(96px, 180px) minmax(0, 980px) minmax(96px, 180px);
-  grid-template-areas: "g corps d" "g tuner d";
-  column-gap: clamp(12px, 2vw, 26px); row-gap: 12px; align-items: end;
-  width: 100%; max-width: 1420px;
+  display: grid; grid-template-columns: minmax(110px, 168px) minmax(0, 1000px) minmax(110px, 168px);
+  grid-template-areas: "g corps d" "tuner tuner tuner";
+  column-gap: clamp(12px, 1.6vw, 22px); row-gap: 0; align-items: stretch;
+  width: 100%; max-width: 1400px;
 }
-.hifi::after { content: ""; position: absolute; z-index: -1; left: 3%; right: 3%; bottom: -24px; height: 42px; background: radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.22), transparent 72%); }
 
 /* ─── les enceintes : vis apparentes, tweeter dans un pavillon, membrane à nervures,
        anneau lumineux, vumètre à diodes, évent bass-reflex, grille amovible ─── */
 .hifi-enceinte {
-  position: relative; display: grid; grid-template-rows: auto auto auto auto 1fr; justify-items: center; gap: 7%;
-  aspect-ratio: 1 / 2.75; padding: 18% 12% 14%; border-radius: 16px 16px 12px 12px; overflow: hidden;
-  background:
-    radial-gradient(circle at 14px 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at calc(100% - 14px) 14px, #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at 14px calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), #8b8e94 0 3px, #3c3e43 3.5px 5.5px, transparent 6px),
-    var(--hifi-corps);
-  box-shadow: var(--hifi-ombre);
+  position: relative; isolation: isolate; display: grid; grid-template-rows: auto auto auto auto auto; justify-items: center; align-content: space-between; gap: 10px;
+  align-self: stretch; min-height: 0; padding: 26px 13% 24px; border-radius: 10px; overflow: hidden;
+  background: var(--noyer);
+  box-shadow: 0 1px 0 rgba(255,235,210,.22) inset, 0 -2px 0 rgba(0,0,0,.25) inset, 0 0 0 1px rgba(30,15,5,.35), 0 40px 70px -34px rgba(40,32,24,.55), 0 14px 26px -16px rgba(40,32,24,.3);
 }
+/* la façade sombre, vissée dans le caisson */
+.hifi-enceinte::before {
+  content: ""; position: absolute; z-index: -1; inset: 9px; border-radius: 5px;
+  background:
+    radial-gradient(circle at 9px 9px, #8b8e94 0 2px, #2b2c30 2.5px 3.5px, transparent 4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, #8b8e94 0 2px, #2b2c30 2.5px 3.5px, transparent 4px),
+    radial-gradient(circle at 9px calc(100% - 9px), #8b8e94 0 2px, #2b2c30 2.5px 3.5px, transparent 4px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), #8b8e94 0 2px, #2b2c30 2.5px 3.5px, transparent 4px),
+    var(--baffle);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.5), inset 0 2px 8px rgba(0,0,0,.45), 0 1px 0 rgba(255,235,210,.12);
+}
+[data-teinte="papier"] .hifi-enceinte { box-shadow: var(--hifi-ombre); }
 .hifi-enceinte-g { grid-area: g; }
 .hifi-enceinte-d { grid-area: d; }
-.hp-plaque { justify-self: center; font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .12em; color: var(--hifi-encre); opacity: .55; text-align: center; line-height: 1; }
-.hp-plaque small { display: block; font-family: var(--texte); font-weight: 600; font-size: 8px; letter-spacing: .2em; text-transform: uppercase; margin-top: 3px; }
-.hp-tweeter { position: relative; width: 52%; aspect-ratio: 1 / 1; border-radius: 26%; background: radial-gradient(circle, #1a1b1e 0 30%, #2c2e33 46%, #3d4046 62%, #2a2c30 70%); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.6); cursor: pointer; }
-.hp-tweeter i { position: absolute; inset: 34%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fbfbfb 0 12%, #a7adb4 30%, #33363c 70%); }
+.hp-plaque { justify-self: center; font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; font-size: 9.5px; letter-spacing: .16em; color: var(--baffle-encre); opacity: .6; text-align: center; line-height: 1; }
+.hp-plaque small { display: block; font-weight: 600; font-size: 7.5px; letter-spacing: .22em; text-transform: uppercase; margin-top: 4px; opacity: .8; }
+.hp-tweeter { position: relative; width: 44%; aspect-ratio: 1 / 1; border-radius: 50%; background: radial-gradient(circle, #141416 0 52%, #2f3035 58%, #b8b6b1 62%, #e4e2dd 66%, #8f8d88 70%, #222326 73%); box-shadow: 0 1px 0 rgba(255,255,255,.08), inset 0 2px 6px rgba(0,0,0,.6); cursor: pointer; }
+.hp-tweeter i { position: absolute; inset: 30%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f3f3f1 0 10%, #9a9ea4 32%, #2b2d31 72%); }
 .hp-boomer {
-  position: relative; width: 96%; aspect-ratio: 1 / 1; border-radius: 50%; cursor: pointer;
-  background: radial-gradient(circle, transparent 0 66%, #121315 66.5% 71%, var(--hifi-anneau) 72% 100%);
-  box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 2px 6px rgba(0,0,0,.5);
+  position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 50%; cursor: pointer;
+  background: radial-gradient(circle, transparent 0 84%, #0e0e10 84.5% 87%, #b9b7b2 88%, #ecebe7 91%, #8e8c87 95%, #2a2b2f 98%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.08), 0 4px 10px rgba(0,0,0,.45);
 }
 .hp-cone { /* membrane nervurée, suspension en caoutchouc, cache-noyau qui brille */
-  position: absolute; inset: 9%; border-radius: 50%;
+  position: absolute; inset: 12%; border-radius: 50%;
   background:
     radial-gradient(circle at 42% 38%, rgba(255,255,255,.55) 0 3%, transparent 9%),
     radial-gradient(circle, #3b3e44 0 17%, #1d1e22 18% 20%, transparent 21%),
@@ -322,28 +388,29 @@ body[data-lumieres="tempo"].cd-tourne .hp-boomer i { animation: anneau var(--bat
 body[data-lumieres="arc"] .hp-boomer i { opacity: 1; box-shadow: 0 0 0 2px #ff6ec7, 0 0 20px 3px rgba(255,110,199,.6); animation: arc-en-ciel 3s linear infinite; }
 @keyframes arc-en-ciel { to { filter: hue-rotate(360deg); } }
 /* le vumètre */
-.hp-vu { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; width: 80%; justify-self: center; padding: 5px 6px; border-radius: 4px; background: #0d0e10; box-shadow: inset 0 1px 3px rgba(0,0,0,.7); }
-.hp-vu b { height: 5px; border-radius: 1px; background: #23262b; transition: background .08s, box-shadow .08s; }
+.hp-vu { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 2px; width: 74%; justify-self: center; padding: 4px 5px; border-radius: 3px; background: #08080a; box-shadow: inset 0 1px 3px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.06); }
+.hp-vu b { height: 4px; border-radius: 1px; background: #1e2024; transition: background .08s, box-shadow .08s; }
 .hp-vu b.on { background: var(--lcd-encre); box-shadow: 0 0 5px var(--lcd-halo); }
 .hp-vu b.on:nth-child(n+8) { background: #ffcf5c; box-shadow: 0 0 5px rgba(255,200,80,.6); }
 .hp-vu b.on:nth-child(10) { background: #ff5a3c; box-shadow: 0 0 5px rgba(255,90,60,.7); }
 body[data-dimmer="1"] .hp-vu b.on { filter: brightness(.6); box-shadow: none; }
 /* l'évent bass-reflex */
-.hp-event { align-self: end; justify-self: center; width: 46%; aspect-ratio: 3.4 / 1; border-radius: 999px; background: radial-gradient(60% 90% at 50% 40%, #050506, #1d1e22 70%, #34363c); box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8); }
+.hp-event { align-self: end; justify-self: center; width: 42%; aspect-ratio: 3.4 / 1; border-radius: 999px; background: radial-gradient(60% 90% at 50% 40%, #020203, #121214 70%, #2c2d31); box-shadow: 0 1px 0 rgba(255,255,255,.08), inset 0 3px 6px rgba(0,0,0,.9); }
 body.loudness.cd-tourne .hp-event { animation: souffle var(--battement, .5s) ease-in-out infinite alternate; }
 @keyframes souffle { to { box-shadow: 0 1px 0 rgba(255,255,255,.35), inset 0 3px 6px rgba(0,0,0,.8), 0 0 14px 2px var(--lcd-halo); } }
 /* la grille, qu'on met ou qu'on enlève */
 .hp-grille {
-  position: absolute; inset: 6px; border-radius: 12px; pointer-events: none;
+  position: absolute; inset: 9px; border-radius: 5px; pointer-events: none;
   background:
-    radial-gradient(circle, rgba(0,0,0,.72) 0 1.1px, transparent 1.6px) 0 0 / 5px 5px,
-    linear-gradient(160deg, rgba(255,255,255,.14), rgba(0,0,0,.1)),
-    #2a2c31;
+    repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, rgba(255,255,255,.1), rgba(0,0,0,.12)),
+    #2b2a2d;
   box-shadow: inset 0 0 0 3px rgba(0,0,0,.25), inset 0 0 18px rgba(0,0,0,.5);
   transform: translateY(-104%); transition: transform .5s cubic-bezier(.3,1.2,.4,1);
 }
 body.grilles .hp-grille { transform: none; }
-.hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .1em; color: #c9ccd2; opacity: .6; }
+.hp-grille::after { content: "AG"; position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; font-size: 9px; letter-spacing: .2em; color: #d8d4cc; opacity: .55; }
 /* les petites bidouilles : on tape sur les haut-parleurs, ils répondent */
 .hp-boomer.coup { animation: coup .5s cubic-bezier(.2,.8,.3,1); }
 .hp-boomer.coup .hp-cone { animation: coup-cone .5s cubic-bezier(.2,.8,.3,1); }
@@ -359,23 +426,26 @@ body.cd-tourne.energie-forte .hifi-enceinte { animation: tremble calc(var(--batt
 .hifi-corps {
   grid-area: corps; position: relative; display: grid; min-width: 0;
   grid-template-columns: minmax(0, 1fr); grid-template-areas: "haut" "afficheur" "commandes" "trappe";
-  gap: 16px 22px; padding: clamp(16px, 2vw, 26px); border-radius: 20px;
+  gap: 18px 20px; padding: clamp(16px, 1.8vw, 24px) clamp(16px, 2vw, 28px) clamp(16px, 1.8vw, 22px); border-radius: var(--rayon-objet);
   background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
 }
 body.video-machine .hifi-corps { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); grid-template-areas: "haut haut" "afficheur ecran" "commandes commandes" "trappe trappe"; }
-.hifi-haut { grid-area: haut; display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--hifi-trait); }
-.hifi-marque { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; }
-.hifi-modele { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
-.hifi-veille { margin-left: 4px; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
+.hifi-haut { grid-area: haut; display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px solid var(--hifi-trait); box-shadow: 0 1px 0 rgba(255,255,255,.5); }
+[data-teinte="nuit"] .hifi-haut { box-shadow: 0 1px 0 rgba(255,255,255,.03); }
+.hifi-marque { font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; letter-spacing: .14em; text-transform: uppercase; font-size: 12.5px; }
+.hifi-modele { font-family: var(--etiquette); font-stretch: 125%; font-size: 9.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; opacity: .5; }
+.hifi-veille { margin-left: 2px; align-self: center; width: 7px; height: 7px; border-radius: 50%; background: #c8402e; box-shadow: 0 0 6px rgba(200,64,46,.7); transition: background .3s, box-shadow .3s; }
 body.chaine-allumee .hifi-veille { background: var(--lcd-encre); box-shadow: 0 0 8px 1px var(--lcd-halo); }
 body[data-dimmer="1"] .hifi-veille { opacity: .5; }
 /* en haut de la façade, un seul bouton : la cosmétique (le choix écran / disque est rangé dedans) */
 .bouton-cosmetique {
-  margin-left: auto; align-self: center; display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 9px; white-space: nowrap;
-  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 5px rgba(0,0,0,.35); transition: transform .08s, box-shadow .08s, filter .15s;
+  margin-left: auto; align-self: center; display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 12px; border-radius: 7px; white-space: nowrap;
+  font-family: var(--etiquette); font-stretch: 125%; font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  background: linear-gradient(#2c2d32, #1d1e22); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.1), 0 3px 6px -2px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s, filter .15s;
 }
+.bouton-cosmetique::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .35; transition: opacity .2s, box-shadow .2s; }
+.bouton-cosmetique[aria-expanded="true"]::before { opacity: 1; box-shadow: 0 0 6px 1px var(--lcd-halo); }
 .bouton-cosmetique:hover { filter: brightness(1.15); }
 .bouton-cosmetique:active, .bouton-cosmetique[aria-expanded="true"] { box-shadow: inset 0 2px 6px rgba(0,0,0,.6); transform: translateY(1px); }
 
@@ -430,7 +500,7 @@ body[data-vitesse="hypno"] .plateau-reflet { opacity: .8; animation-duration: 9s
 .lcd {
   position: relative; overflow: hidden; min-width: 0; min-height: 200px; align-self: stretch; cursor: pointer;
   display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 8px;
-  padding: 16px 18px; border-radius: 10px;
+  padding: 16px 18px; border-radius: 6px;
   background: var(--lcd-fond); color: var(--lcd-encre); text-shadow: 0 0 7px var(--lcd-halo);
   font-family: "Doto", ui-monospace, monospace; font-weight: 900; letter-spacing: .04em;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 4px 18px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.35);
@@ -480,19 +550,23 @@ body[data-dimmer="1"] .lcd { filter: brightness(.45) saturate(.8); text-shadow: 
   box-shadow: inset 0 2px 10px rgba(0,0,0,.5), 0 0 0 1px var(--trait);
 }
 @supports not (aspect-ratio: 16 / 9) { .emplacement-ecran::before { content: ""; display: block; padding-top: 56.25%; } }
-.emplacement-cd { grid-area: ecran; align-self: center; min-height: 200px; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.35); }
+.emplacement-cd { grid-area: ecran; align-self: center; min-height: 200px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5); }
 body:not(.video-machine) .emplacement-cd { display: none; }
 
 /* les commandes : la lecture, ton avis sur le morceau (j'aime / pas trop), le volume */
-.hifi-commandes { grid-area: commandes; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 18px; padding-top: 16px; border-top: 1px solid var(--hifi-trait); }
-.transport { display: flex; align-items: center; gap: 10px; }
+.hifi-commandes { grid-area: commandes; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; padding-top: 18px; border-top: 1px solid var(--hifi-trait); box-shadow: inset 0 1px 0 rgba(255,255,255,.5); }
+[data-teinte="nuit"] .hifi-commandes { box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+.transport { display: flex; align-items: center; gap: 12px; }
 .rond {
-  width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none;
   color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
-  transition: transform .08s, box-shadow .08s;
+  transition: transform .08s, box-shadow .08s, filter .15s;
 }
-.rond:active { transform: translateY(2px) scale(.97); box-shadow: var(--hifi-bouton-enfonce); }
-.rond-lecture { width: 64px; height: 64px; background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort); }
+.rond:hover { filter: brightness(1.04); }
+.rond:active { transform: translateY(1px) scale(.98); box-shadow: var(--hifi-bouton-enfonce); }
+.rond-lecture { width: 62px; height: 62px; background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort); box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.3) inset, 0 -2px 0 rgba(0,0,0,.18) inset, 0 10px 20px -10px rgba(20,30,110,.75); }
+[data-teinte="nuit"] .rond-lecture { box-shadow: 0 0 0 1px rgba(0,0,0,.5), 0 1px 0 #fff inset, 0 10px 20px -10px rgba(0,0,0,.8); }
+[data-teinte="papier"] .rond-lecture { box-shadow: none; }
 .icone {
   display: block; width: 0; height: 0; margin-left: 3px;
   border-left: 12px solid currentColor; border-top: 7px solid transparent; border-bottom: 7px solid transparent;
@@ -502,25 +576,27 @@ body:not(.video-machine) .emplacement-cd { display: none; }
 .icone-prec { transform: scaleX(-1); }
 .icone-prec::after, .icone-suiv::after { content: ""; position: absolute; left: 0; top: -7px; width: 3px; height: 14px; background: currentColor; }
 .icone-stop { width: 12px; height: 12px; background: currentColor; border-radius: 1px; }
-.hifi-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.hifi-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-left: 20px; border-left: 1px solid var(--hifi-trait); }
 .pilule {
-  min-height: 42px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
-  font-weight: 600; font-size: 14px; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre);
-  transition: transform .08s, box-shadow .08s, color .2s;
+  min-height: 44px; padding: 0 16px; border-radius: var(--rayon-bouton); display: inline-flex; align-items: center; justify-content: center; gap: 9px; white-space: nowrap;
+  font-weight: 600; font-size: 14px; letter-spacing: -.005em; color: var(--hifi-encre); background: var(--hifi-touche); box-shadow: var(--hifi-bouton-ombre);
+  transition: transform .08s, box-shadow .08s, color .2s, background .2s;
 }
-.pilule:active { transform: translateY(2px); box-shadow: var(--hifi-bouton-enfonce); }
-.pilule-coeur .pilule-icone { font-size: 15px; line-height: 1; }
+.pilule:hover { filter: brightness(1.03); }
+.pilule:active { transform: translateY(1px); box-shadow: var(--hifi-bouton-enfonce); }
+.pilule-coeur .pilule-icone { font-size: 15px; line-height: 1; transition: transform .2s cubic-bezier(.3,1.8,.5,1); }
 .pilule-coeur.est-garde { color: var(--aiguille); }
+.pilule-coeur.est-garde .pilule-icone { transform: scale(1.15); }
 .pouce { width: 16px; height: 16px; flex: none; }
 /* le volume : un curseur, comme une table de mixage */
-.fader { display: grid; justify-items: center; gap: 4px; margin-left: auto; }
-.fader input { -webkit-appearance: none; appearance: none; width: 150px; height: 28px; background: transparent; cursor: pointer; --v: 60%; }
-.fader input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--lcd-encre) var(--v), var(--hifi-creux) var(--v)); box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
-.fader input::-moz-range-track { height: 6px; border-radius: 3px; background: var(--hifi-creux); }
-.fader input::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--lcd-encre); }
-.fader input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 28px; margin-top: -11px; border-radius: 4px; background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45), inset 0 1px 0 #fff; }
-.fader input::-moz-range-thumb { width: 18px; height: 28px; border: 0; border-radius: 4px; background: linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 5px rgba(0,0,0,.45); }
-.fader-nom { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--hifi-encre); opacity: .6; }
+.fader { display: grid; justify-items: stretch; gap: 6px; margin-left: auto; }
+.fader input { -webkit-appearance: none; appearance: none; width: 160px; height: 26px; background: transparent; cursor: pointer; --v: 60%; }
+.fader input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--aiguille) var(--v), var(--hifi-creux) var(--v)); box-shadow: inset 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5); }
+.fader input::-moz-range-track { height: 4px; border-radius: 2px; background: var(--hifi-creux); }
+.fader input::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--aiguille); }
+.fader input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 24px; margin-top: -10px; border-radius: 3px; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px), linear-gradient(#f6f5f2, #c4c2bd); box-shadow: 0 0 0 1px rgba(0,0,0,.2), 0 2px 5px rgba(0,0,0,.35), inset 0 1px 0 #fff; }
+.fader input::-moz-range-thumb { width: 14px; height: 24px; border: 0; border-radius: 3px; background: linear-gradient(#f6f5f2, #c4c2bd); box-shadow: 0 0 0 1px rgba(0,0,0,.2), 0 2px 5px rgba(0,0,0,.35); }
+.fader-nom { font-family: var(--etiquette); font-stretch: 125%; font-size: 9.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--hifi-encre); opacity: .55; text-align: center; }
 .ios .fader { display: none; }
 
 /* ─── « Cosmétique » : des petits réglages inutiles, qui se déplient d'un bouton de la chaîne ─── */
@@ -528,15 +604,16 @@ body:not(.video-machine) .emplacement-cd { display: none; }
 body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,.9,.3,1.15) both; transform-origin: top; }
 @keyframes trappe { from { transform: perspective(600px) rotateX(-70deg); opacity: 0; } }
 .trappe-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.trappe-titre { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; opacity: .55; padding-top: 4px; }
-.trappe-fermer { width: 32px; height: 32px; border-radius: 50%; font-size: 20px; line-height: 1; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); }
+.trappe-titre { font-family: var(--etiquette); font-stretch: 125%; font-size: 9.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; opacity: .55; padding-top: 4px; }
+.trappe-fermer { width: 30px; height: 30px; border-radius: 50%; font-size: 18px; line-height: 1; color: var(--hifi-encre); background: var(--hifi-bouton); box-shadow: var(--hifi-bouton-ombre); }
 .trappe-panneau {
-  display: flex; flex-wrap: wrap; align-items: end; gap: 16px 28px; padding: 16px 18px 18px; border-radius: 12px;
-  background: var(--hifi-creux); color: #e9eaee; box-shadow: inset 0 3px 12px rgba(0,0,0,.5);
+  display: flex; flex-wrap: wrap; align-items: end; gap: 18px 28px; padding: 18px 20px 20px; border-radius: 10px;
+  background: linear-gradient(180deg, #1d1e22, #141518); color: #e9eaee; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), inset 0 3px 12px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.5);
 }
+[data-teinte="papier"] .trappe-panneau { background: var(--hifi-creux); box-shadow: none; }
 .bidouille { display: grid; gap: 8px; }
 .bidouille-ligne { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.bidouille-nom { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
+.bidouille-nom { font-family: var(--etiquette); font-stretch: 125%; font-size: 9.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
 .leds { display: flex; gap: 9px; }
 .led-choix { --c: #888; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--c) 40%, #fff), var(--c) 55%, color-mix(in srgb, var(--c) 60%, #000)); box-shadow: 0 0 0 2px #0b0c0e, 0 1px 0 3px rgba(255,255,255,.08); transition: transform .12s, box-shadow .2s; }
 .led-choix:hover { transform: scale(1.1); }
@@ -545,14 +622,15 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .led-choix[data-val="origine"] { --c: #9aa0a8; background: conic-gradient(#8fdcff 0 50%, #ffb35c 50%); }
 .led-choix[data-val="glacier"] { --c: #8fdcff; } .led-choix[data-val="ambre"] { --c: #ffb35c; } .led-choix[data-val="menthe"] { --c: #8dffc4; }
 .led-choix[data-val="rose"] { --c: #ff9bd2; } .led-choix[data-val="blanc"] { --c: #f4f6ff; }
-.segments { display: inline-flex; padding: 3px; border-radius: 9px; background: #0b0c0e; gap: 2px; }
-.segments button { min-height: 32px; padding: 0 11px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #b9bcc4; transition: background-color .15s, color .15s; }
+.segments { display: inline-flex; padding: 3px; border-radius: 8px; background: #0a0a0c; gap: 2px; box-shadow: inset 0 1px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05); }
+.segments button { min-height: 32px; padding: 0 12px; border-radius: 5px; font-size: 12.5px; font-weight: 600; color: #a9acb4; transition: background-color .15s, color .15s; }
+.segments button:hover { color: #e9eaee; }
 .segments button[aria-checked="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 2px 4px rgba(0,0,0,.4); }
 .glissiere { --pos: 0; position: relative; display: grid; grid-template-columns: repeat(3, 56px); height: 34px; border-radius: 17px; background: #0b0c0e; box-shadow: inset 0 2px 5px rgba(0,0,0,.6); }
 .glissiere button { position: relative; z-index: 1; font-size: 12px; font-weight: 700; color: #8d9098; transition: color .2s; }
 .glissiere button[aria-checked="true"] { color: #111; }
 .glissiere-curseur { position: absolute; top: 3px; left: 3px; width: 50px; height: 28px; border-radius: 14px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px), linear-gradient(#f3f4f6, #b9bdc4); box-shadow: 0 2px 4px rgba(0,0,0,.5), inset 0 1px 0 #fff; transform: translateX(calc(var(--pos) * 56px)); transition: transform .28s cubic-bezier(.3,1.4,.5,1); }
-.interrupteur-mini { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #d9dbe0; background: linear-gradient(#3e4148, #2a2c31); box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 3px 0 #0b0c0e, 0 4px 6px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s; }
+.interrupteur-mini { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 13px; border-radius: 7px; font-family: var(--etiquette); font-stretch: 125%; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #d9dbe0; background: linear-gradient(#3e4148, #2a2c31); box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 3px 0 #0b0c0e, 0 4px 6px rgba(0,0,0,.4); transition: transform .08s, box-shadow .08s; }
 .interrupteur-mini:active, .interrupteur-mini[aria-pressed="true"] { transform: translateY(2px); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 1px 0 #0b0c0e, 0 1px 2px rgba(0,0,0,.4); }
 .interrupteur-mini .led { display: inline-block; flex: none; width: 7px; height: 7px; border-radius: 50%; background: #3a1714; transition: background .2s, box-shadow .2s; }
 .interrupteur-mini[aria-pressed="true"] .led { background: #ff5a3c; box-shadow: 0 0 8px 1px rgba(255,90,60,.8); }
@@ -562,33 +640,34 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
    (étiquette scotchée). Le disque choisi passe ensuite. Sans vraie pochette, une pochette
    maison : une image de la vidéo en bichromie, le titre composé en grand. */
 .tuner {
-  grid-area: tuner; position: relative; min-width: 0;
+  grid-area: tuner; justify-self: center; position: relative; min-width: 0; width: 100%; max-width: 1000px;
   display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px;
-  padding: 14px 0 0; color: var(--encre);
+  padding: clamp(28px, 3.4vw, 44px) 0 0; color: var(--encre);
 }
-.pile-haut { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 0 4px; }
-.pile-titre { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; letter-spacing: .04em; text-transform: uppercase; font-size: 14px; line-height: 1.2; }
+.pile-haut { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 0 2px; }
+.pile-titre { display: flex; align-items: center; gap: 16px; flex: 1; font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; letter-spacing: .16em; text-transform: uppercase; font-size: 11px; line-height: 1.2; color: var(--encre); }
+.pile-titre::after { content: ""; flex: 1; height: 1px; background: var(--trait); }
 /* la radio ou ta sélection : le sélecteur « FUNCTION » des chaînes */
-.sources { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 9px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
-.source-choix { min-height: 30px; padding: 0 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9a9da5; white-space: nowrap; transition: background-color .15s, color .15s; }
+.sources { margin-left: auto; display: inline-flex; padding: 3px; border-radius: 8px; background: var(--hifi-creux); box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }
+.source-choix { min-height: 30px; padding: 0 12px; border-radius: 5px; font-family: var(--etiquette); font-stretch: 125%; font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #9a9da5; white-space: nowrap; transition: background-color .15s, color .15s; }
 .source-choix b { margin-left: 4px; letter-spacing: 0; opacity: .8; }
 .source-choix[aria-pressed="true"] { background: linear-gradient(#4a4d55, #34363c); color: var(--lcd-encre); text-shadow: 0 0 6px var(--lcd-halo); }
 
 .pile-disques {
-  --boite: min(184px, 24vh);
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; justify-items: center;
-  gap: clamp(10px, 3vw, 40px); padding: 40px 2% 58px; min-height: 140px;
+  --boite: min(176px, 23vh);
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; justify-items: center;
+  gap: clamp(10px, 3vw, 40px); padding: 56px 2% 64px; min-height: 140px;
 }
 .disque-pile {
-  position: relative; display: grid; justify-items: center; gap: 10px; width: 100%; max-width: var(--boite);
-  transform: rotate(var(--penche, 0deg)); transition: transform .3s cubic-bezier(.2,.9,.3,1.25);
+  position: relative; display: grid; justify-items: center; gap: 12px; width: 100%; max-width: var(--boite);
+  transform: rotate(calc(var(--penche, 0deg) * .3)); transition: transform .3s cubic-bezier(.2,.9,.3,1.25);
 }
 .pile-disques.repose .disque-pile { animation: pile-pose .5s cubic-bezier(.2,.9,.3,1.2) both; animation-delay: calc(var(--i) * 70ms); }
 @keyframes pile-pose { from { opacity: 0; transform: translateY(-26px) rotate(calc(var(--penche) * 3)); } }
 @media (hover: hover) { .disque-pile:hover { transform: translateY(-7px) rotate(0deg); } }
 .pile-boite {
-  position: relative; display: block; width: 100%; aspect-ratio: 1; border-radius: 3px 6px 6px 3px;
-  background: #121216; box-shadow: 0 16px 24px -12px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.28);
+  position: relative; display: block; width: 100%; aspect-ratio: 1; border-radius: 2px 4px 4px 2px;
+  background: #121216; box-shadow: 0 1px 1px rgba(0,0,0,.2), 0 22px 30px -16px rgba(30,20,10,.6), 0 0 0 1px rgba(0,0,0,.28);
   transition: box-shadow .2s;
 }
 .pile-boite .pochette-pile { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; }
@@ -608,14 +687,15 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 .disque-pile.choisi .pile-cd { transform: translateX(30%) rotate(50deg); }
 @media (hover: hover) { .disque-pile:not(.choisi):hover .pile-cd { transform: translateX(12%) rotate(20deg); } }
+/* le sens du disque, écrit au-dessus du boîtier : ← d'un côté de l'échelle, → de l'autre */
 .pile-scotch {
-  position: absolute; z-index: 3; top: -13px; left: 50%; max-width: 112%; transform: translateX(-50%) rotate(-3deg);
-  padding: 4px 10px 3px; border-radius: 2px; background: linear-gradient(180deg, #2b2b31, #151518); box-shadow: 0 2px 5px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12);
-  font-family: var(--mono); font-weight: 600; font-size: 11px; line-height: 1.3; letter-spacing: .08em; text-transform: uppercase; color: #f1eee6; white-space: nowrap;
-  text-shadow: 0 1px 0 rgba(255,255,255,.22), 0 -1px 0 rgba(0,0,0,.7);   /* les lettres en relief de l'étiqueteuse */
+  position: absolute; z-index: 3; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); max-width: 130%;
+  font-family: var(--etiquette); font-stretch: 125%; font-weight: 700; font-size: 10px; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase; color: var(--encre-2); white-space: nowrap;
+  transition: color .2s;
 }
-.disque-pile:nth-child(2) .pile-scotch { transform: translateX(-50%) rotate(2deg); }
-.disque-pile:nth-child(3) .pile-scotch { transform: translateX(-50%) rotate(-1.5deg); }
+.disque-pile:nth-child(1) .pile-scotch::before { content: "← "; letter-spacing: 0; }
+.disque-pile:nth-child(3) .pile-scotch::after { content: " →"; letter-spacing: 0; }
+.disque-pile.choisi .pile-scotch { color: var(--aiguille); }
 /* la pochette maison */
 .pile-boite { container-type: inline-size; }
 .maison { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; display: grid; text-align: left; }
@@ -645,44 +725,46 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .pile-titre-m { font-weight: 600; font-size: 15px; }
 .pile-artiste { font-size: 13px; color: var(--encre-2); }
 /* le disque choisi : entouré, avec « ensuite » au-dessus et de quoi l'écouter tout de suite */
-.disque-pile.choisi .pile-boite { box-shadow: 0 16px 24px -12px rgba(0,0,0,.55), 0 0 0 3px var(--fond), 0 0 0 6px var(--aiguille); }
+.disque-pile.choisi .pile-boite { box-shadow: 0 1px 1px rgba(0,0,0,.2), 0 22px 30px -16px rgba(30,20,10,.6), 0 0 0 3px var(--fond), 0 0 0 5px var(--aiguille); }
+/* « ensuite » : une petite languette bleue, au-dessus du sens du disque */
 .disque-pile.choisi::before {
-  content: "Ensuite"; position: absolute; z-index: 4; top: -42px; left: 50%; transform: translateX(-50%);
-  padding: 3px 9px; border-radius: 999px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
-  font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  content: "Ensuite"; position: absolute; z-index: 4; bottom: calc(100% + 34px); left: 50%; transform: translateX(-50%);
+  padding: 3px 7px 2px; border-radius: 4px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
+  font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
 }
 .pile-maintenant {
-  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; white-space: nowrap; background: var(--encre); color: var(--fond);
-  box-shadow: 0 6px 14px -6px rgba(0,0,0,.4); animation: pile-bouton .3s ease both;
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: var(--rayon-bouton);
+  font-size: 13px; font-weight: 600; white-space: nowrap; background: var(--aiguille); color: var(--sur-aiguille);
+  box-shadow: var(--relief-plein); animation: pile-bouton .3s ease both;
 }
+.pile-maintenant:hover { filter: brightness(1.08); }
 .pile-maintenant .icone-suiv { margin-left: 0; }
 @keyframes pile-bouton { from { opacity: 0; transform: translate(-50%, -4px); } }
 .pile-boite:focus-visible { outline: 3px solid var(--aiguille); outline-offset: 5px; }
 .pile-vide { grid-column: 1 / -1; align-self: center; font-size: 15px; color: var(--encre-2); text-align: center; }
-.pile-pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 4px 8px; font-size: 13px; color: var(--encre-2); }
+.pile-pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 2px 8px; border-top: 1px solid var(--trait); font-size: 13px; color: var(--encre-2); }
 .pile-flemme { font-size: 14px; color: var(--encre-2); text-align: left; }
 .pile-flemme u { color: var(--encre); font-weight: 600; text-underline-offset: 3px; }
 .pile-flemme:hover u { color: var(--aiguille); }
 .pile-autres {
-  flex: none; margin-left: auto; display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 16px; border-radius: 999px;
-  font-size: 14px; font-weight: 600; color: var(--encre); border: 1.5px solid var(--trait);
-  transition: border-color .15s, color .15s;
+  flex: none; margin-left: auto; display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 14px; border-radius: var(--rayon-bouton);
+  font-size: 14px; font-weight: 600; color: var(--encre); background: var(--fond-3); box-shadow: var(--relief);
+  transition: box-shadow .15s, color .15s;
 }
 .pile-autres span { font-size: 16px; }
-.pile-autres:hover { border-color: var(--encre); }
+.pile-autres:hover { box-shadow: var(--relief), 0 0 0 1px var(--encre-3); }
 /* le pilote automatique : la pile se range, la radio enchaîne */
 .pilote {
-  grid-column: 1 / -1; justify-self: stretch; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px;
+  grid-column: 1 / -1; justify-self: stretch; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--rayon-objet);
   background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
 }
 .pilote-led { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #4bd37b; box-shadow: 0 0 8px 2px rgba(75, 211, 123, .7); animation: pilote 2s ease-in-out infinite; }
 @keyframes pilote { 50% { opacity: .45; } }
 .pilote-textes { flex: 1; min-width: 0; display: grid; gap: 2px; font-size: 14px; line-height: 1.35; }
-.pilote-textes b { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.pilote-textes b { font-family: var(--etiquette); font-weight: 700; font-stretch: 125%; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; }
 .pilote-textes span { opacity: .8; }
-.pilote-stop { flex: none; min-height: 38px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--hifi-bouton); color: var(--hifi-encre); box-shadow: var(--hifi-bouton-ombre); }
+.pilote-stop { flex: none; min-height: 38px; padding: 0 16px; border-radius: var(--rayon-bouton); font-size: 13px; font-weight: 600; background: var(--hifi-bouton); color: var(--hifi-encre); box-shadow: var(--hifi-bouton-ombre); }
 .tuner.en-auto .pile-disques { padding: 18px 0 14px; min-height: 0; }
 
 /* ─── le mot d'Amélien : une fiche de disquaire, punaisée sur l'enceinte de droite (placée en JS) ─── */
@@ -696,7 +778,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 .post-it-scotch { position: absolute; top: 7px; left: 50%; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%;   /* la punaise */
   background: radial-gradient(circle at 35% 30%, #ff8f73, #c8361f 55%, #7d1c0e); box-shadow: 0 3px 4px rgba(0,0,0,.35); }
-.post-it-texte { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 20px; line-height: 1.16; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
+.post-it-texte { font-family: var(--voix); font-style: italic; font-weight: 400; font-size: 20px; line-height: 1.18; letter-spacing: -.005em; overflow-wrap: break-word; hyphens: manual; text-wrap: pretty; }
 .post-it.long .post-it-texte { font-size: 17px; }
 .post-it-signe { display: none; }
 .post-it.colle { animation: colle .6s cubic-bezier(.2,.9,.3,1.25) both; }
@@ -709,7 +791,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 }
 /* écran moyen ou petit : le post-it se colle au bas de la chaîne, juste avant les disques */
 @media (max-width: 1239px) {
-  .hifi { grid-template-areas: "g corps d" "g postit d" "g tuner d"; }
+  .hifi { grid-template-areas: "g corps d" "postit postit postit" "tuner tuner tuner"; }
   .hifi .post-it { grid-area: postit; position: relative; z-index: 5; right: auto; top: auto; justify-self: end; width: auto; max-width: min(380px, 86%); margin: -26px 6% 0 0; }
 }
 
@@ -764,7 +846,7 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 /* ─────────────────────────────── LE LIVRET (« Plus d'infos ») ───────────────────────────────
    Comme le livret d'un CD : l'album, l'artiste, et où écouter le morceau en entier. */
 .livret { width: 100%; padding-top: 24px; border-top: 1px solid var(--trait); scroll-margin-top: 92px; }
-.livret-machine { position: relative; max-width: 1100px; margin-top: 10px; }
+.livret-machine { position: relative; max-width: 1000px; margin-top: 10px; }
 .livret-bouton { display: flex; align-items: center; gap: 18px; text-align: left; padding: 4px 0; max-width: 100%; }
 .livret-icone { position: relative; flex: none; width: 54px; height: 44px; }
 .livret-icone::before, .livret-icone::after {
@@ -826,7 +908,7 @@ button.piste-btn:hover .piste-ecoute, .pistes li.ecoute .piste-ecoute { opacity:
 .livret-ailleurs-titre { font-weight: 600; }
 /* écouter en entier ailleurs, légalement */
 .ailleurs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
-.ailleurs a { padding: 7px 13px; border-radius: 999px; background: var(--fond-2); box-shadow: var(--relief); color: var(--encre); font-weight: 600; text-decoration: none; transition: box-shadow .15s; }
+.ailleurs a { padding: 8px 13px; border-radius: var(--rayon-bouton); background: var(--fond-3); box-shadow: var(--relief); color: var(--encre); font-weight: 600; text-decoration: none; transition: box-shadow .15s; }
 .ailleurs a:hover { box-shadow: var(--relief), 0 0 0 2px var(--aiguille); }
 
 /* ─────────────────────────────── MA SÉLECTION + RÉGLAGES (panneaux) ─────────────────────────────── */
@@ -845,16 +927,17 @@ body.panneau-ouvert .voile { opacity: 1; }
 body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 .reglages { grid-template-rows: auto auto auto 1fr; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .bac-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 22px 22px 8px; }
-.bac-tete h2 { font-size: 2rem; }
+.bac-tete h2 { font-size: 1.75rem; }
 .bac-explication { margin-top: 6px; font-size: 14px; color: var(--encre-2); max-width: 34ch; }
 .onglets { display: flex; gap: 6px; padding: 8px 22px 12px; }
 .bac { grid-template-rows: auto auto auto 1fr auto; }
 .bac-recherche { padding: 0 22px 10px; }
-.bac-recherche input { width: 100%; min-height: 42px; padding: 0 14px 0 38px; border: 1px solid var(--trait); border-radius: 999px; background: var(--fond-2) no-repeat 14px 50% / 16px 16px; color: var(--encre); font: 500 15px/1 var(--texte);
+.bac-recherche input { width: 100%; min-height: 42px; padding: 0 14px 0 38px; border: 1px solid var(--trait); border-radius: var(--rayon-bouton); background: var(--fond-3) no-repeat 14px 50% / 16px 16px; color: var(--encre); font: 500 15px/1 var(--texte);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l3.5 3.5'/%3E%3C/svg%3E"); }
 .bac-recherche input:focus { outline: 2px solid var(--encre); outline-offset: 1px; }
 .bac-recherche input::placeholder { color: var(--encre-2); }
-.onglet { padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--encre-2); }
+.onglet { padding: 8px 14px; border-radius: var(--rayon-bouton); font-weight: 600; font-size: 15px; color: var(--encre-2); transition: background-color .15s, color .15s; }
+.onglet:hover { color: var(--encre); }
 .onglet[aria-selected="true"] { background: var(--encre); color: var(--fond); }
 .bac-liste { list-style: none; margin: 0; padding: 4px 14px 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; gap: 4px; align-content: start; }
 .bac-ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
@@ -909,8 +992,8 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   position: fixed; left: 50%; top: 92px; z-index: 60;
   transform: translate(-50%, -10px); opacity: 0; pointer-events: none;
   max-width: min(92vw, 520px); text-align: center;
-  padding: 12px 20px; border-radius: 16px;
-  background: var(--encre); color: var(--fond); font-weight: 500; font-size: 15px;
+  padding: 12px 18px; border-radius: 12px;
+  background: var(--encre); color: var(--fond); font-weight: 500; font-size: 15px; box-shadow: 0 16px 34px -14px rgba(0,0,0,.5);
   transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
 }
 .toast.visible { opacity: 1; transform: translate(-50%, 0); }
@@ -1004,7 +1087,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .transport { width: 100%; justify-content: space-between; gap: 6px; }
   .rond { width: 48px; height: 48px; }
   .rond-lecture { width: 60px; height: 60px; }
-  .hifi-actions { flex: 1; }
+  .hifi-actions { flex: 1; padding-left: 0; border-left: 0; }
   .pilule { flex: 1; padding: 0 10px; font-size: 13px; }
   .fader { flex: 1; margin-left: 0; }
   .fader input { width: 100%; }
@@ -1024,14 +1107,6 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .bouton-trouvailles .mini-cdr { display: none; }
   .seulement-mobile-inline { display: inline; }
 
-  .ecran-allumage { gap: 26px; }
-  /* les trois étapes sur une seule ligne : le numéro au-dessus, deux lignes de texte au plus */
-  .etapes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 360px; }
-  .etapes li { display: grid; justify-items: center; align-content: start; gap: 6px; font-size: 13px; line-height: 1.25; text-wrap: balance; }
-  .etapes li + li::before { display: none; }
-  .panneau-allumage { padding: 20px 24px; gap: 24px; }
-  .bouton-rotatif-grand .molette { width: 88px; height: 88px; }
-  .interrupteur { width: 104px; height: 104px; }
 
   /* une chaîne compacte : l'écran réduit à son titre, la vidéo, les commandes, puis le tuner */
   .ecran-machine { padding-top: 12px; gap: 24px; }
@@ -1055,7 +1130,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .hifi-commandes { gap: 12px; padding-top: 12px; }
   .transport { justify-content: center; gap: 26px; }
   .rond[data-action="radio-stop"] { display: none; }
-  .hifi-actions { flex: 1 1 100%; flex-wrap: nowrap; gap: 8px; }
+  .hifi-actions { flex: 1 1 100%; flex-wrap: nowrap; gap: 8px; padding-left: 0; border-left: 0; }
   .hifi-actions .pilule { flex: 1 1 0; min-width: 0; padding: 0 10px; font-size: 14px; }
   .pilule-coeur .pilule-icone { font-size: 16px; }
   .pilule-bof .pouce { width: 17px; height: 17px; }
@@ -1064,10 +1139,10 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   .glissiere-curseur { width: 46px; transform: translateX(calc(var(--pos) * 52px)); }
 
   .sources { margin-left: 0; flex: 1 1 100%; margin-top: 6px; }
-  .pile-titre { font-size: 12px; }
-  .pile-disques { gap: 10px; padding: 38px 0 54px; }
-  .pile-scotch { font-size: 12.5px; padding: 2px 7px 1px; top: -10px; }
-  .disque-pile.choisi::before { font-size: 9px; top: -34px; padding: 2px 7px; }
+  .pile-titre { font-size: 10.5px; }
+  .pile-disques { gap: 12px; padding: 54px 0 58px; }
+  .pile-scotch { font-stretch: 100%; font-size: 9.5px; letter-spacing: .08em; bottom: calc(100% + 9px); max-width: 118%; overflow: hidden; text-overflow: ellipsis; }
+  .disque-pile.choisi::before { font-size: 8.5px; bottom: calc(100% + 27px); }
   .pile-pied { flex-wrap: wrap; }
   .pile-autres { min-height: 34px; padding: 0 12px; font-size: 13px; }
   .pilote { flex-wrap: wrap; }
@@ -1113,7 +1188,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
 }
 .aide.ouverte { opacity: 1; transform: none; }
-.aide-titre { font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 14px; letter-spacing: .02em; }
+.aide-titre { font-family: var(--display); font-weight: 700; font-stretch: 112%; font-size: 16px; letter-spacing: -.01em; }
 .aide-liste { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; counter-reset: aide; }
 .aide-liste li { position: relative; padding-left: 34px; font-size: 14.5px; line-height: 1.42; color: var(--encre-2); counter-increment: aide; }
 .aide-liste li b { color: var(--encre); }
@@ -1191,11 +1266,11 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 @keyframes salon-poussiere { 0%, 100% { transform: translate(0, 0); opacity: .2; } 50% { transform: translate(-14px, -22px); opacity: .9; } }
 .salon-heure { position: absolute; left: 14px; bottom: 10px; margin: 0; padding: 4px 9px; border-radius: 999px; background: rgba(20,16,12,.55); color: #f3ece0;
   font: 500 11px/1.3 var(--mono); letter-spacing: .04em; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-.ecran-machine .salon { margin-top: clamp(26px, 4vw, 44px); }
+.ecran-machine .salon { max-width: 1000px; margin-top: 0; border-radius: var(--rayon-objet); }
 .ecran-allumage .salon { max-width: 760px; margin-top: clamp(24px, 4vw, 40px); }
 @media (max-width: 700px) { .salon { aspect-ratio: 2 / 1; border-radius: 14px; } }
 @media (prefers-reduced-motion: reduce) { .salon *, .salon.joue * { animation: none !important; } }
-@media (max-width: 520px) { .pile-scotch { font-size: 9.5px; padding: 3px 7px 2px; letter-spacing: .05em; } }
+
 
 .salon.joue .salon-lcd { animation: salon-lcd 1.6s steps(4) infinite; }
 @keyframes salon-lcd { 0% { width: 18px; } 50% { width: 10px; } 100% { width: 18px; } }
@@ -1213,7 +1288,7 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
   opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
 .piece-pensee.visible, .piece-pensee-point.visible { opacity: 1; }
 .piece-pensee-texte { margin: 0; padding: 12px 16px; border-radius: 26px; background: rgba(252, 249, 242, .95); color: #1d1a16;
-  font: italic 400 17px/1.2 var(--display); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
+  font: italic 400 17px/1.22 var(--voix); text-align: center; text-wrap: balance; box-shadow: 0 10px 24px -8px rgba(0,0,0,.45); }
 .piece-pensee-point { position: absolute; z-index: 2; left: 0; top: 0; border-radius: 50%; background: rgba(252, 249, 242, .95);
   box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .6s ease; will-change: transform; }
 /* ce qu'on touche dans la pièce : une étiquette (et parfois une passerelle vers une autre création) ; le nom de l'objet sous la souris */

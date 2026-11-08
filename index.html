@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Music Discovery</title>
   <meta name="description" content="Music Discovery : allume la chaîne, choisis la suite, garde ce qui te plaît.">
-  <meta name="theme-color" content="#dcdbd8">
+  <meta name="theme-color" content="#e4e1db">
   <script>
     // la teinte est posée tout de suite (évite un flash de la mauvaise couleur) ; sans choix, on suit le mode sombre du téléphone
     try { var t = JSON.parse(localStorage.getItem('md-teinte-v5')), anc = { ambre: 'nuit', signal: 'salon', vide: 'salon', fievre: 'salon' };
@@ -17,16 +17,16 @@
   <link rel="modulepreload" href="piece.min.js?v=14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wdth,wght@75..100,400..700&family=IBM+Plex+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=67">
-  <link rel="stylesheet" href="teintes.css?v=15">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Doto:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=68">
+  <link rel="stylesheet" href="teintes.css?v=16">
 </head>
 <body>
 
   <!-- ═════════════ LA FAÇADE (barre du haut) ═════════════ -->
   <header class="facade-haut" id="facade">
     <a class="retour-hub" href="https://amelienito.github.io/#music-discovery" aria-label="Retour aux créations d’Amélien" title="Retour aux créations d’Amélien">←<span> OSB</span></a>
-    <button class="marque" data-action="accueil" aria-label="Music Discovery">Music<br><em>Discovery</em></button>
+    <button class="marque" data-action="accueil" aria-label="Music Discovery"><span class="marque-cd" aria-hidden="true"></span><span class="marque-nom">Music Discovery</span></button>
 
     <div class="facade-droite">
       <div class="teintes masquer-mobile" role="radiogroup" aria-label="Teinte du site" id="teintes-facade"></div>
@@ -57,30 +57,32 @@
     <!-- ═════════════ LE CARTON D'ENTRÉE ═════════════ -->
     <section class="ecran ecran-allumage" data-ecran="allumage">
       <div class="allumage-texte">
-        <h1>Music <em>Discovery</em></h1>
+        <h1>Music <span>Discovery</span></h1>
+        <ol class="etapes" aria-label="Comment ça marche">
+          <li><b>1</b><span>Allume la chaîne</span></li>
+          <li><b>2</b><span>Choisis la suite</span></li>
+          <li><b>3</b><span>Garde ce qui te&nbsp;plaît</span></li>
+        </ol>
       </div>
-      <ol class="etapes" aria-label="Comment ça marche">
-        <li><b>1</b><span>Allume la chaîne</span></li>
-        <li><b>2</b><span>Choisis la suite</span></li>
-        <li><b>3</b><span>Garde ce qui te&nbsp;plaît</span></li>
-      </ol>
-      <div class="panneau-allumage">
-        <div class="bouton-rotatif bouton-rotatif-grand" data-molette="volume">
-          <div class="molette" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
-            <svg class="molette-arc" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" pathLength="100"/></svg>
-            <span class="molette-repere"></span>
-          </div>
-          <span class="bouton-rotatif-nom">Volume <span class="valeur-volume">60</span></span>
-        </div>
-        <button class="interrupteur" data-action="allumer">
-          <span class="interrupteur-led"></span>
-          <span class="interrupteur-label">Commencer</span>
-        </button>
-      </div>
-      <p class="allumage-conseil" id="allumage-conseil">Conseil&nbsp;: Règle d'abord le volume grâce à&nbsp;cette super&nbsp;molette.</p>
-      <p class="allumage-retour" id="allumage-retour" hidden></p>
       <div class="salon" data-salon></div>
-      <p class="allumage-libre">Logiquement, tes choix restent enregistrés dans ton navigateur pour la prochaine&nbsp;fois.</p>
+      <div class="allumage-commandes">
+        <div class="panneau-allumage">
+          <div class="bouton-rotatif bouton-rotatif-grand" data-molette="volume">
+            <div class="molette" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60">
+              <svg class="molette-arc" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" pathLength="100"/></svg>
+              <span class="molette-repere"></span>
+            </div>
+            <span class="bouton-rotatif-nom">Volume <span class="valeur-volume">60</span></span>
+          </div>
+          <button class="interrupteur" data-action="allumer">
+            <span class="interrupteur-led"></span>
+            <span class="interrupteur-label">Commencer</span>
+          </button>
+        </div>
+        <p class="allumage-conseil" id="allumage-conseil">Conseil&nbsp;: Règle d'abord le volume grâce à&nbsp;cette super&nbsp;molette.</p>
+        <p class="allumage-retour" id="allumage-retour" hidden></p>
+        <p class="allumage-libre">Logiquement, tes choix restent enregistrés dans ton navigateur pour la prochaine&nbsp;fois.</p>
+      </div>
     </section>
 
     <!-- ═════════════ LA CHAÎNE ═════════════
@@ -370,7 +372,7 @@
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=10"></script>
-  <script src="app.js?v=68"></script>
+  <script src="app.js?v=69"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
   <script type="module" src="piece.min.js?v=14"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>

@@ -400,7 +400,7 @@ function remplirAlbum(el, m) {
     if (!corps) return;
     if (!a) {
       corps.innerHTML = `<p class="livret-nom">${E(m.album || 'Album inconnu')}</p>
-        <p class="livret-vide">${m.album ? 'C\'est l\'album d\'où vient ce morceau. ' : ''}Les catalogues n'en disent pas plus : ces disques-là se racontent chez les disquaires.</p>`;
+        <p class="livret-vide">${m.album ? 'C\'est l\'album d\'où vient ce morceau. ' : ''}Les catalogues n'en disent pas plus : ces disques-là se racontent chez les disquaires.</p>`;
       return;
     }
     const t = N(m.titre);
@@ -1654,8 +1654,8 @@ function choisirSon(son) {
 
 /* ─────────────────────────────── TEINTES ─────────────────────────────── */
 const TEINTES = [
-  { id: 'salon',  nom: 'Salon',  couleur: '#dcdbd8', pastille: 'conic-gradient(#1b3cc4 0 33%, #9a5f34 0 66%, #dcdbd8 0)' },
-  { id: 'nuit',   nom: 'Nuit',   couleur: '#141318', pastille: 'conic-gradient(#5470ff 0 33%, #6e4122 0 66%, #141318 0)' },
+  { id: 'salon',  nom: 'Salon',  couleur: '#e4e1db', pastille: 'conic-gradient(#1f3fd1 0 33%, #6e4429 0 66%, #e4e1db 0)' },
+  { id: 'nuit',   nom: 'Nuit',   couleur: '#121115', pastille: 'conic-gradient(#6178ff 0 33%, #4b2e1b 0 66%, #121115 0)' },
   { id: 'papier', nom: 'Papier', couleur: '#dfe4d7', pastille: 'linear-gradient(135deg, #dfe4d7 50%, #1d2a4d 50%)' },
 ];
 // anciennes teintes (avant la v0.6) : on retombe sur la plus proche
