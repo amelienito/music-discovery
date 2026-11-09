@@ -62,7 +62,8 @@ body[data-vue="allumage"] .facade-droite { visibility: hidden; }
 .marque-cd { flex: none; width: 20px; height: 20px; border-radius: 50%;
   background: radial-gradient(circle, var(--fond) 0 15%, rgba(0,0,0,.25) 16% 19%, transparent 20%), conic-gradient(from 40deg, #dfe2e6, #b9bfc8, #f1e9f2, #c4e1ea, #e6efd8, #efe2c8, #c6ccd4, #dfe2e6);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
-.marque-nom { font-family: var(--etiquette); font-stretch: 125%; font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.marque-nom { font-family: "Instrument Serif", var(--voix), Georgia, serif; font-weight: 400; font-size: 21px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
+.marque-nom i { font-style: italic; }
 body[data-vue="allumage"] .marque { visibility: hidden; }   /* sur l'accueil, le nom est déjà en grand */
 .facade-droite { display: flex; align-items: center; gap: 8px; }
 .bouton-facade {
@@ -145,64 +146,66 @@ body.sans-selection .bouton-trouvailles { display: none; }
   column-gap: clamp(32px, 5vw, 80px); row-gap: 28px; align-items: end; align-content: center;
 }
 .ecran.ecran-allumage { padding: clamp(24px, 4vh, 48px) clamp(20px, 4vw, 56px); }
-.allumage-texte { grid-area: texte; display: grid; gap: clamp(20px, 3.4vh, 34px); align-self: end; }
+.allumage-texte { grid-area: texte; display: grid; gap: clamp(22px, 3.6vh, 36px); align-self: end; }
+/* le nom : un vrai caractère à empattements, « Discovery » en italique, comme sur une pochette */
 .allumage-texte h1 {
-  font-family: var(--etiquette); font-stretch: 125%; font-weight: 800; text-transform: uppercase;
-  font-size: clamp(2.4rem, 4.6vw, 4.4rem); line-height: .9; letter-spacing: -.02em;
+  font-family: "Instrument Serif", var(--voix), Georgia, serif; font-weight: 400; text-transform: none;
+  font-size: clamp(3.2rem, 6.2vw, 6.2rem); line-height: .88; letter-spacing: -.018em; color: var(--encre);
 }
-.allumage-texte h1 span { display: block; color: var(--aiguille); }
-[data-teinte="papier"] .allumage-texte h1 { font-family: var(--display); font-stretch: 100%; text-transform: none; font-weight: 500; letter-spacing: -.035em; }
-[data-teinte="papier"] .allumage-texte h1 span { font-style: italic; }
-.etapes { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--trait); }
-.etapes li { display: flex; align-items: baseline; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--trait); font-weight: 500; font-size: 16px; letter-spacing: -.005em; }
-.etapes b { flex: none; width: 22px; font-family: var(--etiquette); font-stretch: 125%; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--encre-2); font-variant-numeric: tabular-nums; }
-.etapes b::before { content: "0"; }
+.allumage-texte h1 span { display: block; font-style: italic; padding-left: .32em; }
+/* les trois étapes : des pastilles rondes, comme des touches */
+.etapes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.etapes li { position: relative; display: flex; align-items: center; gap: 14px; font-weight: 550; font-size: 16px; letter-spacing: -.005em; }
+.etapes b { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--fond-3); box-shadow: var(--relief); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--encre); }
+.etapes li + li::after { content: ""; position: absolute; left: 14.5px; top: -12px; width: 1px; height: 12px; background: var(--encre-3); opacity: .6; }
 /* la pièce, assez large pour qu'on voie la chaîne, le fauteuil et la fenêtre */
 #scene .ecran-allumage .salon { grid-area: salon; align-self: center; justify-self: end; width: 100%; max-width: 1040px; height: auto; max-height: 100%; min-height: 0; aspect-ratio: 16 / 10.5; margin: 0; border-radius: var(--rayon-objet); }
 .allumage-commandes { grid-area: commandes; display: grid; gap: 14px; justify-items: start; }
-/* la façade d'entrée : une plaque d'alu, la molette et la touche « Commencer » */
+/* la façade d'entrée : la grosse molette et le gros bouton rond, sur une plaque */
 .panneau-allumage {
-  display: flex; align-items: center; gap: 22px; width: 100%;
-  padding: 18px 18px 18px 26px; border-radius: var(--rayon-objet);
-  background: var(--hifi-corps); color: var(--hifi-encre); box-shadow: var(--hifi-ombre);
+  display: flex; align-items: center; gap: clamp(26px, 3vw, 40px);
+  padding: 20px 26px 20px 30px; border-radius: 22px;
+  background: var(--fond-2); box-shadow: var(--relief);
 }
 .panneau-allumage .bouton-rotatif { padding-bottom: 2px; }
 .allumage-conseil { font-size: 13.5px; line-height: 1.45; color: var(--encre-2); max-width: 46ch; }
 .allumage-retour { font-size: 14.5px; line-height: 1.4; color: var(--aiguille); font-weight: 600; max-width: 46ch; }
 .allumage-libre { font-size: 12.5px; line-height: 1.45; color: var(--encre-2); opacity: .8; max-width: 46ch; }
-/* la touche « Commencer » : bleu Klein anodisé, une diode qui s'allume */
+/* « Commencer » : un gros bouton rond qu'on a envie d'enfoncer, la diode s'allume en bleu */
 .interrupteur {
-  flex: 1; min-width: 0; height: 64px; padding: 0 22px; border-radius: var(--rayon-bouton);
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  background: var(--hifi-bouton-fort); color: var(--hifi-sur-fort);
-  box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.28) inset, 0 -2px 0 rgba(0,0,0,.18) inset, 0 10px 22px -10px rgba(20,30,110,.7);
-  transition: transform .12s ease, box-shadow .12s ease, filter .2s;
+  flex: none; width: 116px; height: 116px; border-radius: 50%;
+  display: grid; place-items: center; align-content: center; gap: 9px;
+  background: radial-gradient(circle at 50% 30%, var(--fond-3), var(--fond-2) 75%); color: var(--encre);
+  box-shadow: var(--relief-fort), 0 1px 0 rgba(255,255,255,.7) inset;
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-.interrupteur:hover { filter: brightness(1.08); }
-.interrupteur:active, body.allume .interrupteur { transform: translateY(1px); box-shadow: 0 0 0 1px rgba(0,0,0,.3), inset 0 3px 8px rgba(0,0,0,.35); }
-.interrupteur-led { flex: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.35); box-shadow: inset 0 1px 1px rgba(0,0,0,.3); transition: background .2s, box-shadow .2s; }
-body.allume .interrupteur-led, .interrupteur:hover .interrupteur-led { background: #9fe6ff; box-shadow: 0 0 10px 2px rgba(140,220,255,.8); }
-.interrupteur-label { font-weight: 650; font-size: 17px; letter-spacing: -.005em; }
-[data-teinte="papier"] .interrupteur { box-shadow: none; }
+.interrupteur:hover { transform: translateY(-1px); }
+.interrupteur:active, body.allume .interrupteur { transform: translateY(2px) scale(.98); box-shadow: var(--relief-enfonce); }
+.interrupteur-led { width: 9px; height: 9px; border-radius: 50%; background: var(--verre-eteint); box-shadow: inset 0 1px 2px rgba(0,0,0,.35); transition: background .2s, box-shadow .2s; }
+.interrupteur:hover .interrupteur-led { background: color-mix(in srgb, var(--aiguille) 55%, var(--verre-eteint)); }
+body.allume .interrupteur-led { background: var(--aiguille); box-shadow: 0 0 12px 2px var(--aiguille); }
+.interrupteur-label { font-weight: 650; font-size: 15px; letter-spacing: -.005em; }
 @media (max-width: 860px) {
   .ecran-allumage {
     grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "texte" "salon" "commandes";
     row-gap: clamp(14px, 2.6vh, 22px); align-items: stretch;
   }
   .ecran.ecran-allumage { padding: clamp(14px, 2.4vh, 22px) 16px calc(16px + env(safe-area-inset-bottom)); }
-  .allumage-texte { gap: clamp(12px, 2vh, 18px); }
-  .allumage-texte h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
-  .allumage-texte h1 span { display: inline; }
-  /* les trois étapes sur une seule ligne */
-  .etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 0; gap: 8px; }
-  .etapes li { display: grid; align-content: start; gap: 4px; padding: 8px 0 0; border-bottom: 0; border-top: 1px solid var(--encre); font-size: 13.5px; line-height: 1.25; text-wrap: balance; }
-  .etapes b { width: auto; font-size: 10px; }
+  .allumage-texte { gap: clamp(12px, 2vh, 18px); justify-items: center; text-align: center; }
+  .allumage-texte h1 { font-size: clamp(2.5rem, 12.5vw, 3.6rem); line-height: .95; }
+  .allumage-texte h1 span { display: inline; padding-left: 0; }
+  /* les trois étapes sur une seule ligne, pastille au-dessus */
+  .etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 380px; }
+  .etapes li { display: grid; justify-items: center; align-content: start; gap: 6px; font-size: 13px; line-height: 1.25; text-align: center; text-wrap: balance; }
+  .etapes li + li::after { left: calc(-50% + 9px); top: 13px; width: calc(100% - 26px); height: 1px; }   /* un trait d'une pastille à l'autre */
+  .etapes b { width: 26px; height: 26px; font-size: 12px; }
   #scene .ecran-allumage .salon { align-self: stretch; justify-self: stretch; max-width: none; max-height: none; aspect-ratio: auto; min-height: 150px; border-radius: 12px; }
-  .allumage-commandes { gap: 10px; justify-items: stretch; }
-  .panneau-allumage { padding: 12px 12px 12px 18px; gap: 16px; }
+  .allumage-commandes { gap: 10px; justify-items: center; text-align: center; }
+  .panneau-allumage { padding: 12px 22px; gap: 28px; }
   .ios .panneau-allumage { padding: 0; background: none; box-shadow: none; }
-  .bouton-rotatif-grand .molette { width: 58px; height: 58px; }
-  .interrupteur { height: 58px; }
+  .bouton-rotatif-grand .molette { width: 62px; height: 62px; }
+  .interrupteur { width: 92px; height: 92px; gap: 7px; }
+  .interrupteur-label { font-size: 14px; }
   .allumage-conseil, .allumage-libre { font-size: 12.5px; }
 }
 @media (max-width: 860px) and (max-height: 700px) {
@@ -1291,7 +1294,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 
 /* ─── la pièce en 3D (piece.js) : elle remplace le salon dessiné quand le navigateur sait faire ───
    En attendant qu'elle arrive, on ne montre pas l'ancien dessin : juste la pièce dans la pénombre. */
-.avec-3d .salon, .salon.en-3d { aspect-ratio: 16 / 7.4; background: url(img/salon/apercu-large.jpg) center / cover, linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }   /* une image de la pièce, le temps que la 3D arrive */
+.avec-3d .salon, .salon.en-3d { aspect-ratio: 16 / 7.4; background: url(img/salon/apercu-large.jpg?v=3) center / cover, linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }   /* une image de la pièce, le temps que la 3D arrive */
 .avec-3d .salon .salon-svg, .salon.en-3d .salon-svg { visibility: hidden; }
 .piece-toile { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .9s ease, filter 1.6s ease; }
 .piece-toile.prete { opacity: 1; }
@@ -1347,7 +1350,7 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
 .salon-agrandir:active { transform: scale(.97); }
 body.piece-3d .salon-agrandir { display: inline-flex; }
 @media (max-width: 700px) {
-  .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; background-image: url(img/salon/apercu-haut.jpg), linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
+  .avec-3d .salon, .salon.en-3d { aspect-ratio: 1 / .9; background-image: url(img/salon/apercu-haut.jpg?v=3), linear-gradient(#2a221b 0 63%, #3a2617 63% 100%); }
   .piece-pensee, [data-plein] .piece-pensee { max-width: min(270px, 68%); }
   .piece-pensee-texte, [data-plein] .piece-pensee-texte { font-size: 15px; padding: 9px 13px; }
   .salon-agrandir { right: 10px; bottom: 10px; min-height: 32px; padding: 0 11px; font-size: 11px; }

@@ -568,23 +568,12 @@ function lancer() {
   [-1, 1].forEach(s => [-1, 1].forEach(t => cyl(.025, .02, .05, 6, pied, pouf, s * .18, .025, t * .18)));
 
   /* ═══════════════ Amélien ═══════════════ */
-  const peau = M('#8c5737', { roughness: .62 }), peauF = M('#734428', { roughness: .7 });
-  // le pull vert en maille fine (façon pull de tennis), et un pantalon bleu nuit un peu large
-  const maille = toileTexte(64, 64);
-  {
-    const x = maille.x;
-    x.fillStyle = '#1f6b47'; x.fillRect(0, 0, 64, 64);
-    for (let c = 0; c < 8; c++) {                       // des côtes verticales, et de petits « v » de tricot
-      x.fillStyle = c % 2 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.08)'; x.fillRect(c * 8, 0, 8, 64);
-      x.strokeStyle = 'rgba(0,0,0,.13)'; x.lineWidth = 1;
-      for (let r = 0; r < 8; r++) { x.beginPath(); x.moveTo(c * 8 + 1, r * 8 + 1); x.lineTo(c * 8 + 4, r * 8 + 6); x.lineTo(c * 8 + 7, r * 8 + 1); x.stroke(); }
-    }
-    maille.t.wrapS = maille.t.wrapT = THREE.RepeatWrapping; maille.t.repeat.set(5, 4);
-  }
-  const pull = new THREE.MeshStandardMaterial({ color: '#ffffff', map: maille.t, roughness: .95 });
-  const cotes = new THREE.MeshStandardMaterial({ color: '#185a3b', roughness: .95 });
-  const pant = new THREE.MeshStandardMaterial({ color: '#141c2e', roughness: .9 });
-  const poils = M('#160d09', { roughness: 1 }), cheveux = M('#0d0705', { roughness: 1 }), monture = M('#0d0b0b', { roughness: .3, metalness: .3 });
+  const peau = M('#7b452a', { roughness: .62 }), peauF = M('#673921', { roughness: .7 });
+  // le pull vert, d'une couleur franche (il est dessiné, pas photographié), et un pantalon bleu nuit un peu large
+  const pull = new THREE.MeshStandardMaterial({ color: '#25744c', roughness: .95 });
+  const cotes = new THREE.MeshStandardMaterial({ color: '#1b5c3c', roughness: .95 });
+  const pant = new THREE.MeshStandardMaterial({ color: '#1c2744', roughness: .9 });
+  const poils = M('#160d09', { roughness: 1 }), cheveux = M('#21150f', { roughness: 1 }), monture = M('#0d0b0b', { roughness: .3, metalness: .3 });
   const sombre = M('#1a0f0a');
   // des baskets de trail façon Salomon : mesh beige, renforts ocre, laçage rapide noir, semelle crème et châssis noir
   const meshBeige = M('#c8ae86', { roughness: .85 }), ocre = M('#a8731f', { roughness: .55 }), jauneS = M('#d8b43c', { roughness: .5 }), cremeS = M('#ece5d2', { roughness: .7 }), noirS = M('#18181b', { roughness: .6 });
@@ -594,10 +583,10 @@ function lancer() {
   const bassin = poser(new THREE.Mesh(new THREE.CylinderGeometry(.17, .16, .17, 18), pant), perso, 0, .575, -.11); bassin.scale.z = .8;
   const buste = groupe(perso, 0, .585, -.13);
   // le pull : un peu ample, côtes en bas, au col rond et aux poignets
-  const torseGeo = new THREE.CylinderGeometry(.205, .19, .47, 20, 3); torseGeo.translate(0, .245, 0);
+  const torseGeo = new THREE.CylinderGeometry(.205, .19, .47, 28, 3); torseGeo.translate(0, .245, 0);
   poser(new THREE.Mesh(torseGeo, pull), buste).scale.z = .66;
   poser(new THREE.Mesh(new THREE.CylinderGeometry(.193, .196, .055, 20), cotes), buste, 0, .035, 0).scale.z = .68;
-  const epaulettes = [-1, 1].map(s => { const b = poser(new THREE.Mesh(new THREE.SphereGeometry(.08, 14, 10), pull), buste, s * .185, .43, -.005); b.scale.set(1.02, .8, .92); return b; });
+  const epaulettes = [-1, 1].map(s => { const b = poser(new THREE.Mesh(new THREE.SphereGeometry(.08, 16, 12), pull), buste, s * .185, .43, -.005); b.scale.set(1.02, .8, .92); b.userData.bouge = true; return b; });
   const creme = M('#efe6cf', { roughness: .9 });
   poser(new THREE.Mesh(new THREE.TorusGeometry(.06, .014, 8, 20), creme), buste, 0, .49, .008).rotation.x = Math.PI / 2;
   const rayure = poser(new THREE.Mesh(new THREE.TorusGeometry(.069, .005, 6, 20), cotes), buste, 0, .482, .008); rayure.rotation.x = Math.PI / 2; rayure.castShadow = false;
@@ -617,7 +606,7 @@ function lancer() {
   poser(new THREE.Mesh(new THREE.CylinderGeometry(.051, .056, .1, 12), peauF), buste, 0, .525, .012);
 
   // la tête : visage taillé (mâchoire plus étroite), afro, lunettes rondes, fine moustache
-  const tete = groupe(buste, 0, .645, .03); tete.scale.setScalar(1.08);
+  const tete = groupe(buste, 0, .65, .03); tete.scale.setScalar(1.15);
   // un crâne lisse (une sphère déformée, ombrée en douceur) : le visage n'a plus de facettes bizarres
   const crane = new THREE.SphereGeometry(.104, 28, 22);
   {
@@ -625,56 +614,65 @@ function lancer() {
     for (let i = 0; i < pa.count; i++) {
       let x = pa.getX(i), y = pa.getY(i), z = pa.getZ(i);
       const bas = Math.max(0, -y / .104);
-      x *= 1 - bas * .32; z *= 1 - bas * .12;
+      x *= 1 - bas * .24; z *= 1 - bas * .1;
       if (z > 0 && y < -.02) z += .006 * bas;
       pa.setXYZ(i, x * .94, y * 1.17, z);
     }
     crane.computeVertexNormals();
   }
-  const peauLisse = M('#8c5737', { roughness: .6, flatShading: false }), peauLisseF = M('#76462a', { roughness: .66, flatShading: false });
+  const peauLisse = M('#7b452a', { roughness: .6, flatShading: false }), peauLisseF = M('#673921', { roughness: .66, flatShading: false });
   poser(new THREE.Mesh(crane, peauLisse), tete);
-  const nezP = poser(new THREE.Mesh(new THREE.ConeGeometry(.0155, .04, 10), peauLisseF), tete, 0, -.008, .107); nezP.rotation.x = Math.PI / 2 + .32;
+  const nezP = poser(new THREE.Mesh(new THREE.SphereGeometry(.017, 16, 12), peauLisseF), tete, 0, -.01, .104); nezP.scale.set(1, .8, 1.1);   // un nez rond, de dessin
   [-1, 1].forEach(s => { const o = bille(.024, peauF, tete, s * .098, -.002, -.008, 0); o.scale.set(.45, 1, .75); });
-  const boucleOreille = new THREE.Mesh(new THREE.TorusGeometry(.009, .0025, 4, 10), M('#e3c06a', { metalness: .85, roughness: .25 })); boucleOreille.position.set(.1, -.03, -.005); boucleOreille.rotation.y = Math.PI / 2; tete.add(boucleOreille);
-  const yeux = [-1, 1].map(s => { const o = bille(.0095, sombre, tete, s * .035, .023, .094, 2); o.scale.set(1, .9, .45); bille(.0026, M('#fff6ea', { roughness: .2, flatShading: false }), o, s * .003, .004, .008, 0); return o; });   // avec un petit reflet
-  const sourcils = [-1, 1].map(s => boite(.036, .0075, .01, poils, tete, s * .037, .057, .1));
+  const boucleOreille = new THREE.Mesh(new THREE.TorusGeometry(.009, .0025, 4, 10), M('#c99a3a', { metalness: .85, roughness: .25 })); boucleOreille.position.set(.1, -.03, -.005); boucleOreille.rotation.y = Math.PI / 2; tete.add(boucleOreille);
+  // les yeux : du blanc, une pupille, un éclat ; ils clignent (toute l'œil s'écrase)
+  const blancOeil = M('#fbf6ec', { roughness: .4, flatShading: false }), pupille = M('#140d0a', { roughness: .3, flatShading: false });
+  const yeux = [-1, 1].map(s => {
+    const o = groupe(tete, s * .038, .021, .093);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.0175, 16, 12), blancOeil), o).scale.set(1, 1.12, .45);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.0088, 12, 10), pupille), o, -s * .0025, -.002, .0066).scale.set(1, 1.1, .5);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.0026, 8, 6), M('#ffffff', { flatShading: false })), o, -s * .0025 + .0035, .0025, .0108).castShadow = false;
+    return o;
+  });
+  const sourcils = [-1, 1].map(s => boite(.042, .011, .012, poils, tete, s * .039, .066, .1));   // au-dessus des lunettes, épais
   // l'afro : le même volume, mais en grosses boucles serrées (des petites boules à la surface) :
   // une silhouette à lui, qu'on reconnaît de loin, pas la boule lisse des personnages tout faits
   const afroGeo = (() => {
-    const morceaux = [[new THREE.IcosahedronGeometry(.13, 2), new THREE.Matrix4()]];
-    const N = 52, or = Math.PI * (3 - Math.sqrt(5));
+    const morceaux = [[new THREE.SphereGeometry(.13, 32, 22), new THREE.Matrix4()]];
+    const N = 34, or = Math.PI * (3 - Math.sqrt(5));
     for (let i = 0; i < N; i++) {
-      const y = 1 - (i / (N - 1)) * 1.4, r = Math.sqrt(Math.max(0, 1 - y * y)), a = i * or;   // répartis sur la sphère (sauf en dessous)
-      const x = Math.cos(a) * r, z = Math.sin(a) * r, taille = .036 + ((i * 37) % 7) * .003;
-      if (z > .45 && y < .2) continue;   // rien qui descende sur le front : les yeux et les lunettes restent visibles
-      morceaux.push([new THREE.IcosahedronGeometry(taille, 1), new THREE.Matrix4().makeTranslation(x * .13, y * .13, z * .13)]);
+      const y = 1 - (i / (N - 1)) * 1.45, r = Math.sqrt(Math.max(0, 1 - y * y)), a = i * or;   // répartis sur la sphère (sauf en dessous)
+      const x = Math.cos(a) * r, z = Math.sin(a) * r, taille = .046 + ((i * 37) % 5) * .004;
+      if (z > .42 && y < .22) continue;   // rien qui descende sur le front : les yeux et les lunettes restent visibles
+      morceaux.push([new THREE.SphereGeometry(taille, 20, 14), new THREE.Matrix4().makeTranslation(x * .128, y * .128, z * .128)]);
     }
-    const g = fusionGeos(morceaux); g.computeVertexNormals(); return g;
+    return fusionLisse(morceaux);
   })();
-  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .1, -.062); afro.scale.set(1.08, .96, 1.0);   // assez en avant pour couvrir le haut du front
+  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .1, -.058); afro.scale.set(1.1, .95, 1.0);   // assez en avant pour couvrir le haut du front
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
-    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.033, .0068, 6, 20), monture); cercle.position.set(s * .039, .024, .109); tete.add(cercle);
+    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.033, .0072, 8, 28), monture); cercle.position.set(s * .039, .022, .109); tete.add(cercle);
+    const eclat = new THREE.Mesh(new THREE.PlaneGeometry(.024, .0045), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .7 })); eclat.position.set(s * .039 + .008, .033, .1115); eclat.rotation.z = .75; tete.add(eclat);
     const branche = boite(.004, .004, .11, monture, tete, s * .074, .03, .055); branche.rotation.y = s * -.08;
   });
-  boite(.016, .005, .005, monture, tete, 0, .031, .112);
+  boite(.016, .006, .006, monture, tete, 0, .029, .112);
   // la moustache (fine, en chevron)
-  [-1, 1].forEach(s => { const m = boite(.032, .0095, .012, poils, tete, s * .0145, -.031, .101); m.rotation.z = -s * .2; });
+  [-1, 1].forEach(s => { const m = gelule(.0078, .024, poils, tete, s * .0185, -.032, .1); m.rotation.z = Math.PI / 2 - s * .3; m.scale.z = .8; });
   const bouche = [-1, 1].map(s => boite(.018, .004, .005, M('#3b1a12'), tete, s * .0088, -.05, .095));
 
   // les bras : épaule → coude → main (positionnés par cinématique inverse)
   const L_BRAS = .285, L_AVANT = .265;
   const bras = [-1, 1].map(s => {
     const epaule = groupe(buste, s * .195, .43, -.005);
-    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.059, L_BRAS, 4, 12), pull), epaule, 0, -L_BRAS / 2, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.052, L_BRAS, 6, 22), pull), epaule, 0, -L_BRAS / 2, 0);
     const coude = groupe(epaule, 0, -L_BRAS, 0);
-    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.053, L_AVANT - .04, 4, 12), pull), coude, 0, -(L_AVANT - .04) / 2, 0);
-    poser(new THREE.Mesh(new THREE.CylinderGeometry(.047, .05, .045, 12), creme), coude, 0, -L_AVANT + .03, 0);
-    poser(new THREE.Mesh(new THREE.CylinderGeometry(.0485, .0505, .008, 12), cotes), coude, 0, -L_AVANT + .036, 0).castShadow = false;
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.047, L_AVANT - .04, 6, 22), pull), coude, 0, -(L_AVANT - .04) / 2, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.043, .046, .045, 14), creme), coude, 0, -L_AVANT + .03, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.0445, .0465, .008, 14), cotes), coude, 0, -L_AVANT + .036, 0).castShadow = false;
     const main = groupe(coude, 0, -L_AVANT, 0);
-    boite(.068, .062, .03, peau, main, 0, -.031, 0);
-    const doigts = boite(.062, .05, .026, peau, main, 0, -.078, .006); doigts.rotation.x = .28;
-    const pouce = gelule(.012, .028, peau, main, -s * .036, -.03, .016); pouce.rotation.set(.5, 0, -s * .5);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.035, 14, 10), peauLisse), main, 0, -.04, 0).scale.set(1, 1.12, .58);
+    const doigts = poser(new THREE.Mesh(new THREE.CapsuleGeometry(.021, .03, 4, 10), peauLisse), main, 0, -.077, .008); doigts.scale.set(1.45, 1, .72); doigts.rotation.x = .28;
+    const pouce = poser(new THREE.Mesh(new THREE.CapsuleGeometry(.0115, .026, 4, 8), peauLisse), main, -s * .034, -.034, .016); pouce.rotation.set(.5, 0, -s * .5);
     return { s, epaule, coude, main };
   });
   // son verre : sur la table tant qu'il ne boit pas ; il le prend, boit, et le repose là où il l'a pris
@@ -692,10 +690,10 @@ function lancer() {
   const L_CUISSE = .46, L_TIBIA = .45;
   const jambes = [-1, 1].map(s => {
     const hanche = groupe(perso, s * .095, .565, -.1);
-    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.08, L_CUISSE, 4, 12), pant), hanche, 0, -L_CUISSE / 2, 0);
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.073, L_CUISSE, 6, 22), pant), hanche, 0, -L_CUISSE / 2, 0);
     const genou = groupe(hanche, 0, -L_CUISSE, 0);
-    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.07, L_TIBIA - .05, 4, 12), pant), genou, 0, -L_TIBIA / 2 + .02, 0);
-    poser(new THREE.Mesh(new THREE.CylinderGeometry(.076, .078, .05, 12), pant), genou, 0, -L_TIBIA + .085, 0);   // le bas du pantalon, un peu large, retroussé
+    poser(new THREE.Mesh(new THREE.CapsuleGeometry(.063, L_TIBIA - .05, 6, 22), pant), genou, 0, -L_TIBIA / 2 + .02, 0);
+    poser(new THREE.Mesh(new THREE.CylinderGeometry(.07, .073, .05, 14), pant), genou, 0, -L_TIBIA + .085, 0);   // le bas du pantalon, un peu large, retroussé
     const cheville = groupe(genou, 0, -L_TIBIA, 0);
     cyl(.05, .05, .07, 10, M('#d9a23a', { roughness: .95 }), cheville, 0, .035, 0).castShadow = false;   // les chaussettes moutarde, qu'on voit sous l'ourlet
     const p = groupe(cheville);
@@ -772,6 +770,69 @@ function lancer() {
   const stylo = vivant(groupe(bras[1].main, -.01, -.07, .03)); stylo.visible = false;
   { const c = cyl(.0042, .0042, .13, 6, M('#c8572f', { roughness: .4 }), stylo, 0, 0, 0); c.rotation.x = 1.15; const pointe = cyl(.0012, .0042, .014, 6, M('#c9cbcf', { metalness: .6 }), stylo, 0, -.026, .059); pointe.rotation.x = 1.15 + Math.PI; c.castShadow = pointe.castShadow = false; }
 
+  /* ═══════════════ Amélien est dessiné, pas modelé ═══════════════
+     Son propre style, qu'on ne confond pas avec les petits bonshommes lisses des autres sites :
+     des ombres en aplats (trois tons nets, comme de la gouache) et un trait d'encre autour de chaque forme.
+     Le trait : une coque un peu plus grande, retournée, d'encre brune ; une par morceau rigide (peu d'appels). */
+  {
+    // (le dégradé se lit de -1 à 1 selon l'angle de la lumière : la moitié « de dos » reste à zéro, comme une vraie ombre)
+    const tons = [0, 0, 0, 88, 142, 192], data = new Uint8Array(tons.length * 4);
+    tons.forEach((v, i) => data.set([v, v, v, 255], i * 4));
+    const degrade = new THREE.DataTexture(data, tons.length, 1, THREE.RGBAFormat);
+    degrade.minFilter = degrade.magFilter = THREE.NearestFilter; degrade.generateMipmaps = false; degrade.needsUpdate = true;
+    const versToon = new Map();
+    const toon = m => {
+      if (!m.isMeshStandardMaterial || m.transparent) return m;
+      if (!versToon.has(m.uuid)) versToon.set(m.uuid, new THREE.MeshToonMaterial({ color: m.color.clone(), map: m.map || null, gradientMap: degrade, emissive: m.emissive.clone(), emissiveIntensity: m.emissiveIntensity }));
+      return versToon.get(m.uuid);
+    };
+    const habille = racine => racine.traverse(o => { if (o.isMesh) o.material = toon(o.material); });
+    [perso, carnet, verre].forEach(habille);
+    const encre = new THREE.ShaderMaterial({
+      uniforms: { couleur: { value: new THREE.Color('#1c120d') } },
+      vertexShader: 'attribute vec3 nLisse; attribute float epaisseur; void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position + nLisse * epaisseur, 1.0); }',
+      fragmentShader: 'uniform vec3 couleur; void main() { gl_FragColor = vec4(couleur, 1.0); }',
+      side: THREE.BackSide,
+    });
+    const _hsl = {}, _bs = new THREE.Vector3();
+    // ce qui mérite un trait : pas le noir (le trait ne se verrait pas), pas les miettes, pas le verre ni les écrans
+    const aTrait = o => {
+      const m = o.material;
+      if (!o.isMesh || o.userData.sansTrait || !(m.isMeshToonMaterial) || m.transparent) return false;
+      if (!m.map && m.color.getHSL(_hsl).l < .06) return false;
+      if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      o.getWorldScale(_bs);
+      return o.geometry.boundingSphere.radius * Math.max(_bs.x, _bs.y, _bs.z) > .011;
+    };
+    const coque = (morceaux, parent, ep) => {
+      const geos = morceaux.map(([g, mat]) => (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(mat));
+      let n = 0; geos.forEach(g => { n += g.attributes.position.count; });
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), lis = new Float32Array(n * 3), eps = new Float32Array(n).fill(ep); let k = 0;
+      geos.forEach(g => { pos.set(g.attributes.position.array, k * 3); nor.set(g.attributes.normal.array, k * 3); k += g.attributes.position.count; g.dispose(); });
+      // des normales lissées (moyenne de toutes les faces qui touchent un sommet) : la coque ne s'ouvre pas aux arêtes
+      const somme = new Map(), cle = i => Math.round(pos[i * 3] * 4000) + ',' + Math.round(pos[i * 3 + 1] * 4000) + ',' + Math.round(pos[i * 3 + 2] * 4000);
+      for (let i = 0; i < n; i++) { const c = cle(i); let v = somme.get(c); if (!v) somme.set(c, v = [0, 0, 0]); v[0] += nor[i * 3]; v[1] += nor[i * 3 + 1]; v[2] += nor[i * 3 + 2]; }
+      for (let i = 0; i < n; i++) { const v = somme.get(cle(i)), l = Math.hypot(v[0], v[1], v[2]) || 1; lis[i * 3] = v[0] / l; lis[i * 3 + 1] = v[1] / l; lis[i * 3 + 2] = v[2] / l; }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('nLisse', new THREE.BufferAttribute(lis, 3)); geo.setAttribute('epaisseur', new THREE.BufferAttribute(eps, 1));
+      geo.computeBoundingSphere(); geo.boundingSphere.radius += ep;
+      const t = new THREE.Mesh(geo, encre); t.castShadow = t.receiveShadow = false; t.userData.sansTrait = true; parent.add(t); return t;
+    };
+    perso.updateMatrixWorld(true);
+    // l'épaisseur du trait : plus fin sur le visage et les mains, où les formes sont petites
+    const epaisseurDe = g => { for (let p = g; p && p !== perso; p = p.parent) { if (p === tete) return .0028; if (bras.some(b => b.main === p)) return .0034; } return .006; };
+    const groupes = []; perso.traverse(o => { if (!o.isMesh) groupes.push(o); });
+    groupes.forEach(g => {
+      const ep = epaisseurDe(g), fixes = [];
+      g.children.filter(aTrait).forEach(m => {
+        m.updateMatrix();
+        if (m.userData.bouge) coque([[m.geometry, new THREE.Matrix4()]], m, ep / Math.max(m.scale.x, m.scale.y, m.scale.z));   // ce qui bouge porte son propre trait
+        else fixes.push([m.geometry, m.matrix.clone()]);
+      });
+      if (fixes.length) coque(fixes, g, ep);
+    });
+  }
+
   /* ═══════════════ le petit nuage (sans musique) ═══════════════ */
   const nuage = new THREE.Group(); nuage.visible = false; scene.add(nuage);
   [[0, 0, 0, .11], [.1, -.01, .02, .085], [-.1, -.015, 0, .09], [.04, .06, -.02, .085], [-.05, .045, .03, .07], [.17, -.03, -.01, .06]].forEach(([x, y, z, r], i) => {
@@ -784,6 +845,13 @@ function lancer() {
   });
 
   /* ═══════════════ les notes qui rebondissent sur les murs ═══════════════ */
+  function fusionLisse(liste) {
+    const geos = liste.map(([g, m]) => (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(m));
+    let n = 0; geos.forEach(g => { n += g.attributes.position.count; });
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3); let k = 0;
+    geos.forEach(g => { pos.set(g.attributes.position.array, k * 3); nor.set(g.attributes.normal.array, k * 3); k += g.attributes.position.count; });
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); return geo;
+  }
   function fusionGeos(liste) {
     const geos = liste.map(([g, m]) => (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(m));
     let n = 0; geos.forEach(g => { n += g.attributes.position.count; });
@@ -1227,7 +1295,7 @@ function lancer() {
       j.pied.quaternion.copy(_qa.copy(j.hanche.quaternion).multiply(j.genou.quaternion).invert().multiply(_qf));
     });
     // le visage : sourcils, bouche, clignements
-    sourcils.forEach((s, i) => { const c = i ? 1 : -1; s.rotation.z = c * (so < 0 ? .34 * so : .08 * so); s.position.y = .057 + Math.max(0, -so) * .004; });
+    sourcils.forEach((s, i) => { const c = i ? 1 : -1; s.rotation.z = c * (so < 0 ? .34 * so : .08 * so); s.position.y = .066 + Math.max(0, -so) * .004; });
     bouche.forEach((m, i) => { const c = i ? 1 : -1; m.rotation.z = c * .22 * bo; });
     if ((clin -= dt) < 0) { clinT = .12; clin = 2.5 + Math.random() * 4; }
     clinT = Math.max(0, clinT - dt);
