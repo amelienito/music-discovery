@@ -479,9 +479,13 @@ const NAV = (() => {
 const CONNEXION_YT = 'https://accounts.google.com/ServiceLogin?service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2F';
 // pourquoi YouTube ne voit pas Premium ici, selon le navigateur (le lecteur intégré n'a pas accès à la connexion faite sur youtube.com)
 function astucePremium() {
-  if (NAV.ios || NAV.safari) return `Safari cache ta connexion YouTube aux autres sites, alors ici YouTube ne sait pas que t'as Premium. Pour que ça marche&nbsp;: ${NAV.ios ? 'Réglages › Apps › Safari' : 'Safari › Réglages › Confidentialité'}, décoche «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi. En navigation privée, jamais.`;
-  if (NAV.firefox) return 'Firefox cloisonne ta connexion YouTube&nbsp;: ici, YouTube ne sait pas que t\'as Premium. Le plus simple&nbsp;: les extraits, ou la page dans Chrome.';
-  return 'Connecte-toi à YouTube dans ce navigateur (pas en navigation privée), puis relance le morceau&nbsp;: plus de pub.';
+  const ua = navigator.userAgent, samsung = /SamsungBrowser/.test(ua), android = /Android/.test(ua);
+  const fin = ' En navigation privée, YouTube ne te reconnaîtra pas&nbsp;: passe en extraits.';
+  if (NAV.ios) return `Deux options&nbsp;: dans <b>Réglages › Apps › Safari</b>, désactive «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
+  if (NAV.safari) return `Deux options&nbsp;: dans <b>Safari › Réglages › Confidentialité</b>, décoche «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
+  if (samsung) return `Deux options&nbsp;: dans les <b>paramètres de Samsung Internet › Confidentialité</b>, désactive l'anti-suivi intelligent, puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
+  if (NAV.firefox) return `Deux options&nbsp;: touche le <b>bouclier</b> à gauche de l'adresse et désactive la protection pour ce site, puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
+  return `Connecte-toi à YouTube dans ce navigateur${android ? '' : ' (Chrome, Edge…)'}, puis relance le morceau. Ou passe en mode extraits.${fin}`;
 }
 function majAvis() {
   const el = $('#avis-pub');
@@ -620,8 +624,9 @@ function surveillerPub(m, debut = 0) {
       if (S.pub && !$('#avis-pub.ouvert')) { S.pub = false; majAvis(); }
       return;
     }
-    if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING || (st === YT.PlayerState.UNSTARTED && n > 6)) immobile++;
-    if (immobile >= 2 && !S.pub) { S.pub = true; majAvis(); }
+    // le morceau ne démarre pas alors qu'on a lancé la lecture : une pub (quel que soit l'état annoncé, Safari en dit peu)
+    if (st !== YT.PlayerState.PAUSED && st !== YT.PlayerState.ENDED && (st !== YT.PlayerState.UNSTARTED || n > 3) && !S.pauseVoulue) immobile++;
+    if (immobile >= 3 && !S.pub) { S.pub = true; majAvis(); }
   }, 1000);
 }
 // une vidéo qui ne démarre jamais (lecture automatique bloquée, vidéo coincée) ne doit pas tout figer.
@@ -638,7 +643,7 @@ function surveillerDemarrage(m) {
     if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.PAUSED) return;
     const ecoule = Date.now() - depart;
     if (ecoule < (S.pub ? 150000 : 40000)) {
-      if (!prevenu && ecoule > 14000) { prevenu = true; toast('Ça charge (sûrement une pub)… Patiente un peu, ou passe au suivant.', 4500); }
+      if (!prevenu && ecoule > 6000) { prevenu = true; if (!S.pub) { S.pub = true; S.avisFerme = false; majAvis(); } }   // trop long : sûrement une pub, on propose les extraits
       demarrage = setTimeout(verif, 5000);
       return;
     }

@@ -631,7 +631,9 @@ body.cosmetique .trappe { display: grid; animation: trappe .38s cubic-bezier(.2,
 .led-choix:hover { transform: scale(1.1); }
 .led-choix:active { transform: scale(.9); }
 .led-choix[aria-checked="true"] { box-shadow: 0 0 0 2px #0b0c0e, 0 0 0 4px var(--c), 0 0 14px 3px var(--c); }
-.led-choix[data-val="origine"] { --c: #9aa0a8; background: conic-gradient(#8fdcff 0 50%, #ffb35c 50%); }
+.led-choix[data-val="origine"] { --c: var(--lcd-origine, #8fdcff); }   /* la vraie couleur d'origine de la teinte */
+/* (et la couleur qui fait doublon avec « D'origine » n'est pas reproposée) */
+html:not([data-teinte="nuit"]):not([data-teinte="papier"]) .led-choix[data-val="glacier"], html[data-teinte="nuit"] .led-choix[data-val="ambre"], html[data-teinte="papier"] .led-choix[data-val="blanc"] { display: none; }
 .led-choix[data-val="glacier"] { --c: #8fdcff; } .led-choix[data-val="ambre"] { --c: #ffb35c; } .led-choix[data-val="menthe"] { --c: #8dffc4; }
 .led-choix[data-val="rose"] { --c: #ff9bd2; } .led-choix[data-val="blanc"] { --c: #f4f6ff; }
 .segments { display: inline-flex; padding: 3px; border-radius: 8px; background: #0a0a0c; gap: 2px; box-shadow: inset 0 1px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05); }
@@ -1338,6 +1340,10 @@ body.piece-3d .hifi .post-it { display: none !important; }   /* le mot devient u
 [data-plein] .piece-pensee { max-width: min(260px, 38%); }
 [data-plein] .piece-pensee-texte { padding: 10px 14px; font-size: 15.5px; }
 .piece-survol.visible { opacity: 1; }
+/* le nom de l'objet, et dessous ce qu'il fait (en minuscules, plus discret) */
+.piece-survol { display: grid; gap: 3px; border-radius: 10px; padding: 6px 10px; }
+.piece-survol b { font-weight: 600; }
+.piece-survol span { font: 500 12px/1.1 var(--texte); letter-spacing: 0; text-transform: none; opacity: .78; }
 @keyframes astuce { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
 @media (max-width: 700px) { .piece-etiquette { font-size: 13px; } }
 /* le bouton pour passer la pièce en grand */

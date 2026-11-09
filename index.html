@@ -14,12 +14,12 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=17">
+  <link rel="modulepreload" href="piece.min.js?v=18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=71">
-  <link rel="stylesheet" href="teintes.css?v=17">
+  <link rel="stylesheet" href="styles.css?v=72">
+  <link rel="stylesheet" href="teintes.css?v=18">
 </head>
 <body>
 
@@ -295,9 +295,9 @@
   <aside class="aide" id="aide" role="status" aria-labelledby="aide-titre" hidden>
     <p class="aide-titre" id="aide-titre">Petite astuce</p>
     <ol class="aide-liste">
-      <li>Un morceau te plaît&nbsp;? <b>« J'aime bien »</b> le garde dans ta sélection.</li>
-      <li>Dès deux morceaux gardés, tu peux <b>n'écouter que ta sélection</b>, et continuer à y ajouter des titres.</li>
-      <li>Des pubs, ou envie d'une autre couleur&nbsp;? Tout se change dans <b>Réglages</b>, en haut à droite.</li>
+      <li><b>« J'aime bien »</b> range le morceau dans ta sélection.</li>
+      <li>À partir de deux, tu peux <b>n'écouter qu'elle</b>, et continuer à l'enrichir.</li>
+      <li>Les pubs, la couleur du site&nbsp;: tout se règle dans <b>Réglages</b>, en haut à droite.</li>
     </ol>
     <button class="gros-bouton gros-bouton-plein" data-action="fermer-aide">Compris</button>
   </aside>
@@ -345,17 +345,16 @@
     <div class="reglage-son" role="radiogroup" aria-label="Comment écouter">
       <p class="reglage-titre">Comment écouter</p>
       <button class="choix-son" role="radio" data-action="son" data-son="complet" aria-checked="true">
-        <strong>Morceaux complets</strong><span>Via YouTube. Sans pub avec YouTube Premium, si YouTube te reconnaît ici.</span>
+        <strong>Morceaux complets</strong><span>Pour celles et ceux sous Ad-Block et YouTube Premium.</span>
       </button>
       <button class="choix-son" role="radio" data-action="son" data-son="extraits" aria-checked="false">
-        <strong>Extraits de 30 secondes</strong><span>Zéro pub, sans compte. Idéal pour découvrir vite.</span>
+        <strong>Extraits de 30 secondes</strong><span>Zéro pub, sans compte, et ça continue écran verrouillé.</span>
       </button>
       <div class="reglage-premium">
         <p class="reglage-premium-titre">T'as YouTube Premium mais des pubs ?</p>
         <p id="astuce-premium"></p>
         <a class="lien-bouton" id="connexion-youtube" target="_blank" rel="noopener">Se connecter à YouTube ↗</a>
       </div>
-      <p class="reglage-note">Le livret de chaque morceau a aussi ses liens Deezer, Apple Music, Qobuz et Bandcamp.</p>
     </div>
     <div class="reglage-teinte">
       <p class="reglage-titre">Teinte du site</p>
@@ -366,14 +365,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="extrait" preload="none" playsinline></audio>
 
-  <script src="data.js?v=35"></script>
+  <script src="data.js?v=36"></script>
   <script src="moteur.js?v=4"></script>
   <script src="pochettes.js?v=16"></script>
   <script src="infos.js?v=14"></script>
   <script src="salon.js?v=10"></script>
-  <script src="app.js?v=70"></script>
+  <script src="app.js?v=71"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=17"></script>
+  <script type="module" src="piece.min.js?v=18"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>

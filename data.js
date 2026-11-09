@@ -1375,12 +1375,6 @@ const MORCEAUX = [
     tags: ["rap", "rap français", "93", "hardcore"],
     energie: 6, etrange: 6, danse: 3 },
 
-  { titre: "La nuit", artiste: "Seth Gueko", album: "Barillet plein",
-    lien: "https://music.youtube.com/watch?v=NEbKHRkBwSc", note: "",
-    ambiance: "bitume", style: "Rap du 95, nocturne", annee: 2008, bpm: 85, voix: "rap",
-    tags: ["rap", "rap français", "nuit", "néochrome"],
-    energie: 5, etrange: 5, danse: 3 },
-
   { titre: "Can You Keep Up", artiste: "Busta Rhymes feat. Twista", album: "",
     lien: "https://music.youtube.com/watch?v=veflCk2rHfA", note: "",
     ambiance: "bitume", style: "Rap à toute vitesse", bpm: 95, voix: "rap",
@@ -1470,6 +1464,7 @@ const MORCEAUX = [
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
    ne les repropose plus et ne les renvoie plus à Claude. */
 const RETIRES = [
+  "https://music.youtube.com/watch?v=NEbKHRkBwSc", // La nuit (Seth Gueko), retiré le 9 nov.
   "https://music.youtube.com/watch?v=UGDQVZ4caR0", // Oh! Tengo Suerte, version courte (remplacée)
   "https://music.youtube.com/watch?v=QmH60FrHzO4", // HOWWEFLOW, audio (remplacé par le clip)
   "https://music.youtube.com/watch?v=beO3qViOUiQ", // The Weekend (Original 12 Inch Mix)

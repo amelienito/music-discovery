@@ -573,7 +573,7 @@ function lancer() {
   const pull = new THREE.MeshStandardMaterial({ color: '#25744c', roughness: .95 });
   const cotes = new THREE.MeshStandardMaterial({ color: '#1b5c3c', roughness: .95 });
   const pant = new THREE.MeshStandardMaterial({ color: '#1c2744', roughness: .9 });
-  const poils = M('#160d09', { roughness: 1 }), cheveux = M('#21150f', { roughness: 1 }), monture = M('#0d0b0b', { roughness: .3, metalness: .3 });
+  const poils = M('#160d09', { roughness: 1 }), cheveux = M('#21150f', { roughness: 1 }), monture = M('#1a1310', { roughness: .35, metalness: .25, flatShading: false });
   const sombre = M('#1a0f0a');
   // des baskets de trail façon Salomon : mesh beige, renforts ocre, laçage rapide noir, semelle crème et châssis noir
   const meshBeige = M('#c8ae86', { roughness: .85 }), ocre = M('#a8731f', { roughness: .55 }), jauneS = M('#d8b43c', { roughness: .5 }), cremeS = M('#ece5d2', { roughness: .7 }), noirS = M('#18181b', { roughness: .6 });
@@ -629,9 +629,9 @@ function lancer() {
   const blancOeil = M('#fbf6ec', { roughness: .4, flatShading: false }), pupille = M('#140d0a', { roughness: .3, flatShading: false });
   const yeux = [-1, 1].map(s => {
     const o = groupe(tete, s * .038, .021, .093);
-    poser(new THREE.Mesh(new THREE.SphereGeometry(.0175, 16, 12), blancOeil), o).scale.set(1, 1.12, .45);
-    poser(new THREE.Mesh(new THREE.SphereGeometry(.0088, 12, 10), pupille), o, -s * .0025, -.002, .0066).scale.set(1, 1.1, .5);
-    poser(new THREE.Mesh(new THREE.SphereGeometry(.0026, 8, 6), M('#ffffff', { flatShading: false })), o, -s * .0025 + .0035, .0025, .0108).castShadow = false;
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.0135, 16, 12), blancOeil), o).scale.set(1, 1.08, .45);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.007, 12, 10), pupille), o, -s * .002, -.0015, .0052).scale.set(1, 1.1, .5);
+    poser(new THREE.Mesh(new THREE.SphereGeometry(.002, 8, 6), M('#ffffff', { flatShading: false })), o, -s * .002 + .0028, .002, .0088).castShadow = false;
     return o;
   });
   const sourcils = [-1, 1].map(s => boite(.042, .011, .012, poils, tete, s * .039, .066, .1));   // au-dessus des lunettes, épais
@@ -665,11 +665,12 @@ function lancer() {
   const afro = poser(new THREE.Mesh(afroGeo, cheveuxAfro), tete, 0, .112, -.052); afro.scale.set(1.12, .93, 1.02);   // la ligne des cheveux juste au-dessus des sourcils   // assez en avant pour couvrir le haut du front
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
-    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.033, .0072, 8, 28), monture); cercle.position.set(s * .039, .022, .109); tete.add(cercle);
-    const eclat = new THREE.Mesh(new THREE.PlaneGeometry(.024, .0045), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .7 })); eclat.position.set(s * .039 + .008, .033, .1115); eclat.rotation.z = .75; tete.add(eclat);
-    const branche = boite(.004, .004, .11, monture, tete, s * .074, .03, .055); branche.rotation.y = s * -.08;
+    // une monture fine et bien ronde, un verre à peine teinté (un reflet, pas un trait blanc), la branche jusqu'à l'oreille
+    const cercle = new THREE.Mesh(new THREE.TorusGeometry(.032, .0042, 12, 48), monture); cercle.position.set(s * .038, .022, .107); tete.add(cercle);
+    const verreL = new THREE.Mesh(new THREE.CircleGeometry(.031, 32), new THREE.MeshStandardMaterial({ color: '#dfeeff', transparent: true, opacity: .14, roughness: .05, metalness: .2, depthWrite: false })); verreL.position.set(s * .038, .022, .1075); verreL.castShadow = false; tete.add(verreL);
+    const branche = boite(.0035, .0035, .1, monture, tete, s * .071, .028, .058); branche.rotation.y = s * -.1;
   });
-  boite(.016, .006, .006, monture, tete, 0, .029, .112);
+  { const pont = new THREE.Mesh(new THREE.TorusGeometry(.0085, .0032, 8, 16, Math.PI), monture); pont.position.set(0, .024, .108); tete.add(pont); }   // le pont, en arc
   // la moustache (fine, en chevron)
   [-1, 1].forEach(s => { const m = gelule(.0078, .024, poils, tete, s * .0185, -.032, .1); m.rotation.z = Math.PI / 2 - s * .3; m.scale.z = .8; });
   const bouche = [-1, 1].map(s => boite(.018, .004, .005, M('#3b1a12'), tete, s * .0088, -.05, .095));
@@ -1447,7 +1448,7 @@ function lancer() {
      Une passerelle ouvre dans un nouvel onglet : la musique continue ici. */
   const zone = (w, h, d, parent, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ visible: false })); m.position.set(x, y, z); parent.add(m); return m; };
   const CIBLES = [];
-  const cible = (obj, nom, action) => CIBLES.push({ obj, nom, action });
+  const cible = (obj, nom, action, quoi = '') => CIBLES.push({ obj, nom, action, quoi });   // quoi : ce qu'on y gagne, écrit sous le nom
   const reactions = {};                                        // nom → instant où ça a commencé
   const reagir = nom => { reactions[nom] = horloge; };
   const depuis = nom => reactions[nom] === undefined ? 99 : horloge - reactions[nom];
@@ -1461,28 +1462,28 @@ function lancer() {
     if (etat.humeur === 'triste') { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
     lancerActivite('salut');
     return { texte: 'Monte le son' };
-  });
-  cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return null; });
+  }, 'lui dire bonjour');
+  cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return null; }, 'il boude sans musique');
   // les passerelles : une petite fenêtre, avec de quoi y aller (nouvel onglet, la musique continue ici)
-  cible(porte, 'La porte du bureau', () => { reagir('porte'); return { texte: 'Le bureau, à côté : toutes les créations d’Amélien', lien: ALLER.bureau, quoi: 'Entrer' }; });
-  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Jouer' }; });
-  cible(ordi, 'L’ordi', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; });
-  cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; });
-  cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; });
+  cible(porte, 'La porte du bureau', () => { reagir('porte'); return { texte: 'Le bureau, à côté : toutes les créations d’Amélien', lien: ALLER.bureau, quoi: 'Entrer' }; }, 'toutes ses créations');
+  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Jouer' }; }, 'son jeu : RP Talya');
+  cible(ordi, 'L’ordi', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; }, 'son blog, Onsenbranle.fr');
+  cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; }, 'le jeu Cite 3 Chinois');
+  cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; }, 'le quiz Fun facts');
   // les objets futiles : ils réagissent, sans forcément rien dire
-  cible(chat, 'Le chat', () => { reagir('chat'); return null; });
+  cible(chat, 'Le chat', () => { reagir('chat'); return null; }, 'il s’étire');
   const zoneLampe = zone(.2, 2.2, .2, lampe, 0, 1.1, 0); zone(.44, .3, .44, zoneLampe, -.68, 1.17, .46);
-  cible(zoneLampe, 'La lampe', () => { lampeEteinte = !lampeEteinte; return null; });
+  cible(zoneLampe, 'La lampe', () => { lampeEteinte = !lampeEteinte; return null; }, 'allumer, éteindre');
   cibleFenetre = { obj: vitre, nom: `La fenêtre : ${tranche.nom}`, action: () => null }; CIBLES.push(cibleFenetre);
-  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.e, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return null; }); });
-  cible(zone(RW + .1, 1.3, RD, chaine, 0, .66, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return null; });
-  cible(plante, 'La plante', () => { reagir('plante'); return null; });
+  haut_parleurs.forEach(h => { if (h.type === 'grave') cible(h.e, 'L’enceinte', () => { for (let k = 0; k < 5; k++) emettre(true); return null; }, 'un coup de basse'); });
+  cible(zone(RW + .1, 1.3, RD, chaine, 0, .66, 0), 'La chaîne', () => { vuForce = 1.2; lcdMessage = hasard(['MERCI', 'TROP FORT', 'BASS BOOST']); finLcdMessage = horloge + 2.2; return null; }, 'un mot sur l’écran');
+  cible(plante, 'La plante', () => { reagir('plante'); return null; }, 'ses feuilles dansent');
   // la bibliothèque : on en sort un CD au hasard (un morceau avec le mot d'Amélien) ; il vient flotter devant nous
-  cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { sortirCD(); return null; });
-  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Le verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
-  cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
-  cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; });
-  cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });
+  cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { sortirCD(); return null; }, 'sortir un CD au hasard');
+  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Le verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; }, 'il boit une gorgée');
+  cible(pouf, 'Le pouf', () => { reagir('pouf'); return null; }, 'il rebondit');
+  cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; }, 'le média rap qu’il a cofondé');
+  cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; }, 'le morceau qui passe');
   CADRES_IMG.forEach(c => cible(c.g, c.legende, () => { c.g.userData.penche = !c.g.userData.penche; return { texte: c.legende }; }));
 
   /* ═══════════════ un CD sorti de la bibliothèque, comme un objet qu'on inspecte dans un jeu vidéo ═══════════════
@@ -1599,7 +1600,7 @@ function lancer() {
       const v = viser(ev);
       toile.style.cursor = v ? 'pointer' : '';
       survol.classList.toggle('visible', !!v);
-      if (v) { const r = toile.getBoundingClientRect(); survol.textContent = v.c.nom; survol.style.transform = `translate(${Math.round(ev.clientX - r.left + 14)}px, ${Math.round(ev.clientY - r.top + 16)}px)`; }
+      if (v) { const r = toile.getBoundingClientRect(); survol.innerHTML = ''; { const b = document.createElement('b'); b.textContent = v.c.nom; survol.append(b); if (v.c.quoi) { const i = document.createElement('span'); i.textContent = v.c.quoi; survol.append(i); } } survol.style.transform = `translate(${Math.round(ev.clientX - r.left + 14)}px, ${Math.round(ev.clientY - r.top + 16)}px)`; }
     });
   });
   toile.addEventListener('pointerleave', () => { survol.classList.remove('visible'); toile.style.cursor = ''; });
