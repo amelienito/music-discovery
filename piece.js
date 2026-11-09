@@ -568,7 +568,7 @@ function lancer() {
   [-1, 1].forEach(s => [-1, 1].forEach(t => cyl(.025, .02, .05, 6, pied, pouf, s * .18, .025, t * .18)));
 
   /* ═══════════════ Amélien ═══════════════ */
-  const peau = M('#7b452a', { roughness: .62 }), peauF = M('#673921', { roughness: .7 });
+  const peau = M('#6c412c', { roughness: .62 }), peauF = M('#5a3422', { roughness: .7 });
   // le pull vert, d'une couleur franche (il est dessiné, pas photographié), et un pantalon bleu nuit un peu large
   const pull = new THREE.MeshStandardMaterial({ color: '#25744c', roughness: .95 });
   const cotes = new THREE.MeshStandardMaterial({ color: '#1b5c3c', roughness: .95 });
@@ -620,7 +620,7 @@ function lancer() {
     }
     crane.computeVertexNormals();
   }
-  const peauLisse = M('#7b452a', { roughness: .6, flatShading: false }), peauLisseF = M('#673921', { roughness: .66, flatShading: false });
+  const peauLisse = M('#6c412c', { roughness: .6, flatShading: false }), peauLisseF = M('#5a3422', { roughness: .66, flatShading: false });
   poser(new THREE.Mesh(crane, peauLisse), tete);
   const nezP = poser(new THREE.Mesh(new THREE.SphereGeometry(.017, 16, 12), peauLisseF), tete, 0, -.01, .104); nezP.scale.set(1, .8, 1.1);   // un nez rond, de dessin
   [-1, 1].forEach(s => { const o = bille(.024, peauF, tete, s * .098, -.002, -.008, 0); o.scale.set(.45, 1, .75); });
@@ -638,17 +638,31 @@ function lancer() {
   // l'afro : le même volume, mais en grosses boucles serrées (des petites boules à la surface) :
   // une silhouette à lui, qu'on reconnaît de loin, pas la boule lisse des personnages tout faits
   const afroGeo = (() => {
-    const morceaux = [[new THREE.SphereGeometry(.13, 32, 22), new THREE.Matrix4()]];
-    const N = 34, or = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < N; i++) {
-      const y = 1 - (i / (N - 1)) * 1.45, r = Math.sqrt(Math.max(0, 1 - y * y)), a = i * or;   // répartis sur la sphère (sauf en dessous)
-      const x = Math.cos(a) * r, z = Math.sin(a) * r, taille = .046 + ((i * 37) % 5) * .004;
-      if (z > .42 && y < .22) continue;   // rien qui descende sur le front : les yeux et les lunettes restent visibles
-      morceaux.push([new THREE.SphereGeometry(taille, 20, 14), new THREE.Matrix4().makeTranslation(x * .128, y * .128, z * .128)]);
+    const g = new THREE.SphereGeometry(.135, 64, 40), pa = g.attributes.position, v = new THREE.Vector3();
+    for (let i = 0; i < pa.count; i++) {
+      v.fromBufferAttribute(pa, i); const n = v.clone().normalize();
+      // de grosses bosses douces (la masse n'est pas une boule) et un grain serré (les boucles)
+      const gros = Math.sin(n.x * 5.1 + 1.3) * Math.sin(n.y * 4.3 + .7) * Math.sin(n.z * 4.7 + 2.1);
+      const grain = Math.sin(n.x * 31 + n.z * 7) * Math.sin(n.y * 29 + n.x * 5) * Math.sin(n.z * 33 + n.y * 3);
+      v.addScaledVector(n, gros * .009 + grain * .0035); pa.setXYZ(i, v.x, v.y, v.z);
     }
-    return fusionLisse(morceaux);
+    g.computeVertexNormals();
+    return g;
   })();
-  const afro = poser(new THREE.Mesh(afroGeo, cheveux), tete, 0, .1, -.058); afro.scale.set(1.1, .95, 1.0);   // assez en avant pour couvrir le haut du front
+  const boucles = toileTexte(256, 128);
+  {
+    const x = boucles.x;
+    x.fillStyle = '#1d120c'; x.fillRect(0, 0, 256, 128);
+    let k = 7; const h = () => (k = (k * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 1400; i++) {   // des petites spirales serrées, plus claires ou plus sombres
+      const cx = h() * 256, cy = h() * 128, r = 1.5 + h() * 2.6, a = h() * 6.3;
+      x.strokeStyle = h() < .55 ? 'rgba(66,45,32,.75)' : 'rgba(6,4,2,.85)'; x.lineWidth = 1 + h() * .8;
+      x.beginPath(); x.arc(cx, cy, r, a, a + 4.2 + h() * 1.5); x.stroke();
+    }
+    boucles.t.wrapS = boucles.t.wrapT = THREE.RepeatWrapping; boucles.t.repeat.set(3, 2);
+  }
+  const cheveuxAfro = new THREE.MeshStandardMaterial({ color: '#ffffff', map: boucles.t, roughness: 1 });
+  const afro = poser(new THREE.Mesh(afroGeo, cheveuxAfro), tete, 0, .112, -.052); afro.scale.set(1.12, .93, 1.02);   // la ligne des cheveux juste au-dessus des sourcils   // assez en avant pour couvrir le haut du front
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
     const cercle = new THREE.Mesh(new THREE.TorusGeometry(.033, .0072, 8, 28), monture); cercle.position.set(s * .039, .022, .109); tete.add(cercle);
@@ -670,9 +684,17 @@ function lancer() {
     poser(new THREE.Mesh(new THREE.CylinderGeometry(.043, .046, .045, 14), creme), coude, 0, -L_AVANT + .03, 0);
     poser(new THREE.Mesh(new THREE.CylinderGeometry(.0445, .0465, .008, 14), cotes), coude, 0, -L_AVANT + .036, 0).castShadow = false;
     const main = groupe(coude, 0, -L_AVANT, 0);
-    poser(new THREE.Mesh(new THREE.SphereGeometry(.035, 14, 10), peauLisse), main, 0, -.04, 0).scale.set(1, 1.12, .58);
-    const doigts = poser(new THREE.Mesh(new THREE.CapsuleGeometry(.021, .03, 4, 10), peauLisse), main, 0, -.077, .008); doigts.scale.set(1.45, 1, .72); doigts.rotation.x = .28;
-    const pouce = poser(new THREE.Mesh(new THREE.CapsuleGeometry(.0115, .026, 4, 8), peauLisse), main, -s * .034, -.034, .016); pouce.rotation.set(.5, 0, -s * .5);
+    {
+      const mx = (x, y, z, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, 0, rz)), new THREE.Vector3(sx, sy, sz));
+      const morceaux = [[new THREE.SphereGeometry(1, 16, 12), mx(0, -.036, 0, 0, 0, .029, .04, .013)], [new THREE.CapsuleGeometry(.0145, .02, 3, 10), mx(0, -.004, 0, 0, 0, 1, 1, .8)]];   // la paume, un peu longue, et le poignet
+      [[-.0185, .042], [-.0062, .048], [.0062, .045], [.0185, .036]].forEach(([dx, l], i) => {   // l'index, le majeur, l'annulaire, l'auriculaire : longs et fins
+        const x = -s * dx, y0 = -.066, ec = s * (i - 1.5) * .03;
+        morceaux.push([new THREE.CapsuleGeometry(.0058, l * .55, 3, 8), mx(x, y0 - l * .3, .001, -.12, ec)]);
+        morceaux.push([new THREE.CapsuleGeometry(.0052, l * .38, 3, 8), mx(x - ec * l * .5, y0 - l * .74, .007, -.38, ec)]);
+      });
+      morceaux.push([new THREE.CapsuleGeometry(.0072, .034, 3, 8), mx(-s * .028, -.044, .011, .4, -s * .55)]);   // le pouce
+      poser(new THREE.Mesh(fusionLisse(morceaux), peauLisse), main);
+    }
     return { s, epaule, coude, main };
   });
   // son verre : sur la table tant qu'il ne boit pas ; il le prend, boit, et le repose là où il l'a pris
@@ -706,10 +728,10 @@ function lancer() {
     bille(.047, meshBeige, p, 0, -.036, .14, 1).scale.set(.98, .66, 1.12);
     [-1, 1].forEach(c => {                                                            // les renforts ocre, en zigzag sur les côtés
       [[-.05, .55], [.01, -.55], [.07, .55], [.12, -.5]].forEach(([z, r]) => { const b = boite(.006, .056, .016, ocre, p, c * .046, -.03, z); b.rotation.x = r; });
-      boite(.006, .012, .2, jauneS, p, c * .047, -.052, .04);                        // la bande jaune
+      boite(.006, .012, .2, jauneS, p, c * .047, -.052, .04).castShadow = false;     // la bande jaune (trop fine pour une ombre)
     });
-    boite(.05, .045, .012, ocre, p, 0, -.012, -.072);                                // le renfort du talon
-    [.0, .045, .09].forEach((z, i) => { const l = boite(.075, .006, .007, noirS, p, 0, .006 - i * .008, z); l.rotation.y = i % 2 ? .45 : -.45; });   // le laçage rapide
+    boite(.05, .045, .012, ocre, p, 0, -.012, -.072).castShadow = false;             // le renfort du talon
+    [.0, .045, .09].forEach((z, i) => { const l = boite(.075, .006, .007, noirS, p, 0, .006 - i * .008, z); l.rotation.y = i % 2 ? .45 : -.45; l.castShadow = false; });   // le laçage rapide
     return { s, hanche, genou, pied: p };
   });
 
@@ -770,10 +792,9 @@ function lancer() {
   const stylo = vivant(groupe(bras[1].main, -.01, -.07, .03)); stylo.visible = false;
   { const c = cyl(.0042, .0042, .13, 6, M('#c8572f', { roughness: .4 }), stylo, 0, 0, 0); c.rotation.x = 1.15; const pointe = cyl(.0012, .0042, .014, 6, M('#c9cbcf', { metalness: .6 }), stylo, 0, -.026, .059); pointe.rotation.x = 1.15 + Math.PI; c.castShadow = pointe.castShadow = false; }
 
-  /* ═══════════════ Amélien est dessiné, pas modelé ═══════════════
+  /* ═══════════════ Amélien est peint en aplats ═══════════════
      Son propre style, qu'on ne confond pas avec les petits bonshommes lisses des autres sites :
-     des ombres en aplats (trois tons nets, comme de la gouache) et un trait d'encre autour de chaque forme.
-     Le trait : une coque un peu plus grande, retournée, d'encre brune ; une par morceau rigide (peu d'appels). */
+     des ombres en aplats (trois tons nets, comme de la gouache), sans contour. */
   {
     // (le dégradé se lit de -1 à 1 selon l'angle de la lumière : la moitié « de dos » reste à zéro, comme une vraie ombre)
     const tons = [0, 0, 0, 88, 142, 192], data = new Uint8Array(tons.length * 4);
@@ -788,49 +809,6 @@ function lancer() {
     };
     const habille = racine => racine.traverse(o => { if (o.isMesh) o.material = toon(o.material); });
     [perso, carnet, verre].forEach(habille);
-    const encre = new THREE.ShaderMaterial({
-      uniforms: { couleur: { value: new THREE.Color('#1c120d') } },
-      vertexShader: 'attribute vec3 nLisse; attribute float epaisseur; void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position + nLisse * epaisseur, 1.0); }',
-      fragmentShader: 'uniform vec3 couleur; void main() { gl_FragColor = vec4(couleur, 1.0); }',
-      side: THREE.BackSide,
-    });
-    const _hsl = {}, _bs = new THREE.Vector3();
-    // ce qui mérite un trait : pas le noir (le trait ne se verrait pas), pas les miettes, pas le verre ni les écrans
-    const aTrait = o => {
-      const m = o.material;
-      if (!o.isMesh || o.userData.sansTrait || !(m.isMeshToonMaterial) || m.transparent) return false;
-      if (!m.map && m.color.getHSL(_hsl).l < .06) return false;
-      if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
-      o.getWorldScale(_bs);
-      return o.geometry.boundingSphere.radius * Math.max(_bs.x, _bs.y, _bs.z) > .011;
-    };
-    const coque = (morceaux, parent, ep) => {
-      const geos = morceaux.map(([g, mat]) => (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(mat));
-      let n = 0; geos.forEach(g => { n += g.attributes.position.count; });
-      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), lis = new Float32Array(n * 3), eps = new Float32Array(n).fill(ep); let k = 0;
-      geos.forEach(g => { pos.set(g.attributes.position.array, k * 3); nor.set(g.attributes.normal.array, k * 3); k += g.attributes.position.count; g.dispose(); });
-      // des normales lissées (moyenne de toutes les faces qui touchent un sommet) : la coque ne s'ouvre pas aux arêtes
-      const somme = new Map(), cle = i => Math.round(pos[i * 3] * 4000) + ',' + Math.round(pos[i * 3 + 1] * 4000) + ',' + Math.round(pos[i * 3 + 2] * 4000);
-      for (let i = 0; i < n; i++) { const c = cle(i); let v = somme.get(c); if (!v) somme.set(c, v = [0, 0, 0]); v[0] += nor[i * 3]; v[1] += nor[i * 3 + 1]; v[2] += nor[i * 3 + 2]; }
-      for (let i = 0; i < n; i++) { const v = somme.get(cle(i)), l = Math.hypot(v[0], v[1], v[2]) || 1; lis[i * 3] = v[0] / l; lis[i * 3 + 1] = v[1] / l; lis[i * 3 + 2] = v[2] / l; }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('nLisse', new THREE.BufferAttribute(lis, 3)); geo.setAttribute('epaisseur', new THREE.BufferAttribute(eps, 1));
-      geo.computeBoundingSphere(); geo.boundingSphere.radius += ep;
-      const t = new THREE.Mesh(geo, encre); t.castShadow = t.receiveShadow = false; t.userData.sansTrait = true; parent.add(t); return t;
-    };
-    perso.updateMatrixWorld(true);
-    // l'épaisseur du trait : plus fin sur le visage et les mains, où les formes sont petites
-    const epaisseurDe = g => { for (let p = g; p && p !== perso; p = p.parent) { if (p === tete) return .0028; if (bras.some(b => b.main === p)) return .0034; } return .006; };
-    const groupes = []; perso.traverse(o => { if (!o.isMesh) groupes.push(o); });
-    groupes.forEach(g => {
-      const ep = epaisseurDe(g), fixes = [];
-      g.children.filter(aTrait).forEach(m => {
-        m.updateMatrix();
-        if (m.userData.bouge) coque([[m.geometry, new THREE.Matrix4()]], m, ep / Math.max(m.scale.x, m.scale.y, m.scale.z));   // ce qui bouge porte son propre trait
-        else fixes.push([m.geometry, m.matrix.clone()]);
-      });
-      if (fixes.length) coque(fixes, g, ep);
-    });
   }
 
   /* ═══════════════ le petit nuage (sans musique) ═══════════════ */
@@ -1501,7 +1479,7 @@ function lancer() {
   cible(plante, 'La plante', () => { reagir('plante'); return null; });
   // la bibliothèque : on en sort un CD au hasard (un morceau avec le mot d'Amélien) ; il vient flotter devant nous
   cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { sortirCD(); return null; });
-  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Son verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
+  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Le verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
   cible(pouf, 'Le pouf', () => { reagir('pouf'); return { texte: 'Pouf' }; });
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; });
   cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; });

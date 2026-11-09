@@ -14,11 +14,11 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=16">
+  <link rel="modulepreload" href="piece.min.js?v=17">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Doto:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=70">
+  <link rel="stylesheet" href="styles.css?v=71">
   <link rel="stylesheet" href="teintes.css?v=17">
 </head>
 <body>
@@ -373,7 +373,7 @@
   <script src="salon.js?v=10"></script>
   <script src="app.js?v=70"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=16"></script>
+  <script type="module" src="piece.min.js?v=17"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>
