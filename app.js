@@ -480,12 +480,12 @@ const CONNEXION_YT = 'https://accounts.google.com/ServiceLogin?service=youtube&c
 // pourquoi YouTube ne voit pas Premium ici, selon le navigateur (le lecteur intégré n'a pas accès à la connexion faite sur youtube.com)
 function astucePremium() {
   const ua = navigator.userAgent, samsung = /SamsungBrowser/.test(ua), android = /Android/.test(ua);
-  const fin = ' En navigation privée, YouTube ne te reconnaîtra pas&nbsp;: passe en extraits.';
-  if (NAV.ios) return `Deux options&nbsp;: dans <b>Réglages › Apps › Safari</b>, désactive «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
-  if (NAV.safari) return `Deux options&nbsp;: dans <b>Safari › Réglages › Confidentialité</b>, décoche «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
-  if (samsung) return `Deux options&nbsp;: dans les <b>paramètres de Samsung Internet › Confidentialité</b>, désactive l'anti-suivi intelligent, puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
-  if (NAV.firefox) return `Deux options&nbsp;: touche le <b>bouclier</b> à gauche de l'adresse et désactive la protection pour ce site, puis connecte-toi à YouTube. Ou passe en mode extraits.${fin}`;
-  return `Connecte-toi à YouTube dans ce navigateur${android ? '' : ' (Chrome, Edge…)'}, puis relance le morceau. Ou passe en mode extraits.${fin}`;
+  const fin = ' En navigation privée, il ne reste que les extraits.';
+  if (NAV.ios) return `Deux options&nbsp;: dans <b>Réglages › Apps › Safari</b>, désactive «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Sinon, passe en mode extraits.${fin}`;
+  if (NAV.safari) return `Deux options&nbsp;: dans <b>Safari › Réglages › Confidentialité</b>, décoche «&nbsp;Empêcher le suivi intersite&nbsp;», puis connecte-toi à YouTube. Sinon, passe en mode extraits.${fin}`;
+  if (samsung) return `Deux options&nbsp;: dans les <b>paramètres de Samsung Internet › Confidentialité</b>, désactive l'anti-suivi intelligent, puis connecte-toi à YouTube. Sinon, passe en mode extraits.${fin}`;
+  if (NAV.firefox) return `Deux options&nbsp;: touche le <b>bouclier</b> à gauche de l'adresse et désactive la protection pour ce site, puis connecte-toi à YouTube. Sinon, passe en mode extraits.${fin}`;
+  return `Connecte-toi à YouTube dans ce navigateur${android ? '' : ' (Chrome, Edge…)'}, puis relance le morceau. Sinon, passe en mode extraits.${fin}`;
 }
 function majAvis() {
   const el = $('#avis-pub');

@@ -220,7 +220,7 @@ const MORCEAUX = [
     energie: 5, etrange: 6, danse: 6 },
 
   { titre: "Close the Door", artiste: "Teddy Pendergrass", album: "Life Is a Song Worth Singing",
-    lien: "https://music.youtube.com/watch?v=QEbyvA9srrE", note: "Il tendait la MPC pour se faire sampler...",
+    lien: "https://music.youtube.com/watch?v=QEbyvA9srrE", note: "Il tendait la MPC pour se faire sampler…",
     ambiance: "soleil", style: "Philly soul", annee: 1978, bpm: 72, voix: "chant",
     tags: ["soul", "philly", "ballade", "nocturne"],
     energie: 2, etrange: 2, danse: 4 },
@@ -797,7 +797,7 @@ const MORCEAUX = [
     energie: 6, etrange: 4, danse: 7 },
 
   { titre: "Daydream", artiste: "Gunter Kallmann Choir", album: "",
-    lien: "https://music.youtube.com/watch?v=rQACwgrYwKM", note: "Merci Lupe Fiasco et Mr.Nobody pour la vision",
+    lien: "https://music.youtube.com/watch?v=rQACwgrYwKM", note: "Merci Lupe Fiasco et Mr. Nobody pour la vision",
     ambiance: "brume", style: "Easy listening, chœurs", annee: 1970, bpm: 90, voix: "chant",
     tags: ["chœurs", "easy listening", "samples", "reprise"],
     energie: 2, etrange: 3, danse: 2 },
@@ -809,13 +809,13 @@ const MORCEAUX = [
     energie: 6, etrange: 5, danse: 7 },
 
   { titre: "When Sunny Gets Blue", artiste: "McCoy Tyner Trio", album: "Today and Tomorrow",
-    lien: "https://music.youtube.com/watch?v=frYLvC0mM50", note: "Vous reprendrez bien une bouteille?",
+    lien: "https://music.youtube.com/watch?v=frYLvC0mM50", note: "Vous reprendrez bien une bouteille ?",
     ambiance: "brume", style: "Jazz, ballade en trio piano", annee: 1964, bpm: 66, voix: "instru",
     tags: ["jazz", "piano", "ballade", "trio"],
     energie: 2, etrange: 2, danse: 2 },
 
   { titre: "C12H16N2", artiste: "Action Bronson", album: "Only for Dolphins",
-    lien: "https://music.youtube.com/watch?v=4DCiFyduK2c", note: "Sûrement un des sons que j'ai le plus écouté (le sample également)",
+    lien: "https://music.youtube.com/watch?v=4DCiFyduK2c", note: "Sûrement un des sons que j'ai le plus écoutés (le sample également)",
     ambiance: "bitume", style: "Rap psyché, boom bap", annee: 2020, bpm: 71, voix: "rap",
     tags: ["rap", "new york", "samples", "psyché"],
     energie: 5, etrange: 4, danse: 4 },
@@ -857,7 +857,7 @@ const MORCEAUX = [
     energie: 3, etrange: 3, danse: 5 },
 
   { titre: "Nová syntéza", artiste: "Blue Effect", album: "Nová syntéza",
-    lien: "https://music.youtube.com/watch?v=sA33UBVUWNM", note: "Quoi? Vous n'êtes pas branchés de jazz-rock/psych tchécoslovaque des années 70???", long: true,
+    lien: "https://music.youtube.com/watch?v=sA33UBVUWNM", note: "Quoi ? Vous n'êtes pas branchés de jazz-rock/psych tchécoslovaque des années 70 ???", long: true,
     ambiance: "ailleurs", style: "Jazz-rock orchestral, psyché", annee: 1971, bpm: 110, voix: "instru",
     tags: ["jazz-rock", "psychédélique", "tchécoslovaquie", "big band", "album entier"],
     energie: 6, etrange: 7, danse: 3 },
@@ -875,7 +875,7 @@ const MORCEAUX = [
     energie: 3, etrange: 3, danse: 2 },
 
   { titre: "You Know How We Do It", artiste: "Ice Cube", album: "Lethal Injection",
-    lien: "https://music.youtube.com/watch?v=_HGZBLdn9_c", note: "Je m'empêche grave de mettre des sons « trop évidents » mais celui-ci….", connu: true,
+    lien: "https://music.youtube.com/watch?v=_HGZBLdn9_c", note: "Je m'empêche grave de mettre des sons « trop évidents » mais celui-ci…", connu: true,
     ambiance: "bitume", style: "G-funk, rap de L.A.", annee: 1993, bpm: 93, voix: "rap",
     tags: ["rap", "g-funk", "los angeles", "samples soul"],
     energie: 5, etrange: 2, danse: 6 },
@@ -1175,7 +1175,7 @@ const MORCEAUX = [
     energie: 3, etrange: 6, danse: 3 },
 
   { titre: "Detronomicon L'Archive (Detroit Thug Rap Mix)", artiste: "Zetray", album: "",
-    lien: "https://music.youtube.com/watch?v=x3Bo48TYD-0", note: "Que les gens qui sentent bons passent leurs routes, on est savoureurs/savoureuses de Detroit Rap", long: true,
+    lien: "https://music.youtube.com/watch?v=x3Bo48TYD-0", note: "Que les gens qui sentent bon passent leur route, on est savoureurs/savoureuses de Detroit Rap", long: true,
     ambiance: "bitume", style: "Mix de rap de Detroit", bpm: 95, voix: "rap",
     tags: ["rap", "detroit", "mix", "street"],
     energie: 7, etrange: 6, danse: 5 },
@@ -1295,7 +1295,7 @@ const MORCEAUX = [
     energie: 7, etrange: 5, danse: 6 },
 
   { titre: "Max B (feat. Starring Max B)", artiste: "Ateyaba", album: "",
-    lien: "https://music.youtube.com/watch?v=hCwT8-HbBf8", note: "Tokyo>Kyoto",
+    lien: "https://music.youtube.com/watch?v=hCwT8-HbBf8", note: "Tokyo > Kyoto",
     ambiance: "bitume", style: "Rap français", bpm: 80, voix: "rap",
     tags: ["rap", "france", "cloud"],
     energie: 5, etrange: 5, danse: 4 },
@@ -1328,7 +1328,7 @@ const MORCEAUX = [
     energie: 5, etrange: 5, danse: 3 },
 
   { titre: "Sunny Days", artiste: "SahBabii feat. itzMrT3", album: "S.A.N.D.A.S.",
-    lien: "https://music.youtube.com/watch?v=FWCaOMab4QU", note: "AirPods dans l'avion en disant au revoir à la France macronnienne",
+    lien: "https://music.youtube.com/watch?v=FWCaOMab4QU", note: "AirPods dans l'avion en disant au revoir à la France macronienne",
     ambiance: "soleil", style: "Trap mélodique d'Atlanta", annee: 2017, bpm: 136, voix: "rap",
     tags: ["rap", "trap", "mélodique", "atlanta"],
     energie: 4, etrange: 6, danse: 5 },
@@ -1436,7 +1436,7 @@ const MORCEAUX = [
     energie: 4, etrange: 6, danse: 4 },
 
   { titre: "Do for Love (mash-up avec Nujabes)", artiste: "2Pac & Nujabes", album: "",
-    lien: "https://music.youtube.com/watch?v=HrzDZ0imS2Y", note: "Je le remets en souvenir de tous ces remixs pas officiels",
+    lien: "https://music.youtube.com/watch?v=HrzDZ0imS2Y", note: "Je le remets en souvenir de tous ces remixes pas officiels",
     ambiance: "brume", style: "Mash-up : 2Pac sur Nujabes", bpm: 90, voix: "rap",
     tags: ["rap", "nujabes", "jazz rap", "remix"],
     energie: 3, etrange: 6, danse: 5 },
