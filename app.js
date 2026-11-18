@@ -626,8 +626,11 @@ function surveillerPub(m, debut = 0) {
       if (S.pub && !$('#avis-pub.ouvert')) { S.pub = false; majAvis(); }
       return;
     }
-    // le morceau ne démarre pas alors qu'on a lancé la lecture : une pub (quel que soit l'état annoncé, Safari en dit peu)
-    if (st !== YT.PlayerState.PAUSED && st !== YT.PlayerState.ENDED && (st !== YT.PlayerState.UNSTARTED || n > 3) && !S.pauseVoulue) immobile++;
+    // une pub : le lecteur dit qu'il joue, mais le morceau reste à 0 seconde (trois secondes de suite).
+    // Un lecteur qui charge (YouTube met souvent 4 à 8 secondes à lancer une vidéo intégrée) n'est pas une pub :
+    // on ne le suppose qu'au bout de 14 secondes sans rien (Safari annonce mal ses états)
+    if (st === YT.PlayerState.PLAYING && !S.pauseVoulue) immobile++;
+    else if (st !== YT.PlayerState.PAUSED && st !== YT.PlayerState.ENDED && !S.pauseVoulue && n > 14) immobile = 3;
     if (immobile >= 3 && !S.pub) { S.pub = true; majAvis(); }
   }, 1000);
 }
@@ -645,7 +648,7 @@ function surveillerDemarrage(m) {
     if (st === YT.PlayerState.PLAYING || st === YT.PlayerState.PAUSED) return;
     const ecoule = Date.now() - depart;
     if (ecoule < (S.pub ? 150000 : 40000)) {
-      if (!prevenu && ecoule > 6000) { prevenu = true; if (!S.pub) { S.pub = true; S.avisFerme = false; majAvis(); } }   // trop long : sûrement une pub, on propose les extraits
+      if (!prevenu && ecoule > 14000) { prevenu = true; if (!S.pub) { S.pub = true; S.avisFerme = false; majAvis(); } }   // vraiment trop long : sûrement une pub, on propose les extraits
       demarrage = setTimeout(verif, 5000);
       return;
     }
@@ -1589,6 +1592,7 @@ function majAfficheur() {
   texteLCD($('#lcd-texte'), texte);
   majEtiquette(m, active);
   $('#lcd-etat').textContent = lecture ? 'READ' : !active ? 'STOP' : S.bloque ? 'APPUIE SUR ▶' : S.enLecture ? '▶ PLAY' : S.aJoue ? 'II PAUSE' : 'LOAD';
+  $('#lcd-etat').classList.toggle('charge', !lecture && active && !S.bloque && !S.enLecture && !S.aJoue);   // (le temps que YouTube lance la vidéo : « LOAD » clignote, comme sur une vraie chaîne)
   const ensuite = parId[S.suite[0]];
   $('#lcd-ensuite').textContent = ensuite && !lecture ? `ENSUITE ${ensuite.affiche}` : '';
   if (!active) $('#lcd-temps').textContent = '--:--';
