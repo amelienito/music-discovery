@@ -128,7 +128,7 @@ let ctxAudio = null;
 function audioCtx() {
   // l'iPhone en mode silencieux coupe le son « d'ambiance » des pages : on demande le son d'une lecture (comme la vidéo)
   try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) {}
-  try { ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)(); if (ctxAudio.state === 'suspended') ctxAudio.resume(); } catch (e) {}
+  try { ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)(); if (ctxAudio.state !== 'running') ctxAudio.resume(); } catch (e) {}   // (« suspended », ou « interrupted » sur l'iPhone quand la vidéo a pris la main sur le son)
   return ctxAudio;
 }
 function clic(freq = 1800, duree = 0.035, volume = 0.05) {
@@ -253,7 +253,7 @@ $('#fader-volume').addEventListener('input', e => reglerVolume(+e.target.value))
 function appliquerVolume() {
   const m = S.joue ? parId[S.joue] : null;
   const f = m ? m.facteur : 1;
-  const att = extraitPour ? 0.15 : 1; // pendant une pré-écoute, le morceau en cours se fait tout petit
+  const att = (extraitPour ? 0.15 : 1) * (Date.now() < (S.pullJusqua || 0) ? 0.04 : 1); // pendant une pré-écoute, le morceau en cours se fait tout petit ; pendant un pull up, il se tait
   if (lecteur && lecteurPret) { try { lecteur.setVolume(Math.round(S.volume * f * att)); } catch (e) {} }
   audioLecture.volume = borner(S.volume / 100 * f * att, 0, 1);
 }
@@ -749,6 +749,13 @@ function basculerLecture() {
 function finDuMorceau() {
   if (S.finTraitee) return;
   S.finTraitee = true;
+  // une coupure pub, comme à la radio : après quelques morceaux écoutés jusqu'au bout, une réclame pour un autre jeu
+  // (une seule par visite ; elle se referme d'elle-même au bout de 9 secondes : on écoute souvent de loin)
+  S.finsEntieres = (S.finsEntieres || 0) + 1;
+  if (window.OSB && S.finsEntieres >= 4 && document.visibilityState === 'visible' && OSB.pubPossible()) {
+    OSB.pub({ ici: 'music-discovery', auto: 9 }).then(() => radioSuivant(), () => radioSuivant());
+    return;
+  }
   radioSuivant();
 }
 setInterval(() => {
@@ -800,7 +807,7 @@ function majSalon() {
   if (affiche && !im && !(majSalon.demandes = majSalon.demandes || new Set()).has(affiche.id)) { majSalon.demandes.add(affiche.id); Pochettes.demander(affiche, () => setTimeout(majSalon)); }
   // entre deux morceaux (le suivant charge, une pub passe), il attend tranquille ; il ne déprime que sur une vraie pause
   // (avant le premier morceau, sur le carton d'entrée, il attend aussi : la pièce ne s'éteint pas avant même d'avoir commencé)
-  const etat = { joue: S.enLecture, attente: !S.enLecture && ((!!m && (!S.pauseVoulue || Date.now() - S.pauseA < 2500)) || !S.joues), bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, pochette: im ? im.src : null,
+  const etat = { joue: S.enLecture, attente: !S.enLecture && ((!!m && (!S.pauseVoulue || Date.now() - S.pauseA < 2500)) || !S.joues), bpm: m && m.bpm, energie: m ? m.energie : 5, danse: m ? m.danse : 5, ambiance: m ? m.ambiance : '', pochette: im ? im.src : null,
     titre: m ? m.affiche : '', artiste: m ? m.artiste : '', note: m && m.note ? typoFr(m.note) : '' };
   window.__salonEtat = etat;                                   // la pièce 3D le lit en arrivant
   if (typeof Salon !== 'undefined') Salon.maj(etat);
@@ -1245,11 +1252,21 @@ function radioSuivant() {
 }
 function radioPrecedent() {
   const [t] = tempsActuel();
-  if (S.joue && t > 5) {
-    try { if (S.lecture === 'yt') lecteur.seekTo(0, true); else audioLecture.currentTime = 0; } catch (e) {}
-    pullUp(); return;
-  }
-  if (S.historique.length >= 2) { S.historique.pop(); const id = S.historique.pop(); pullUp(); jouerRadio(id); }
+  // le morceau vient à peine de démarrer et il y en a un avant : on y retourne (un petit rembobinage, pas le klaxon)
+  if ((!S.joue || t < 3) && S.historique.length >= 2) { S.historique.pop(); const id = S.historique.pop(); rembobiner(); jouerRadio(id); return; }
+  // sinon : pull up ! on coupe, le klaxon, et le morceau repart du début (même s'il était en pause)
+  if (S.joue) pullUp(true);
+}
+// le petit bruit d'une bande qu'on rembobine : un souffle qui descend, très court
+function rembobiner() {
+  if (S.fidget && S.fidget.bip === false) return;
+  const c = audioCtx(); if (!c) return;
+  const t = c.currentTime + 0.01, n = Math.floor(c.sampleRate * 0.32), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = c.createBufferSource(); s.buffer = b;
+  const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 6; f.frequency.setValueAtTime(3800, t); f.frequency.exponentialRampToValueAtTime(380, t + 0.3);
+  const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + 0.34);
 }
 // pull up ! comme sur la table de tri : on repart du début, le klaxon trois fois, un flash, des étincelles, la chaîne qui tremble
 let klaxon = null, klaxonCharge = null;
@@ -1277,8 +1294,21 @@ function sonKlaxon() {
   };
   klaxon ? jouer() : chargerKlaxon().then(jouer);
 }
-function pullUp() {
+function pullUp(relancer = false) {
   sonKlaxon();
+  if (relancer) {
+    // le DJ lève le diamant : la musique se tait le temps des trois coups de klaxon, puis le morceau repart du tout début
+    S.pullJusqua = Date.now() + 1050; appliquerVolume();
+    clearTimeout(S.pullMinuteur);
+    S.pullMinuteur = setTimeout(() => {
+      S.pullJusqua = 0;
+      try {
+        if (S.lecture === 'yt' && lecteurPret) { lecteur.seekTo(0, true); lecteur.playVideo(); }
+        else if (S.lecture === 'extrait') { audioLecture.currentTime = 0; audioLecture.play().catch(() => {}); }
+      } catch (e) {}
+      S.pauseVoulue = false; appliquerVolume(); majEtat();
+    }, 1050);
+  }
   try { navigator.vibrate && navigator.vibrate([20, 40, 20, 40, 60]); } catch (e) {}
   const fx = $('#pull-fx');
   if (fx) { fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go'); setTimeout(() => fx.classList.remove('go'), 900); }
@@ -2020,3 +2050,13 @@ if (coupure) {
 if (typeof Salon !== 'undefined') { document.querySelectorAll('[data-salon]').forEach(Salon.monter); majSalon(); }
 aller('allumage');
 })();
+
+// osb.js, le fichier commun aux jeux d'OSB Corporation : la visite est notée, et en bas de la page, la ligne des retours et les autres jeux
+addEventListener('load', () => {
+  if (!window.OSB) return;
+  try {
+    OSB.ici('music-discovery');
+    const pied = document.getElementById('md-pied');
+    if (pied) OSB.pied(pied, { ici: 'music-discovery', contexte: 'Music Discovery' });
+  } catch (e) {}
+});

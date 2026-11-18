@@ -994,10 +994,10 @@ const MORCEAUX = [
     tags: ["bresil", "samba", "funk", "fête"],
     energie: 6, etrange: 3, danse: 8 },
 
-  { titre: "Medley: Intro", artiste: "JAŸ-Z", album: "",
+  { titre: "Intro / A Million and One Questions / Rhyme No More", artiste: "Jay-Z", album: "In My Lifetime, Vol. 1",
     lien: "https://music.youtube.com/watch?v=6zE7uHz7d4E", note: "Auto-persuadé que le refrain dit Amélien",
-    ambiance: "bitume", style: "Rap, mashup", bpm: 90, voix: "rap",
-    tags: ["rap", "mashup", "samples"],
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 1997, bpm: 90, voix: "rap",
+    tags: ["rap", "new york", "boom bap", "samples"],
     energie: 5, etrange: 6, danse: 5 },
 
   { titre: "Day & Night (feat. Holybrune)", artiste: "Dabeull", album: "",

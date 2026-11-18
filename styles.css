@@ -1486,3 +1486,7 @@ html.avant-commencer, html.avant-commencer body { overflow: hidden; overscroll-b
 .interrupteur.appel { animation: appel-commencer .55s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes appel-commencer { 0%, 100% { transform: none; } 30% { transform: translateY(-7px) scale(1.06); } 60% { transform: translateY(2px) scale(.99); } }
 @media (prefers-reduced-motion: reduce) { .interrupteur.appel { animation: none; } }
+
+/* en bas de la page : la ligne des retours et les autres jeux (osb.js) */
+.md-pied { width: 100%; max-width: 1000px; margin: 34px auto 0; padding: 0 0 calc(40px + env(safe-area-inset-bottom)); color: var(--encre, inherit); }
+.md-pied:empty { display: none; }

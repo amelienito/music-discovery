@@ -515,17 +515,57 @@ function lancer() {
   // les yeux fermés : deux petits traits
   [-1, 1].forEach(c => { const t = boite(.035, .006, .006, truffeM, teteT, c * .07, .03, .145); t.rotation.z = c * .15; });
   const queueT = poser(new THREE.Mesh(new THREE.ConeGeometry(.05, .35, 5), blanc), talya, -.42, .2, .12); queueT.rotation.z = 1.9;
+  /* Talya debout : la même chienne, sur ses pattes, pour ses allées et venues (elle sort par la porte du bureau, va boire, vient voir Amélien) */
+  const talyaD = vivant(groupe(piece, 2.2, 0, -1.2)); talyaD.visible = false;
+  const corpsD = bille(.2, blanc, talyaD, 0, .4, -.02); corpsD.scale.set(.6, .6, 1.42);
+  bille(.13, blanc, talyaD, 0, .43, .2).scale.set(.8, .85, .9);   // le poitrail
+  const pattesD = [[-1, 1], [1, 1], [-1, -1], [1, -1]].map(([c, a]) => { const g = groupe(talyaD, c * .075, .34, a * .2 - .02); cyl(.034, .026, .34, 6, a > 0 ? blanc : ombreT, g, 0, -.17, 0); bille(.036, blanc, g, 0, -.33, .012, 0).scale.set(1, .5, 1.3); return g; });
+  const couD = groupe(talyaD, 0, .5, .25);
+  { const c = cyl(.06, .085, .22, 6, blanc, couD, 0, .07, .04); c.rotation.x = .55; }
+  const teteD = groupe(couD, 0, .2, .12);
+  bille(.135, blanc, teteD, 0, 0, 0, 0).scale.set(1, .85, 1);
+  { const m = poser(new THREE.Mesh(new THREE.ConeGeometry(.064, .27, 5), blanc), teteD, 0, -.032, .16); m.rotation.x = Math.PI / 2; }
+  bille(.021, truffeM, teteD, 0, -.032, .295, 0);
+  const oreillesD = [-1, 1].map(c => {
+    const o = groupe(teteD, c * .072, .08, -.016); o.rotation.z = -c * .25;
+    poser(new THREE.Mesh(new THREE.ConeGeometry(.048, .21, 4), c < 0 ? ombreT : blanc), o, 0, .096, 0);
+    poser(new THREE.Mesh(new THREE.ConeGeometry(.026, .145, 3), rose), o, 0, .088, .024);
+    return o;
+  });
+  [-1, 1].forEach(c => { bille(.016, truffeM, teteD, c * .056, .028, .112, 1); });   // les yeux, ouverts
+  const queueD = groupe(talyaD, 0, .47, -.3); { const q = poser(new THREE.Mesh(new THREE.ConeGeometry(.04, .3, 5), blanc), queueD, 0, .13, -.04); q.rotation.x = -.5; }
   const gamelle = groupe(panier, .8, 0, .35);
   poser(new THREE.Mesh(new THREE.CylinderGeometry(.15, .11, .08, 14, 1, true), M('#c8572f', { side: THREE.DoubleSide, metalness: .2 })), gamelle, 0, .04, 0);
   cyl(.11, .11, .01, 14, M('#9c4225'), gamelle, 0, .005, 0);
   bille(.07, M('#cfe05a'), panier, -.75, .07, .55);
 
+  /* devant la fenêtre, quelques lucioles égarées : celles d'Osmose, le quizz rap (on les touche, elles y mènent).
+     Le soir, elles brillent ; en plein jour, on les devine à peine. */
+  const lucioles = vivant(groupe(piece, FX - .22, FY + .06, FOND + .45));
+  const LUC = Array.from({ length: 7 }, (_, i) => {
+    const g = groupe(lucioles, 0, 0, 0);
+    const coeur = new THREE.Mesh(new THREE.SphereGeometry(.011, 8, 6), new THREE.MeshBasicMaterial({ color: '#f3f0ff', transparent: true, toneMapped: false }));
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(.042, 10, 8), new THREE.MeshBasicMaterial({ color: '#a99cff', transparent: true, opacity: .2, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+    g.add(coeur, halo);
+    return { g, coeur, halo, p: [Math.sin(i * 2.1) * .26, Math.cos(i * 1.7) * .18, Math.sin(i * 3.3) * .12], ph: i * 1.37, v: .35 + (i % 3) * .12 };
+  });
+  function animerLucioles(t) {
+    const nuit = 1 - jour, eclat = .42 + nuit * .58;
+    LUC.forEach(l => {
+      l.g.position.set(l.p[0] + Math.sin(t * l.v + l.ph) * .09, l.p[1] + Math.sin(t * l.v * 1.3 + l.ph * 2) * .07, l.p[2] + Math.cos(t * l.v * .8 + l.ph) * .06);
+      const clig = Math.pow(.5 + .5 * Math.sin(t * (1.1 + l.v) + l.ph * 3), 3);   // chacune s'allume et s'éteint à son rythme
+      l.coeur.material.opacity = (.25 + clig * .75) * eclat; l.halo.material.opacity = clig * .26 * eclat;
+    });
+  }
   /* le chat, roulé en boule sur le rebord de la fenêtre */
   const chat = vivant(groupe(piece, FX + .38, REBORD + .03, FOND + .15, .2));
   const fourrure = M('#2b2522', { roughness: 1 });
   const corpsChat = bille(.13, fourrure, chat, 0, .065, 0); corpsChat.scale.set(1.35, .6, .9);
-  bille(.068, fourrure, chat, -.15, .065, .04);
-  [-1, 1].forEach(s => { const o = cyl(0, .024, .05, 4, fourrure, chat, -.165, .12, .04 + s * .035); o.rotation.x = s * .2; });
+  const teteChat = groupe(chat, -.15, .065, .04);
+  bille(.068, fourrure, teteChat, 0, 0, 0);
+  [-1, 1].forEach(s => { const o = cyl(0, .024, .05, 4, fourrure, teteChat, -.015, .055, s * .035); o.rotation.x = s * .2; });
+  // ses yeux : il dort ; quand on le dérange, deux fentes vertes s'ouvrent
+  const yeuxChat = [-1, 1].map(s => { const o = poser(new THREE.Mesh(new THREE.SphereGeometry(.014, 10, 8), new THREE.MeshStandardMaterial({ color: '#c6e86c', emissive: '#8fbf32', emissiveIntensity: .8, roughness: .3 })), teteChat, -.06, .012, s * .028); o.scale.set(.45, .1, 1); o.castShadow = false; o.visible = false; return o; });
   const queueChat = poser(new THREE.Mesh(new THREE.TorusGeometry(.11, .018, 5, 12, Math.PI * 1.1), fourrure), chat, .04, .02, .02); queueChat.rotation.x = Math.PI / 2;
 
   /* ═══════════════ le fauteuil club, en velours, et le pouf ═══════════════
@@ -661,8 +701,66 @@ function lancer() {
     }
     boucles.t.wrapS = boucles.t.wrapT = THREE.RepeatWrapping; boucles.t.repeat.set(3, 2);
   }
-  const cheveuxAfro = new THREE.MeshStandardMaterial({ color: '#ffffff', map: boucles.t, roughness: 1 });
-  const afro = poser(new THREE.Mesh(afroGeo, cheveuxAfro), tete, 0, .112, -.052); afro.scale.set(1.12, .93, 1.02);   // la ligne des cheveux juste au-dessus des sourcils   // assez en avant pour couvrir le haut du front
+  const cheveuxAfro = new THREE.MeshStandardMaterial({ color: '#b9a89c', map: boucles.t, roughness: 1 });   // (le cœur, un peu plus sombre : on le voit entre les boucles)
+  const afro = poser(new THREE.Mesh(afroGeo, cheveuxAfro), tete, 0, .112, -.052); afro.scale.set(1.08, .9, .99);   // la ligne des cheveux juste au-dessus des sourcils
+  /* Les cheveux et les poils sont faits de petites touffes posées une à une (des boules à peine bosselées, de tailles et de bruns différents) :
+     de loin, l'afro a enfin une silhouette de vrais cheveux, mousseuse, qui accroche la lumière ; de près, on voit les boucles.
+     Les poils du visage (moustache, bouc) sont posés sur la peau elle-même : on lance un rayon vers le crâne et la touffe se colle là où il touche. */
+  const touffes = (n, geo, place, mat, ombre = false) => {
+    const m = new THREE.InstancedMesh(geo, mat, n), o = new THREE.Object3D(), c = new THREE.Color();
+    let k = 0;
+    for (let i = 0; i < n * 6 && k < n; i++) { const p = place(o, c); if (!p) continue; o.updateMatrix(); m.setMatrixAt(k, o.matrix); m.setColorAt(k, c); k++; }
+    m.count = k; m.castShadow = ombre; m.receiveShadow = true; m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    tete.add(m); return m;
+  };
+  let graine = 11; const hz = () => (graine = (graine * 16807) % 2147483647) / 2147483647;
+  const bruns = ['#120b07', '#1a110b', '#21160f', '#0e0805', '#291b12'];
+  const matPoil = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, flatShading: false });
+  // l'afro : environ 900 touffes à la surface du volume (un ellipsoïde un peu plus haut derrière), sauf sur le front et le visage
+  const touffeGeo = (() => { const g = new THREE.SphereGeometry(1, 7, 5), pa = g.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < pa.count; i++) { v.fromBufferAttribute(pa, i); v.multiplyScalar(1 + (Math.sin(v.x * 9 + v.y * 4) * Math.sin(v.z * 7 + v.x * 3)) * .16); pa.setXYZ(i, v.x, v.y, v.z); } g.computeVertexNormals(); return g; })();
+  const centreAfro = new THREE.Vector3(0, .112, -.052), rAfro = new THREE.Vector3(.135 * 1.08, .135 * .9, .135 * .99);
+  touffes(1500, touffeGeo, (o, c) => {
+    const u = hz() * 2 - 1, a = hz() * Math.PI * 2, r = Math.sqrt(1 - u * u), n = new THREE.Vector3(r * Math.cos(a), u, r * Math.sin(a));
+    const p = n.clone().multiply(rAfro).add(centreAfro);
+    // la ligne des cheveux : au milieu du front juste au-dessus des sourcils, plus haut sur les tempes ; rien sous les oreilles
+    const ligne = .094 + Math.pow(Math.abs(p.x) / .11, 2) * .02;
+    if (p.z > .035 && p.y < ligne) return null;
+    if (p.y < -.01 && Math.abs(p.x) < .1) return null;
+    const t = .0095 + hz() * .009;
+    o.position.copy(p).addScaledVector(n, (hz() - .35) * .01); o.scale.setScalar(t); o.rotation.set(hz() * 6, hz() * 6, hz() * 6);
+    c.set(bruns[Math.floor(hz() * bruns.length)]); c.multiplyScalar(.9 + hz() * .35);
+    return true;
+  }, matPoil);   // (l'ombre de l'afro, c'est le cœur qui la porte : des centaines de touffes en plus dans le calcul des ombres, pour rien)
+  // les pattes (favoris) : une bande de touffes devant chaque oreille, qui descend jusqu'au milieu de l'oreille
+  // (les rayons visent un double du crâne posé seul, à l'origine : ce qu'ils touchent est déjà dans le repère de la tête)
+  const craneSeul = new THREE.Mesh(crane, peauLisse); craneSeul.updateMatrixWorld(true);
+  const rayonPoil = new THREE.Raycaster(), _oP = new THREE.Vector3(), _dP = new THREE.Vector3();
+  const surPeau = (x, y, vers = new THREE.Vector3(0, 0, -1)) => {
+    _dP.copy(vers).normalize(); _oP.set(x, y, 0).addScaledVector(_dP, -.4);
+    rayonPoil.set(_oP, _dP); const h = rayonPoil.intersectObject(craneSeul, false)[0];
+    return h ? { p: h.point.clone(), n: h.face.normal.clone() } : null;
+  };
+  const poilGeo = new THREE.SphereGeometry(1, 6, 4);
+  const poilPeau = (n, region, taille, ecart, mat = matPoil) => touffes(n, poilGeo, (o, c) => {
+    const q = region(); if (!q) return null;
+    const h = surPeau(q[0], q[1], q[2]); if (!h) return null;
+    o.position.copy(h.p).addScaledVector(h.n, ecart); o.scale.set(taille * (.8 + hz() * .5), taille * (.7 + hz() * .4), taille * .7); o.rotation.set(hz() * 6, hz() * 6, hz() * 6);
+    c.set(bruns[Math.floor(hz() * 4)]); c.multiplyScalar(.85 + hz() * .3);
+    return true;
+  });
+  [-1, 1].forEach(s => poilPeau(70, () => { const y = -.03 + hz() * .085, x = s * (.083 + hz() * .014); return [x, y, new THREE.Vector3(-s, 0, -.25)]; }, .0085, .002));
+  // la moustache : pleine, posée sur la lèvre du haut, plus épaisse au milieu, les pointes qui tombent jusqu'aux coins de la bouche
+  poilPeau(240, () => {
+    const u = hz() * 2 - 1, x = u * .028, haut = -.0255 - u * u * .0025, bas = -.0368 - Math.pow(Math.abs(u), 3) * .0035;
+    if (Math.abs(x) < .004 && hz() < .5) return null;   // un léger creux sous le nez
+    return [x, haut + (bas - haut) * hz(), new THREE.Vector3(0, .12, -1)];
+  }, .0047, .0014);
+  // le bouc : une touffe sous la lèvre du bas, et la barbe du menton, qui s'arrondit dessous
+  poilPeau(36, () => [(hz() * 2 - 1) * .006 * (1 - hz() * .3), -.061 - hz() * .011, new THREE.Vector3(0, .1, -1)], .0042, .0012);
+  poilPeau(320, () => {
+    const v = hz(), y = -.078 - v * .04, l = .021 * (1 - v * v * .45);
+    return [(hz() * 2 - 1) * l, y, new THREE.Vector3(0, .25 + v * 1.1, -1)];
+  }, .005, .0016);
   // les lunettes rondes, noires
   [-1, 1].forEach(s => {
     // une monture fine et bien ronde, un verre à peine teinté (un reflet, pas un trait blanc), la branche jusqu'à l'oreille
@@ -671,8 +769,6 @@ function lancer() {
     const branche = boite(.0035, .0035, .1, monture, tete, s * .071, .028, .058); branche.rotation.y = s * -.1;
   });
   { const pont = new THREE.Mesh(new THREE.TorusGeometry(.0085, .0032, 8, 16, Math.PI), monture); pont.position.set(0, .024, .108); tete.add(pont); }   // le pont, en arc
-  // la moustache (fine, en chevron)
-  [-1, 1].forEach(s => { const m = gelule(.0078, .024, poils, tete, s * .0185, -.032, .1); m.rotation.z = Math.PI / 2 - s * .3; m.scale.z = .8; });
   const bouche = [-1, 1].map(s => boite(.018, .004, .005, M('#3b1a12'), tete, s * .0088, -.05, .095));
 
   // les bras : épaule → coude → main (positionnés par cinématique inverse)
@@ -1042,14 +1138,17 @@ function lancer() {
 
   /* ═══════════════ l'état de la musique ═══════════════ */
   const etat = { joue: false, attente: false, bpm: 96, energie: 5, danse: 5, humeur: 'triste', note: '' };
-  const humeurDe = (e, d) => e <= 3 && d <= 4 ? 'doux' : e >= 8 ? 'energie' : d >= 6 ? 'groove' : 'detente';
+  // l'attitude suit le morceau : très doux, il lit ; intense, il tape (et si c'est du rap qui cogne, il a la mâchoire serrée) ; dansant, il balance
+  const humeurDe = (e, d, amb) => e <= 3 && d <= 4 ? 'doux' : e >= 8 ? (amb === 'bitume' ? 'hargne' : 'energie') : d >= 6 ? 'groove' : 'detente';
   let penseeVue = false, bulleW = 0, bulleH = 0;
   function mesurerPensee() { bulleW = pensee.offsetWidth; bulleH = pensee.offsetHeight; }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => mesurerPensee());   // la police de la pensée arrive parfois après le texte
   function maj(n = {}) {
     Object.assign(etat, n);
     // la musique joue : selon le morceau ; entre deux morceaux : détendu, il attend le suivant ; vraie pause : il déprime
-    etat.humeur = etat.joue ? humeurDe(Number(etat.energie) || 5, Number(etat.danse) || 5) : etat.attente ? 'detente' : 'triste';
+    etat.humeur = etat.joue ? humeurDe(Number(etat.energie) || 5, Number(etat.danse) || 5, etat.ambiance) : etat.attente ? 'detente' : 'triste';
+    // ce qu'il était en train de faire ne va plus avec le nouveau morceau (il savourait les yeux fermés, et ça se met à cogner) : il arrête
+    if (activite && ACTIVITES[etat.humeur] && !ACTIVITES[etat.humeur].includes(activite)) finActivite = Math.min(finActivite, horlogeCorps + .4);
     if (n.titre !== undefined) { lcdTexte = (n.titre ? `${n.titre} — ${n.artiste || ''}` : 'MUSIC DISCOVERY').toUpperCase(); lcdDecalage = 0; }
     if (n.pochette) majPoster(n.pochette);
     const texte = (etat.note || '').trim();
@@ -1172,6 +1271,36 @@ function lancer() {
         sourcils: .4, bouche: .8,
       };
     },
+    // un morceau remonté : assis au bord, les pieds au sol, la tête qui pilonne, la main droite qui ponctue chaque temps
+    hargne: (t, ph) => {
+      const bat = ondule(Math.max(0, Math.sin(ph))), coup = ondule(Math.pow(Math.max(0, Math.sin(ph)), 3));
+      return {
+        buste: [.2 + bat * .05, ondule(Math.sin(ph / 4)) * .05, 0], tete: [.02 + coup * .3, ondule(Math.sin(ph / 4)) * .14, 0], epaules: bat * .02, assise: .1, assiseY: .01,
+        main: s => s > 0 ? ['buste', .17, .4 + coup * .1, .36 - coup * .05] : ['F', -.17, .63, .33], pole: s => s > 0 ? [1, -.5, -.2] : [-1, -.6, .2],
+        pied: s => [s * .2, .085, .44], polePied: [0, 1, .35], tangage: 0, lacet: .2, tape: 1.2,
+        sourcils: -.8, bouche: -.3,
+      };
+    },
+    // les poings en l'air, l'un après l'autre, sur le temps
+    poings: (t, ph) => {
+      const a = s => ondule(Math.max(0, Math.sin(ph + (s > 0 ? 0 : Math.PI)))), dur = etat.humeur === 'hargne';
+      return {
+        buste: [-.1, 0, 0], tete: [.1 + ondule(Math.max(0, Math.sin(ph))) * .2, 0, 0], epaules: .02, assise: .03,
+        main: s => ['buste', s * .27, .6 + a(s) * .3, .2 + a(s) * .12], pole: s => [s, -.5, -.45],
+        pied: s => [s * .11, .56, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .16, tape: 1.4,
+        sourcils: dur ? -.7 : .55, bouche: dur ? -.2 : .95,
+      };
+    },
+    // il joue de la batterie dans le vide, deux coups par temps
+    batterie: (t, ph) => {
+      const f = s => ondule(Math.pow(Math.max(0, Math.sin(ph * 2 + (s > 0 ? 0 : Math.PI))), 2)), bal = ondule(Math.sin(ph / 2)), dur = etat.humeur === 'hargne';
+      return {
+        buste: [-.1, bal * .05, 0], tete: [.12 + ondule(Math.max(0, Math.sin(ph))) * .16, 0, bal * .08], epaules: .012, assise: .03,
+        main: s => ['buste', s * .2, .5 - f(s) * .13, .33], pole: s => [s, -.75, -.1],
+        pied: s => [s * .11, .56, .78], polePied: [0, 1, .2], tangage: -1.05, lacet: .16, tape: 1.4,
+        sourcils: dur ? -.6 : .45, bouche: dur ? -.15 : .85,
+      };
+    },
     // il te fait coucou
     salut: (t) => ({
       buste: [-.2, 0, -.04], tete: [0, .38, .06], epaules: 0,
@@ -1182,10 +1311,20 @@ function lancer() {
   const HUMEURS = Object.keys(P);
   const poids = Object.fromEntries(HUMEURS.map(h => [h, h === 'triste' ? 1 : 0]));
   let activite = null, finActivite = 0, debutActivite = 0, prochaineActivite = 12;
-  const DUREES = { ordi: 13, boire: 5.6, telephone: 9, etirement: 3.4, salut: 2.8, malcolm: 7, savourer: 8, claquer: 7, ecrire: 12 };
+  const DUREES = { ordi: 13, boire: 5.6, telephone: 9, etirement: 3.4, salut: 2.8, malcolm: 7, savourer: 8, claquer: 7, ecrire: 12, poings: 6.5, batterie: 7.5 };
+  // ce qu'il fait de lui-même dépend du morceau : on ne savoure pas les yeux fermés un morceau qui cogne, on ne boxe pas l'air sur une berceuse
+  const ACTIVITES = {
+    doux: ['savourer', 'ecrire', 'malcolm', 'boire', 'telephone', 'savourer'],
+    detente: ['ordi', 'ecrire', 'telephone', 'etirement', 'malcolm', 'savourer', 'claquer', 'boire'],
+    groove: ['claquer', 'claquer', 'boire', 'etirement', 'malcolm', 'batterie'],
+    energie: ['poings', 'batterie', 'claquer', 'boire', 'etirement'],
+    hargne: ['poings', 'batterie', 'poings'],
+  };
+  let derniereActivite = '';
   function lancerActivite(nom) { activite = nom; debutActivite = horlogeCorps; finActivite = horlogeCorps + DUREES[nom]; }
   const avancement = nom => activite === nom ? borne((horlogeCorps - debutActivite) / DUREES[nom], 0, 1) : 1;
-  let horlogeCorps = 0;
+  let horlogeCorps = 0, regardDebut = -99;
+  const _reg = new THREE.Vector3();
   // la gorgée, en cinq temps : aller au verre, le porter à la bouche, boire, le reposer au même endroit, lâcher
   const doux3 = x => { x = borne(x, 0, 1); return x * x * (3 - 2 * x); };
   function mouvementBoire(p) {
@@ -1248,6 +1387,15 @@ function lancer() {
     const souffle = ondule(Math.sin(t * 1.25) * .012);
     // quand il écoute tranquille, il tourne un peu la tête vers nous
     ty += .22 * (poids.detente + poids.groove + poids.energie + poids.claquer) / (total || 1);
+    // on l'a touché : il tourne la tête vers nous et nous regarde, sans lâcher ce qu'il faisait
+    {
+      const dr = horloge - regardDebut, r = dr < 4.2 ? doux3(Math.min(1, dr / .35)) * doux3(Math.min(1, (4.2 - dr) / .7)) : 0;
+      if (r > 0) {
+        _reg.copy(camera.position); buste.worldToLocal(_reg); _reg.y -= .68; _reg.z -= .03;
+        const lacet = borne(Math.atan2(_reg.x, _reg.z), -1.15, 1.15), tang = borne(-Math.atan2(_reg.y, Math.hypot(_reg.x, _reg.z)), -.5, .45);
+        tx = lisse(tx, tang, r); ty = lisse(ty, lacet, r); tz *= 1 - r; so = lisse(so, Math.max(so, .55), r); fermes *= 1 - r;
+      }
+    }
     buste.rotation.set(bx + souffle, by, bz); tete.rotation.set(tx - souffle * .6, ty, tz);
     buste.updateMatrix(); tete.updateMatrix();
     invBuste.copy(buste.matrix).invert();
@@ -1453,25 +1601,28 @@ function lancer() {
   const reagir = nom => { reactions[nom] = horloge; };
   const depuis = nom => reactions[nom] === undefined ? 99 : horloge - reactions[nom];
   let lampeEteinte = false, vuForce = 0, lcdMessage = '', finLcdMessage = 0, penseeJusqua = 0;
-  const ALLER = { bureau: 'https://amelienito.github.io/', talya: 'https://amelienito.github.io/Hb/', blog: 'https://www.onsenbranle.fr', cite: 'https://amelienito.github.io/cite-trois-chinois/', faits: 'https://amelienito.github.io/fun-facts/' };
+  const ALLER = { osmose: 'https://amelienito.github.io/osmose/?depuis=music-discovery', bureau: 'https://amelienito.github.io/', talya: 'https://amelienito.github.io/Hb/', blog: 'https://www.onsenbranle.fr', cite: 'https://amelienito.github.io/cite-trois-chinois/', faits: 'https://amelienito.github.io/fun-facts/' };
   const hasard = l => l[Math.floor(Math.random() * l.length)];
 
   // lui (et sa pensée revient quand on le touche)
   cible(zone(.5, .8, .4, buste, 0, .4, 0), 'Amélien', () => {
     penseeJusqua = horloge + 8;
-    if (etat.humeur === 'triste') { reagir('eclair'); return { texte: hasard(['Pas maintenant…', 'Remets du son…', 'Laisse-moi…']) }; }
-    lancerActivite('salut');
-    return { texte: 'Monte le son' };
-  }, 'lui dire bonjour');
+    if (etat.humeur === 'triste') { reagir('eclair'); return { texte: hasard(['Remets du son', 'Mélenchon 2027', 'Remets la musique']) }; }
+    regardDebut = horloge;   // il nous regarde, et continue ce qu'il faisait
+    return null;
+  });
   cible(nuage, 'Le petit nuage', () => { reagir('eclair'); return null; }, 'il boude sans musique');
   // les passerelles : une petite fenêtre, avec de quoi y aller (nouvel onglet, la musique continue ici)
   cible(porte, 'La porte du bureau', () => { reagir('porte'); return { texte: 'Le bureau, à côté : toutes les créations d’Amélien', lien: ALLER.bureau, quoi: 'Entrer' }; }, 'toutes ses créations');
-  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return { texte: 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Jouer' }; }, 'son jeu : RP Talya');
+  const direTalya = () => ({ texte: talyaPartie ? 'Talya est sortie faire un tour. Son jeu, lui, ne bouge pas : RP Talya' : 'Talya a son jeu à elle : RP Talya', lien: ALLER.talya, quoi: 'Jouer' });
+  cible(zone(1.1, .55, 1.0, panier, 0, .27, 0), 'Talya', () => { reagir('talya'); return direTalya(); }, 'son jeu : RP Talya');
+  cible(talyaD, 'Talya', () => direTalya(), 'son jeu : RP Talya');
   cible(ordi, 'L’ordi', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('ordi'); return { texte: 'Sur l’écran : Onsenbranle.fr, son blog', lien: ALLER.blog, quoi: 'Lire' }; }, 'son blog, Onsenbranle.fr');
   cible(globe, 'Le globe', () => { reagir('globe'); return { texte: 'Cite 3 Chinois : trois célébrités par pays', lien: ALLER.cite, quoi: 'Jouer' }; }, 'le jeu Cite 3 Chinois');
   cible(curio, 'La boîte à curiosités', () => { reagir('curio'); return { texte: 'Fun facts : pour apprendre en s’amusant', lien: ALLER.faits, quoi: 'Ouvrir' }; }, 'le quiz Fun facts');
   // les objets futiles : ils réagissent, sans forcément rien dire
-  cible(chat, 'Le chat', () => { reagir('chat'); return null; }, 'il s’étire');
+  cible(chat, 'Le chat', () => { reagir('chat'); return null; });
+  cible(zone(.8, .55, .4, lucioles, 0, 0, 0), 'Des lucioles', () => ({ texte: 'Elles viennent d’Osmose, le quizz rap du soir', lien: ALLER.osmose, quoi: 'Jouer' }), 'elles viennent d’Osmose');
   const zoneLampe = zone(.2, 2.2, .2, lampe, 0, 1.1, 0); zone(.44, .3, .44, zoneLampe, -.68, 1.17, .46);
   cible(zoneLampe, 'La lampe', () => { lampeEteinte = !lampeEteinte; return null; }, 'allumer, éteindre');
   cibleFenetre = { obj: vitre, nom: `La fenêtre : ${tranche.nom}`, action: () => null }; CIBLES.push(cibleFenetre);
@@ -1480,7 +1631,7 @@ function lancer() {
   cible(plante, 'La plante', () => { reagir('plante'); return null; }, 'ses feuilles dansent');
   // la bibliothèque : on en sort un CD au hasard (un morceau avec le mot d'Amélien) ; il vient flotter devant nous
   cible(zone(1.3, 1.47, .34, biblio, 0, .735, 0), 'La bibliothèque', () => { sortirCD(); return null; }, 'sortir un CD au hasard');
-  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Le verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; }, 'il boit une gorgée');
+  cible(zone(.6, .3, .6, table, 0, .62, 0), 'Le verre', () => { if (etat.humeur !== 'triste' && !activite) lancerActivite('boire'); return null; });
   cible(pouf, 'Le pouf', () => { reagir('pouf'); return null; }, 'il rebondit');
   cible(loup, 'Le loup de Cul7ure', () => { reagir('loup'); return null; }, 'le média rap qu’il a cofondé');
   cible(poster, 'En écoute', () => { reagir('pochette'); return { texte: etat.titre ? `En écoute : ${etat.titre} — ${etat.artiste || ''}` : 'La pochette du dernier morceau' }; }, 'le morceau qui passe');
@@ -1505,17 +1656,25 @@ function lancer() {
   const legendeI = document.createElement('div'); legendeI.className = 'piece-livret';
   let cdSorti = null, cdDebut = 0, cdFin = 0;
   const _dep = new THREE.Vector3(), _arr = new THREE.Vector3(), _fw = new THREE.Vector3(), _up = new THREE.Vector3(), _qc = new THREE.Quaternion(), _qw = new THREE.Quaternion();
+  const _nrm = new THREE.Vector3(), _sortie = new THREE.Vector3(), _ctrl = new THREE.Vector3(), _ab = new THREE.Vector3(), _bc = new THREE.Vector3();
+  let cdTour = -99, cdLivre = null;   // (« un autre » : le boîtier fait un tour sur lui-même et revient avec un autre disque)
   function sortirCD() {
     const m = window.MD && window.MD.auHasard && window.MD.auHasard();
     if (!m) return;
-    const l = hasard(livresMobiles); if (l) l.userData.sortie = horloge;
-    cdSorti = m; cdDebut = horloge; cdFin = 0;
+    const dejaLa = cdSorti && !cdFin;   // (déjà sorti, même en chemin : il tourne sur lui-même là où il est, il ne repart pas du rayon)
+    if (dejaLa) cdTour = horloge;
+    else {
+      const l = hasard(livresMobiles); if (l) l.userData.sortie = horloge; cdLivre = l;
+      cdDebut = horloge;
+      (l || biblio).getWorldPosition(_dep);
+      biblio.updateMatrixWorld(); _nrm.set(0, 0, 1).transformDirection(biblio.matrixWorld);
+    }
+    cdSorti = m; cdFin = 0;
     couvI.map = vierge; couvI.needsUpdate = true;
     if (window.MD.pochette) window.MD.pochette(m.id, src => chargeur.load(src, t => {
       if (cdSorti !== m) { t.dispose(); return; }
       t.colorSpace = THREE.SRGBColorSpace; const avant = couvI.map; couvI.map = t; couvI.needsUpdate = true; if (avant && avant !== vierge) avant.dispose();
     }, undefined, () => {}));
-    (l || biblio).getWorldPosition(_dep);
     legendeI.innerHTML = '';
     const t = document.createElement('p'); t.className = 'piece-livret-titre'; t.textContent = m.titre; legendeI.appendChild(t);
     const a = document.createElement('p'); a.className = 'piece-livret-artiste'; a.textContent = m.artiste; legendeI.appendChild(a);
@@ -1538,21 +1697,31 @@ function lancer() {
     camera.getWorldDirection(_fw); _up.copy(camera.up).applyQuaternion(camera.quaternion);
     const pres = Math.max(.75, .8 * (camera.fov > 50 ? 1.15 : 1));
     _arr.copy(camera.position).addScaledVector(_fw, pres).addScaledVector(_up, .07);
-    const aller = doux3((horloge - cdDebut) / .7), retour = cdFin ? doux3((horloge - cdFin) / .45) : 0, k = aller * (1 - retour);
-    inspect.position.lerpVectors(_dep, _arr, k);
-    // d'abord sur la tranche (comme rangé), puis face à nous ; il tourne doucement de gauche à droite
+    /* Le trajet, en trois temps, à l'aller comme au retour :
+       il glisse hors du rayon (tout droit, comme on tire un boîtier d'une étagère), puis vient vers nous en arc, en grandissant
+       et en se tournant face à nous ; au retour, le même arc à l'envers, et il rentre dans son rayon avant de disparaître. */
+    const da = horloge - cdDebut, dr = cdFin ? horloge - cdFin : 0;
+    const tire = doux3(Math.min(1, da / .38)), vol = doux3(borne((da - .26) / .85, 0, 1));
+    const rvol = cdFin ? doux3(Math.min(1, dr / .7)) : 0, rentre = cdFin ? doux3(borne((dr - .62) / .32, 0, 1)) : 0;
+    const aller = vol, retour = rvol, k = vol * (1 - rvol);
+    _sortie.copy(_dep).addScaledVector(_nrm, .14 * tire * (1 - rentre) - .02 * rentre);
+    _ctrl.copy(_sortie).lerp(_arr, .5).addScaledVector(_up, .22).addScaledVector(_nrm, .1);
+    _ab.lerpVectors(_sortie, _ctrl, k); _bc.lerpVectors(_ctrl, _arr, k); inspect.position.lerpVectors(_ab, _bc, k);   // (une courbe de Bézier : un arc, pas une ligne droite)
+    // d'abord sur la tranche (comme rangé), puis face à nous ; il tourne doucement de gauche à droite ; « un autre » : un tour complet
+    const tour = horloge - cdTour < .75 ? doux3((horloge - cdTour) / .75) * Math.PI * 2 : 0;
     _qc.copy(camera.quaternion);
-    _qw.setFromEuler(new THREE.Euler(Math.sin(horloge * .9) * .08, (1 - k) * 1.5 + Math.sin(horloge * .7) * .35, 0));
+    _qw.setFromEuler(new THREE.Euler(Math.sin(horloge * .9) * .08 * k, (1 - doux3(borne((k - .15) / .85, 0, 1))) * 1.5 + Math.sin(horloge * .7) * .35 * k + tour, 0));
     inspect.quaternion.copy(_qc).multiply(_qw);
-    inspect.scale.setScalar(.25 + .75 * k);
-    legendeI.classList.toggle('visible', aller > .9 && !cdFin);
+    inspect.scale.setScalar(.22 + .78 * k);
+    if (horloge - cdTour < .75) legendeI.classList.remove('visible');
+    legendeI.classList.toggle('visible', aller > .9 && !cdFin && horloge - cdTour > .75);
     if (aller > .9 && !cdFin) {
       _ep.copy(_arr).addScaledVector(_up, -.16).project(camera);
       const lw = legendeI.offsetWidth, lh = legendeI.offsetHeight;
       const x = borne((_ep.x + 1) / 2 * tW - lw / 2, 8, tW - lw - 8), y = borne((1 - _ep.y) / 2 * tH, 8, tH - lh - 8);
       legendeI.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
     }
-    if (cdFin && retour >= 1) { cdSorti = null; inspect.visible = false; }
+    if (cdFin && dr > .98) { cdSorti = null; inspect.visible = false; }
   }
 
   // l'étiquette qui apparaît là où on a touché, et le nom de l'objet sous la souris
@@ -1615,20 +1784,24 @@ function lancer() {
   }
 
   // les réactions, image après image
-  let eveilTalya = 0;
+  let eveilTalya = 0, prochainChat = 45 + Math.random() * 60;
   function animerReactions(t, dt) {
     // il vit sa vie en mode salon : de temps en temps, l'ordi, une gorgée, le téléphone, un étirement
     if (activite && (t > finActivite || (etat.humeur === 'triste' && activite !== 'salut'))) { activite = null; prochaineActivite = t + (parent === plein ? 9 + Math.random() * 9 : 18 + Math.random() * 18); }
     // en mode salon il vit sa vie souvent ; dans la page, de temps en temps (sinon il garde l'attitude du morceau)
-    if (!activite && etat.joue && !calme && t > prochaineActivite) lancerActivite(hasard(['ordi', 'ecrire', 'telephone', 'etirement', 'malcolm', 'savourer', 'claquer', 'boire', 'ecrire']));
+    if (!activite && etat.joue && !calme && t > prochaineActivite) { const choix = (ACTIVITES[etat.humeur] || ACTIVITES.detente).filter(a => a !== derniereActivite); lancerActivite(derniereActivite = hasard(choix)); }
     // la porte s'ouvre un peu plus, puis revient
-    const dp = depuis('porte'); battant.rotation.y = .42 + (dp < 4 ? Math.sin(Math.min(1, dp * 3) * Math.PI / 2) * .5 * Math.min(1, (4 - dp) * 1.5) : 0);
+    const dp = depuis('porte'); battant.rotation.y = .42 + Math.max(dp < 4 ? Math.sin(Math.min(1, dp * 3) * Math.PI / 2) * .5 * Math.min(1, (4 - dp) * 1.5) : 0, ouvT * .98);
     // Talya relève la tête et remue la queue
-    const dt2 = depuis('talya'); eveilTalya = dt2 < 3 ? Math.min(1, dt2 * 4, (3 - dt2) * 2) : 0;
+    const dt2 = depuis('talya'); eveilTalya = Math.max(dt2 < 3 ? Math.min(1, dt2 * 4, (3 - dt2) * 2) : 0, leverT);
     teteT.position.y = .36 + eveilTalya * .1;
-    // le chat s'étire
-    const dc = depuis('chat'), et = dc < 1.6 ? Math.sin(dc / 1.6 * Math.PI) : 0;
-    corpsChat.scale.x = 1.35 + et * .35; chat.position.y = REBORD + .03 + et * .02;
+    animerTalya(t, dt); animerLucioles(t);
+    // le chat : on le dérange (ou il se réveille tout seul, de loin en loin) : il lève la tête vers nous, ouvre l'œil, fouette l'air de la queue, puis se rendort
+    if (!calme && t > prochainChat) { reagir('chat'); prochainChat = t + 80 + Math.random() * 150; }
+    const dc = depuis('chat'), ev = dc < 3.6 ? Math.min(1, dc * 4, (3.6 - dc) * 1.4) : 0;
+    teteChat.position.y = .065 + ev * .055; teteChat.rotation.y = ev * 1.2; teteChat.rotation.z = -ev * .3 + ev * Math.sin(t * 2.4) * .05;
+    yeuxChat.forEach(o => { o.visible = ev > .08; o.scale.y = .1 + ev * .8 * (Math.sin(t * 1.3) > .96 ? .1 : 1); });
+    queueChat.rotation.z = ev * Math.sin(t * 7.5) * .5; queueChat.position.y = .02 + ev * .03;
     // le globe tourne, la boîte s'ouvre, le loup fait un tour, la plante danse, le pouf rebondit
     globeBoule.rotation.y += dt * (.1 + (depuis('globe') < 2.5 ? (2.5 - depuis('globe')) * 6 : 0));
     const dcu = depuis('curio'), ouvert = dcu < 5 ? Math.min(1, dcu * 3, (5 - dcu) * 2) : 0;
@@ -1639,10 +1812,78 @@ function lancer() {
     // les cadres qu'on a mis de travers
     CADRES_IMG.map(c => c.g).forEach((g, i) => { const vise = g.userData.penche ? (i % 2 ? .07 : -.07) : 0; g.rotation.z = lisse(g.rotation.z, vise, Math.min(1, dt * 8)); });
     // un livre sort un peu, puis rentre
-    livresMobiles.forEach(l => { const d = l.userData.sortie === undefined ? 99 : t - l.userData.sortie; if (l.userData.z0 === undefined) l.userData.z0 = l.position.z; l.position.z = l.userData.z0 + (d < 2.4 ? Math.min(1, d * 4, (2.4 - d) * 2) * .11 : 0); });
+    livresMobiles.forEach(l => { if (l === cdLivre && cdSorti && !cdFin) l.userData.sortie = t - .6; const d = l.userData.sortie === undefined ? 99 : t - l.userData.sortie; if (l.userData.z0 === undefined) l.userData.z0 = l.position.z; l.position.z = l.userData.z0 + (d < 2.4 ? Math.min(1, d * 4, (2.4 - d) * 2) * .11 : 0); });
     // l'éclair dans le petit nuage
     const de = depuis('eclair');
     nuage.children.forEach(m => { if (m.material && m.material.emissive) m.material.emissive.setRGB(de < .35 ? 1.2 : 0, de < .35 ? 1.1 : 0, de < .35 ? .6 : 0); });
+  }
+
+  /* ═══════════════ Talya va et vient ═══════════════
+     De loin en loin, elle se lève de son panier : elle sort faire un tour par la porte du bureau (et revient plus tard),
+     va boire à sa gamelle, ou vient voir Amélien en remuant la queue. Jamais deux fois de suite la même chose, jamais
+     à heure fixe ; quand la musique est coupée, elle reste couchée. */
+  const LIEUX = { panier: [2.2, -1.2], porte: [2.2, -2.06], dehors: [2.24, -3.1], gamelle: [1.8, -1.12], fauteuil: [1.08, -.38] };
+  const BALADES = {
+    tour: () => [['lever'], ['aller', 'porte', 1], ['aller', 'dehors', 1], ['absente', 22 + Math.random() * 65], ['aller', 'porte', 1], ['aller', 'panier'], ['coucher']],
+    boire: () => [['lever'], ['aller', 'gamelle'], ['boire', 3 + Math.random() * 3], ['aller', 'panier'], ['coucher']],
+    visite: () => [['lever'], ['aller', 'fauteuil'], ['attendre', 2.5 + Math.random() * 3], ['aller', 'panier'], ['coucher']],
+  };
+  let balade = null, pasBalade = 0, debutPas = 0, prochaineBalade = 40 + Math.random() * 70, derniereBalade = '', ouvT = 0, leverT = 0, marche = 0, capT = 0, talyaPartie = false;
+  const cap = (x, z) => Math.atan2(x - talyaD.position.x, z - talyaD.position.z);
+  const tourner = (vise, k) => { let d = vise - capT; d = Math.atan2(Math.sin(d), Math.cos(d)); capT += d * k; talyaD.rotation.y = capT; };
+  function animerTalya(t, dt) {
+    if (window.__pieceBalade) { const n = window.__pieceBalade; window.__pieceBalade = null; if (!balade && BALADES[n]) { derniereBalade = n; balade = BALADES[n](); pasBalade = 0; debutPas = t; } }   // pour les vérifications
+    if (!balade) {
+      leverT = 0; ouvT = lisse(ouvT, 0, Math.min(1, dt * 3));
+      if (!calme && etat.humeur !== 'triste' && t > prochaineBalade) {
+        derniereBalade = hasard(Object.keys(BALADES).filter(n => n !== derniereBalade));
+        balade = BALADES[derniereBalade](); pasBalade = 0; debutPas = t;
+      }
+      return;
+    }
+    const pas = balade[pasBalade], d = t - debutPas, suivant = () => { pasBalade++; debutPas = t; if (pasBalade >= balade.length) { balade = null; prochaineBalade = t + 55 + Math.random() * 150; } };
+    let ouvre = 0, vitesse = 0, teteBas = 0, remue = .25;
+    if (pas[0] === 'lever') {
+      // elle relève la tête, puis se met sur ses pattes
+      leverT = Math.min(1, d * 2.2);
+      if (d > .75 && talya.visible) { talya.visible = false; talyaD.visible = true; talyaD.position.set(LIEUX.panier[0], .1, LIEUX.panier[1]); const n = balade[pasBalade + 1]; capT = cap(...LIEUX[n[1]]); talyaD.rotation.y = capT; }
+      if (talyaD.visible) { const k = Math.min(1, (d - .75) / .35); talyaD.scale.setScalar(.9 * (.72 + .28 * doux3(k))); talyaD.position.y = .1 * (1 - k); }
+      if (d > 1.25) suivant();
+    } else if (pas[0] === 'aller') {
+      const [x, z] = LIEUX[pas[1]];
+      if (!talyaD.visible) { talyaD.visible = true; talyaPartie = false; talyaD.scale.setScalar(.9); talyaD.position.set(LIEUX.dehors[0], 0, LIEUX.dehors[1]); capT = cap(x, z); }   // elle revient
+      ouvre = pas[2] ? 1 : 0;
+      const dx = x - talyaD.position.x, dz = z - talyaD.position.z, reste = Math.hypot(dx, dz);
+      // devant la porte, elle attend qu'elle soit assez ouverte
+      const bloque = pas[1] === 'dehors' && ouvT < .8 || (pas[1] === 'porte' && talyaD.position.z < -2.5 && ouvT < .8);
+      vitesse = bloque ? 0 : Math.min(.62, reste * 3 + .12);
+      tourner(Math.atan2(dx, dz), Math.min(1, dt * 7));
+      if (reste > .03) { talyaD.position.x += dx / reste * vitesse * dt; talyaD.position.z += dz / reste * vitesse * dt; } else suivant();
+      talyaD.position.y = 0;
+    } else if (pas[0] === 'absente') {
+      talyaD.visible = false; talyaPartie = true; if (d > pas[1]) suivant();
+    } else if (pas[0] === 'boire') {
+      tourner(cap(1.457, -.946), Math.min(1, dt * 6)); teteBas = Math.min(1, d * 3) * Math.min(1, (pas[1] - d) * 3); remue = .12;
+      if (d > pas[1]) suivant();
+    } else if (pas[0] === 'attendre') {
+      tourner(cap(.3, -.62), Math.min(1, dt * 6)); remue = 1; teteBas = -.35 * Math.min(1, d * 3);
+      if (d > pas[1]) suivant();
+    } else if (pas[0] === 'coucher') {
+      // elle tourne sur elle-même, comme font les chiens, puis se couche
+      if (d < 1.1) { capT += dt * 5.6; talyaD.rotation.y = capT; vitesse = .3; }
+      else if (talyaD.visible) { talyaD.visible = false; talya.visible = true; reagir('talya'); }
+      leverT = d > 1.1 ? Math.max(0, 1 - (d - 1.1) * 1.2) : 0;
+      if (d > 2) suivant();
+    }
+    ouvT = lisse(ouvT, ouvre, Math.min(1, dt * 3.2));
+    // la marche : les pattes en diagonale, le corps qui tangue, la queue, la tête
+    marche += dt * (vitesse > .02 ? 7 + vitesse * 9 : 0);
+    const amp = Math.min(1, vitesse * 3);
+    pattesD.forEach((g, i) => { g.rotation.x = Math.sin(marche + (i === 0 || i === 3 ? 0 : Math.PI)) * .6 * amp; });
+    corpsD.position.y = .4 + Math.abs(Math.sin(marche)) * .012 * amp;
+    couD.rotation.x = teteBas * 1.05 + Math.sin(marche * 2) * .04 * amp; teteD.rotation.x = teteBas > 0 ? teteBas * .5 + Math.sin(t * 9) * .05 * teteBas : teteBas * .4;
+    queueD.rotation.z = Math.sin(t * (6 + remue * 9)) * (.25 + remue * .5); queueD.rotation.x = -.2 - remue * .25;
+    oreillesD[0].rotation.x = Math.sin(t * 1.7) * .05; oreillesD[1].rotation.x = Math.sin(t * 2.1 + 1) * .05;
   }
 
   /* ═══════════════ la boucle ═══════════════ */
@@ -1820,10 +2061,10 @@ function lancer() {
   }, { timeout: 1500 });
   lierOrbite(toile);
   window.Piece = { maj, placer, vue: () => { pres = !pres && parent === plein; remettreVue(); cadrer(); return pres; } };
-  window.__pieceDebug = { THREE, rendu, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
+  window.__pieceDebug = { talya: () => ({ couchee: talya.visible, debout: talyaD.visible, pos: talyaD.position.toArray(), porte: battant.rotation.y }), THREE, rendu, fauteuil, perso, buste, tete, bras, jambes, poids, scene, camera, lancerActivite,
     // où se trouve un objet touchable à l'écran (pour les vérifications)
     ecran: nom => { const c = CIBLES.find(x => x.nom === nom); if (!c) return null; const b = new THREE.Box3().setFromObject(c.obj); const p = b.getCenter(new THREE.Vector3()).project(camera); const r = toile.getBoundingClientRect(); return [r.left + (p.x + 1) / 2 * r.width, r.top + (1 - p.y) / 2 * r.height]; },
-    noms: () => CIBLES.map(c => c.nom), cd: () => ({ sorti: !!cdSorti, visible: inspect.visible, pos: inspect.position.toArray(), cam: camera.position.toArray() }), sortirCD, finirCD: () => { cdDebut = horloge - 5; }, orbite };   // pour les vérifications
+    noms: () => CIBLES.map(c => c.nom), cd: () => ({ sorti: !!cdSorti, visible: inspect.visible, pos: inspect.position.toArray(), s: inspect.scale.x, cam: camera.position.toArray(), h: horloge }), sortirCD, finirCD: () => { cdDebut = horloge - 5; }, orbite };   // pour les vérifications
   if (window.__salonEtat) maj(window.__salonEtat);
   const compile = rendu.compileAsync ? rendu.compileAsync(scene, camera).catch(() => {}) : Promise.resolve();
   compile.then(() => placer());
