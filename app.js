@@ -551,6 +551,7 @@ document.addEventListener('pochette-prete', e => {
 
 /* ─────────────────────────────── LE LECTEUR ─────────────────────────────── */
 let lecteur = null, lecteurPret = false, enAttente = null, apiDemandee = false, demarrage = null;
+const MESURES = [];   // pour les vérifications : le temps de démarrage de chaque morceau (MD.mesures())
 function chargerAPI() {
   if (apiDemandee) return;
   apiDemandee = true;
@@ -580,6 +581,7 @@ window.onYouTubeIframeAPIReady = () => {
       },
       onStateChange: e => {
         if (S.lecture !== 'yt') return;
+        if (e.data === YT.PlayerState.PLAYING && S.chargeA && !S.mesure) { S.mesure = true; MESURES.push({ id: S.joue, ms: Date.now() - S.chargeA, pub: !!S.pub, premier: MESURES.length === 0 }); }
         if (e.data === YT.PlayerState.PLAYING) { S.enLecture = true; S.pauseVoulue = false; S.aJoue = true; S.bloque = false; S.echecs = 0; clearTimeout(demarrage); appliquerVolume(); }
         if (e.data === YT.PlayerState.PAUSED) {
           S.enLecture = false;
@@ -678,7 +680,7 @@ function jouerMorceau(m, debut = 0) {
   S.erreur = false;
   S.bloque = false;
   S.aJoue = false;
-  S.pauseVoulue = false; S.chargeA = Date.now();
+  S.pauseVoulue = false; S.chargeA = Date.now(); S.mesure = false;
   audioLecture.pause();
   if (!jouable(m)) { jouerExtraitComplet(m); return; }
   bonCommentaire(m, false);
@@ -820,6 +822,9 @@ window.MD = {
   // la pochette d'un morceau (tout de suite si on l'a déjà, sinon dès qu'elle arrive)
   pochette(id, cb) { const m = parId[id]; if (!m) return; const im = Pochettes.image(m); if (im) cb(im.src); else Pochettes.demander(m, () => { const j = Pochettes.image(m); if (j) cb(j.src); }); },
   jouer(id) { if (parId[id]) jouerRadio(id); },
+  mesures: () => MESURES.slice(),
+  // (pour les vérifications : couper le son du lecteur YouTube)
+  muet() { chargerAPI(); return new Promise(r => { const f = () => { if (lecteurPret) { try { lecteur.mute(); } catch (e) {} r(true); } else setTimeout(f, 50); }; f(); }); },
   // pour vérifier la pile : à quelle distance du morceau en cours sont les trois disques proposés
   pile() { const c = parId[S.joue]; return S.pile.map(p => ({ id: p.m.id, dir: p.dir, dist: c ? Moteur.distance(c, p.m) : null, amb: p.m.ambiance })); },
 };
