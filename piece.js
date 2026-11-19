@@ -512,8 +512,9 @@ function lancer() {
     poser(new THREE.Mesh(new THREE.ConeGeometry(.032, .18, 3), rose), o, 0, .11, .03);
     return o;
   });
-  // les yeux fermés : deux petits traits
-  [-1, 1].forEach(c => { const t = boite(.035, .006, .006, truffeM, teteT, c * .07, .03, .145); t.rotation.z = c * .15; });
+  // l'œil fermé : un petit trait. Un seul : Talya n'a plus son œil gauche (côté +x de sa tête, qui regarde vers +z),
+  // de ce côté-là, juste du pelage, comme en vrai et comme dans le hub
+  [-1].forEach(c => { const t = boite(.035, .006, .006, truffeM, teteT, c * .07, .03, .145); t.rotation.z = c * .15; });
   const queueT = poser(new THREE.Mesh(new THREE.ConeGeometry(.05, .35, 5), blanc), talya, -.42, .2, .12); queueT.rotation.z = 1.9;
   /* Talya debout : la même chienne, sur ses pattes, pour ses allées et venues (elle sort par la porte du bureau, va boire, vient voir Amélien) */
   const talyaD = vivant(groupe(piece, 2.2, 0, -1.2)); talyaD.visible = false;
@@ -532,11 +533,11 @@ function lancer() {
     poser(new THREE.Mesh(new THREE.ConeGeometry(.026, .145, 3), rose), o, 0, .088, .024);
     return o;
   });
-  // les yeux, ouverts : chacun est posé là où un rayon touche la tête, un peu enfoncé, aplati contre elle (avant, ils flottaient devant les facettes)
+  // l'œil, ouvert (le droit seulement : elle n'a plus le gauche), posé là où un rayon touche la tête, un peu enfoncé, aplati contre elle
   {
     const seul = new THREE.Mesh(crT.geometry, blanc); seul.scale.copy(crT.scale); seul.updateMatrixWorld(true);
     const ray = new THREE.Raycaster(), dir = new THREE.Vector3();
-    [-1, 1].forEach(c => {
+    [-1].forEach(c => {
       dir.set(c * .5, .28, .82).normalize(); ray.set(dir.clone().multiplyScalar(.5), dir.clone().negate());
       const h = ray.intersectObject(seul, false)[0]; if (!h) return;
       const n = h.face.normal.clone().transformDirection(seul.matrixWorld);

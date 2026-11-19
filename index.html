@@ -23,7 +23,7 @@
     try { if (window.WebGLRenderingContext && 'IntersectionObserver' in window) document.documentElement.classList.add('avec-3d'); } catch (e) {}
   </script>
   <!-- la pièce en 3D se télécharge tout de suite, en parallèle du reste -->
-  <link rel="modulepreload" href="piece.min.js?v=20">
+  <link rel="modulepreload" href="piece.min.js?v=21">
   <!-- la musique vient de YouTube : on ouvre la connexion dès l'arrivée sur la page, le premier morceau part plus vite -->
   <link rel="preconnect" href="https://www.youtube.com">
   <link rel="preconnect" href="https://i.ytimg.com">
@@ -388,7 +388,7 @@
   <script src="https://amelienito.github.io/osb.js" defer></script>
   <script src="app.js?v=75"></script>
   <!-- la pièce en 3D : piece.js, regroupé et compacté dans piece.min.js (avec three.js) -->
-  <script type="module" src="piece.min.js?v=20"></script>
+  <script type="module" src="piece.min.js?v=21"></script>
   <script nomodule>document.documentElement.classList.remove('avec-3d');</script>
   <script>addEventListener('load', function () { setTimeout(function () { if (!window.__piece) document.documentElement.classList.remove('avec-3d'); }, 0); });</script>
 </body>
