@@ -1459,6 +1459,122 @@ const MORCEAUX = [
     tags: ["rap", "rap français", "mélancolie"],
     energie: 3, etrange: 7, danse: 3 },
 
+
+  // ajouts du 22 nov. (table de tri)
+
+  { titre: "Fly-By-Day", artiste: "Toshiki Kadomatsu",
+    lien: "https://music.youtube.com/watch?v=L_3NgzFt9Vk", note: "Je suis le même de Ryan Gosling quand il touche l'eau",
+    ambiance: "soleil", style: "City pop japonaise", annee: 1982, bpm: 108, voix: "chant",
+    tags: ["city pop", "japon", "funk", "soleil"],
+    energie: 5, etrange: 5, danse: 6 },
+
+  { titre: "I'd Like to Walk Around in Your Mind", artiste: "Vashti Bunyan", album: "Just Another Diamond Day",
+    lien: "https://music.youtube.com/watch?v=aJCJKhUXe60", note: "C'est sublime, mais aucun souvenir de comment je suis tombé dessus",
+    ambiance: "brume", style: "Folk pastoral", annee: 1970, bpm: 70, voix: "chant",
+    tags: ["folk", "voix douce", "champêtre", "rêveur"],
+    energie: 1, etrange: 6, danse: 0 },
+
+  { titre: "N.D.R (Naissance Du Rap)", artiste: "Famille Nombreuse",
+    lien: "https://music.youtube.com/watch?v=AtNaStSoMY8", note: "La meilleure réappropriation francophone de ce classique",
+    ambiance: "bitume", style: "Rap français", bpm: 95, voix: "rap",
+    tags: ["rap", "france", "reprise"],
+    energie: 5, etrange: 5, danse: 4 },
+
+  { titre: "Mac 10 Handle", artiste: "Prodigy", album: "Return of the Mac",
+    lien: "https://music.youtube.com/watch?v=JigP4JiMmAs",
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 2007, bpm: 82, voix: "rap",
+    tags: ["rap", "new york", "alchemist", "sombre", "queensbridge"],
+    energie: 5, etrange: 3, danse: 3 },
+
+  { titre: "Goulag", artiste: "Kaaris",
+    lien: "https://music.youtube.com/watch?v=Iz2LmzLjS9E", note: "Toujours aussi efficace",
+    ambiance: "bitume", style: "Rap français agressif", bpm: 140, voix: "rap",
+    tags: ["rap", "france", "trap", "agressif"],
+    energie: 8, etrange: 4, danse: 5 },
+
+  { titre: "A.P.I.D.T.A.", artiste: "Jay Electronica", album: "A Written Testimony",
+    lien: "https://music.youtube.com/watch?v=Pk-TBouw57M", note: "Je sais toujours pas pq Jay-Z est devenu musulman sur cet album",
+    ambiance: "bitume", style: "Rap à samples", annee: 2020, bpm: 84, voix: "rap",
+    tags: ["rap", "samples soul", "spirituel", "new york"],
+    energie: 5, etrange: 5, danse: 3 },
+
+  { titre: "Sell Coke to White Folks Pt. 2", artiste: "greenSLLIME",
+    lien: "https://music.youtube.com/watch?v=31U15RnlASc", note: "Je partage pour la culture",
+    ambiance: "bitume", style: "Rap underground", bpm: 90, voix: "rap",
+    tags: ["rap", "underground", "chicago", "décalé"],
+    energie: 5, etrange: 7, danse: 4 },
+
+  { titre: "I Like It (I Wanna Be Where You Are)", artiste: "Grand Puba", album: "Reel to Reel",
+    lien: "https://music.youtube.com/watch?v=yn7KoADZlRk", note: "J'étais obsédé par cette loop au lycée",
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 1992, bpm: 94, voix: "rap",
+    tags: ["rap", "boom bap", "loop", "new york", "jazzy"],
+    energie: 5, etrange: 4, danse: 5 },
+
+  { titre: "C'est donc ça nos vies", artiste: "IAM",
+    lien: "https://music.youtube.com/watch?v=wfzxsJHPAF0", note: "L'instru la plus mélancolique du rap fr",
+    ambiance: "bitume", style: "Rap marseillais", bpm: 88, voix: "rap",
+    tags: ["rap", "france", "marseille", "mélancolique"],
+    energie: 4, etrange: 3, danse: 2 },
+
+  { titre: "Sing About Me, I'm Dying of Thirst", artiste: "Kendrick Lamar", album: "good kid, m.A.A.d city",
+    lien: "https://music.youtube.com/watch?v=Z3CnfFQENkw", note: "Et si c'était son meilleur son ?",
+    ambiance: "bitume", style: "Rap de Compton", annee: 2012, bpm: 69, voix: "rap",
+    tags: ["rap", "compton", "narratif", "long"],
+    energie: 4, etrange: 3, danse: 2 },
+
+  { titre: "Hive", artiste: "Earl Sweatshirt feat. Vince Staples & Casey Veggies", album: "Doris",
+    lien: "https://music.youtube.com/watch?v=0FcDXL5Aw0o", note: "Ce clip a ouvert une porte dans mon cerveau",
+    ambiance: "bitume", style: "Rap sombre", annee: 2013, bpm: 75, voix: "rap",
+    tags: ["rap", "sombre", "californie", "odd future"],
+    energie: 6, etrange: 6, danse: 3 },
+
+  { titre: "La France, itinéraire d'une polémique", artiste: "Sniper",
+    lien: "https://music.youtube.com/watch?v=C1mSAMhYLHY", note: "Je l'écoutais en 2006 sur mon baladeur cd",
+    ambiance: "bitume", style: "Rap français engagé", annee: 2003, bpm: 90, voix: "rap",
+    tags: ["rap", "france", "engagé", "années 2000"],
+    energie: 6, etrange: 2, danse: 3 },
+
+  { titre: "À 30%", artiste: "Maître Gims",
+    lien: "https://music.youtube.com/watch?v=Np_r6Kbcq18", note: "Du par cœur", debut: 67,
+    ambiance: "bitume", style: "Freestyle filmé", bpm: 90, voix: "rap",
+    tags: ["rap", "france", "freestyle", "amateur"],
+    energie: 6, etrange: 4, danse: 3 },
+
+  { titre: "I'm a Player", artiste: "Too Short",
+    lien: "https://music.youtube.com/watch?v=WfeVI29oHp4", note: "Essayez en conduisant svp",
+    ambiance: "bitume", style: "Rap de la Baie", annee: 1993, bpm: 98, voix: "rap",
+    tags: ["rap", "oakland", "g-funk", "voiture"],
+    energie: 5, etrange: 3, danse: 6 },
+
+  { titre: "Round and Round", artiste: "The Twinz", album: "Conversation",
+    lien: "https://music.youtube.com/watch?v=kLWUhZADliA", note: "Vous voyez pas mes jantes tourner, dommage",
+    ambiance: "bitume", style: "G-funk", annee: 1995, bpm: 92, voix: "rap",
+    tags: ["rap", "g-funk", "west coast", "voiture"],
+    energie: 4, etrange: 5, danse: 6 },
+
+  { titre: "Alone Again", artiste: "Biz Markie", album: "I Need a Haircut",
+    lien: "https://music.youtube.com/watch?v=OebqNsNRBtU", note: "RIP roi des divertisseurs",
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 1991, bpm: 88, voix: "rap",
+    tags: ["rap", "samples", "humour", "new york"],
+    energie: 4, etrange: 3, danse: 4 },
+
+  { titre: "Where the Hood At (Uncensored)", artiste: "DMX",
+    lien: "https://music.youtube.com/watch?v=IIeSGUK-Lyo", note: "À mon stage de 3e, mon tuteur écoutait ça (par homophobie)",
+    ambiance: "bitume", style: "Rap new-yorkais", annee: 2003, bpm: 87, voix: "rap",
+    tags: ["rap", "new york", "agressif", "années 2000"],
+    energie: 8, etrange: 2, danse: 5 },
+
+  { titre: "Jackpotes 2000", artiste: "113", album: "Les princes de la ville",
+    lien: "https://music.youtube.com/watch?v=t_KLCjlAGDk", note: "Allez on se le remet",
+    ambiance: "bitume", style: "Rap français", annee: 1999, bpm: 92, voix: "rap",
+    tags: ["rap", "france", "banlieue", "années 90"],
+    energie: 6, etrange: 2, danse: 5 },
+
+  { titre: "J'étais comme eux", artiste: "Demon One feat. Soprano", album: "Démons et merveilles",
+    lien: "https://music.youtube.com/watch?v=FPPjYrTD7-E", note: "Les souvenirs",
+    ambiance: "bitume", style: "Rap français", annee: 2008, bpm: 90, voix: "rap",
+    tags: ["rap", "france", "pop-rap", "nostalgie"],
+    energie: 5, etrange: 2, danse: 3 },
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
@@ -1494,4 +1610,8 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=-Vs9LO83SKA", // Dany Dan, Des voix dans ma tête (retiré le 8 nov.)
   "https://music.youtube.com/watch?v=XOAU2lpoEKw", // Sexion d'Assaut, Noir (retiré le 8 nov.)
   "https://music.youtube.com/watch?v=F4yb0CBd4I4", // Eminem, Beautiful (retiré le 3 nov.)
+  "https://music.youtube.com/watch?v=_YTPuHVlGXY", // Mitski, Drunk Walk Home (écarté le 22 nov.)
+  "https://music.youtube.com/watch?v=BrtHiMisC5o", // Prodigy, Genesis (remplacé par Mac 10 Handle)
+  "https://music.youtube.com/watch?v=NR5ZOBh7O04", // Jacques Brel, La Valse à mille temps (écarté le 22 nov.)
+  "https://music.youtube.com/watch?v=fc24JSufIlM", // Joke, Max B (doublon : Ateyaba, Max B est déjà sur le site)
 ];
