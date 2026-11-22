@@ -1463,7 +1463,7 @@ const MORCEAUX = [
   // ajouts du 22 nov. (table de tri)
 
   { titre: "Fly-By-Day", artiste: "Toshiki Kadomatsu",
-    lien: "https://music.youtube.com/watch?v=L_3NgzFt9Vk", note: "Je suis le même de Ryan Gosling quand il touche l'eau",
+    lien: "https://music.youtube.com/watch?v=L_3NgzFt9Vk", note: "Je suis le meme de Ryan Gosling quand il touche l'eau",
     ambiance: "soleil", style: "City pop japonaise", annee: 1982, bpm: 108, voix: "chant",
     tags: ["city pop", "japon", "funk", "soleil"],
     energie: 5, etrange: 5, danse: 6 },
