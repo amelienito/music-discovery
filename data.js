@@ -1244,7 +1244,7 @@ const MORCEAUX = [
     energie: 4, etrange: 3, danse: 4 },
 
   { titre: "Les maux", artiste: "Tandem", album: "Ceux qui le savent m'écoutent",
-    lien: "https://music.youtube.com/watch?v=sWlNspjdH_I", note: "Comment t’écris ça a 22 ans ?", secours: { lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "Comment t’écris ça a 22 ans ?" },
+    lien: "https://music.youtube.com/watch?v=sWlNspjdH_I", note: "Comment t’écris ça à 22 ans ?", secours: { lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "Comment t’écris ça à 22 ans ?" },
     ambiance: "bitume", style: "Rap du 93", annee: 2001, bpm: 90, voix: "rap",
     tags: ["rap", "rap français", "93", "hardcore"],
     energie: 6, etrange: 6, danse: 3 },

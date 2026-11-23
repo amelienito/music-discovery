@@ -182,6 +182,24 @@ function lireEntree(texte) {
   if (ids.length) return { cle: 'ids:' + ids.slice(0, 3).join(','), list: null, ids: [...new Set(ids)] };
   return null;
 }
+// plusieurs playlists d'un coup : « Nom : lien » ou le nom sur la ligne d'avant, un lien par playlist
+function lireListes(texte) {
+  const out = [], vus = new Set();
+  let nom = '';
+  for (const brut of texte.split(/\r?\n/)) {
+    const ligne = brut.trim();
+    if (!ligne) continue;
+    const m = ligne.match(/[?&]list=([\w-]+)/);
+    if (!m) { if (!/^https?:/i.test(ligne)) nom = ligne.replace(/[:\-–—\s]+$/, ''); continue; }
+    if (!vus.has(m[1])) {
+      vus.add(m[1]);
+      const devant = ligne.slice(0, Math.max(0, ligne.search(/https?:/))).replace(/[:\-–—\s]+$/, '').trim();
+      out.push({ cle: 'pl:' + m[1], list: m[1], nom: devant || nom });
+    }
+    nom = '';
+  }
+  return out;
+}
 function cuePlaylist(list, index) {
   return new Promise(res => {
     // si le lecteur est déjà « prêt », YouTube ne prévient pas toujours : on vérifie aussi nous-mêmes
@@ -258,7 +276,38 @@ async function chargerSuite() {
   sauver();
   return ajoutes > 0;
 }
+async function demarrerPlusieurs(listes) {
+  T.derniere = $('#entree').value.trim();
+  let ok = 0, rate = [];
+  for (let k = 0; k < listes.length; k++) {
+    const e = listes[k];
+    $('#bouton-charger').textContent = `Chargement ${k + 1}/${listes.length}…`;
+    const existait = !!T.listes[e.cle];
+    if (!existait) T.listes[e.cle] = { nom: e.nom || '', list: e.list, ids: [], infos: {}, decisions: {}, historique: [], complet: false, cree: Date.now() };
+    else if (e.nom && !T.listes[e.cle].nom) T.listes[e.cle].nom = e.nom;
+    const l = T.listes[e.cle];
+    const ids = await cuePlaylist(e.list, 0);
+    if (!ids || !ids.length) {
+      if (!existait) delete T.listes[e.cle];
+      rate.push(e.nom || e.list);
+      continue;
+    }
+    fusionner(l, ids);
+    if (ids.length >= 199) l.complet = false; else l.complet = true;
+    ok++;
+    if (!T.active || !T.listes[T.active] || T.active === SITE) T.active = e.cle;
+    sauver();
+  }
+  $('#bouton-charger').textContent = 'Charger';
+  if (!ok) { toast('Aucune de ces playlists n\'a pu être chargée (privées ou introuvables ?).'); return; }
+  const premiere = listes.find(e => T.listes[e.cle]);
+  T.active = premiere.cle; sauver();
+  toast(`${ok} playlist${ok > 1 ? 's' : ''} chargée${ok > 1 ? 's' : ''}${rate.length ? ` · ratée${rate.length > 1 ? 's' : ''} : ${rate.join(', ')}` : ''}.`);
+  ouvrirTable();
+}
 async function demarrer() {
+  const plusieurs = lireListes($('#entree').value);
+  if (plusieurs.length > 1) return demarrerPlusieurs(plusieurs);
   const e = lireEntree($('#entree').value);
   if (!e) { toast('Je ne trouve pas de lien de playlist ou de morceau YouTube.'); return; }
   T.derniere = $('#entree').value.trim(); // la playlist de tous les jours : elle sera déjà là la prochaine fois
@@ -722,7 +771,8 @@ function rendreListes() {
     ? cles.map(k => {
         const l = T.listes[k];
         const faits = l.ids.filter(x => l.decisions[x]).length;
-        const nom = k === SITE ? 'Le site actuel' : `Playlist ${++n}`;
+        const num = k === SITE ? 0 : ++n;
+        const nom = k === SITE ? 'Le site actuel' : esc(l.nom || `Playlist ${num}`);
         return `<button class="liste-pastille" data-cle="${esc(k)}" aria-pressed="${k === T.active}">${nom} (${faits}/${l.ids.length}${l.complet ? '' : '+'})</button>`;
       }).join('')
     : '';
