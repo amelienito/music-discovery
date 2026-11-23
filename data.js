@@ -375,30 +375,6 @@ const MORCEAUX = [
     tags: ["ambient", "synthés", "japon", "minimal"],
     energie: 1, etrange: 6, danse: 0 },
 
-  { titre: "Symphonie n° 6 : I. Allegro energico, ma non troppo", artiste: "Mahler, Berliner Philharmoniker", album: "",
-    lien: "https://music.youtube.com/watch?v=hoVnIDmuwLw", note: "", connu: true,
-    ambiance: "epopee", style: "Symphonie tragique", annee: 1904, bpm: 120, voix: "instru",
-    tags: ["classique", "orchestre", "cuivres", "romantique"],
-    energie: 8, etrange: 4, danse: 1 },
-
-  { titre: "Symphonie n° 2 : IV. Finale (Allegro moderato)", artiste: "Sibelius, Berliner Philharmoniker", album: "",
-    lien: "https://music.youtube.com/watch?v=-10jYSvWYeI", note: "", connu: true,
-    ambiance: "epopee", style: "Finale symphonique", annee: 1902, bpm: 100, voix: "instru",
-    tags: ["classique", "orchestre", "cuivres", "romantique"],
-    energie: 6, etrange: 3, danse: 0 },
-
-  { titre: "Resurrections", artiste: "Lena Raine", album: "Celeste (Original Soundtrack)",
-    lien: "https://music.youtube.com/watch?v=-YjgOzSQNQ0", note: "",
-    ambiance: "epopee", style: "Musique de jeu vidéo", annee: 2018, bpm: 120, voix: "instru",
-    tags: ["bo", "electro", "piano", "synthés"],
-    energie: 6, etrange: 4, danse: 4 },
-
-  { titre: "Moments (Voice Memo)", artiste: "Teesa", album: "Moments (Voice Memo)",
-    lien: "https://music.youtube.com/watch?v=R8BmJxhrZdo", note: "",
-    ambiance: "brume", style: "Mémo vocal intime", annee: 2023, bpm: 70, voix: "chant",
-    tags: ["rnb", "lofi", "mélancolique", "voix aérienne"],
-    energie: 1, etrange: 7, danse: 0 },
-
   { titre: "Wake Up Everybody", artiste: "Harold Melvin & The Blue Notes", album: "Wake Up Everybody",
     lien: "https://music.youtube.com/watch?v=FMR6eMHjqIo", note: "",
     ambiance: "soleil", style: "Philly soul", annee: 1975, bpm: 100, voix: "chant",
@@ -411,23 +387,11 @@ const MORCEAUX = [
     tags: ["soul", "disco", "cordes", "solaire"],
     energie: 5, etrange: 3, danse: 6 },
 
-  { titre: "Swing and Jump", artiste: "Alba Lamar", album: "",
-    lien: "https://music.youtube.com/watch?v=pNPw1PZboWI", note: "",
-    ambiance: "piste", style: "Électro swing", annee: 2015, bpm: 125, voix: "instru",
-    tags: ["electro", "swing", "jazz", "club"],
-    energie: 7, etrange: 5, danse: 8 },
-
   { titre: "Overjoyed", artiste: "Stevie Wonder", album: "In Square Circle",
     lien: "https://music.youtube.com/watch?v=678STgx-Esw", note: "J'y crois à la théorie qu'il est pas vraiment aveugle",
     ambiance: "soleil", style: "Soul ballade", annee: 1985, bpm: 72, voix: "chant",
     tags: ["soul", "ballade", "piano", "motown"],
     energie: 2, etrange: 2, danse: 2 },
-
-  { titre: "Concerto pour piano n° 21 : II. Andante", artiste: "Mozart, London Mozart Players", album: "",
-    lien: "https://music.youtube.com/watch?v=sgqtFZ9S5sA", note: "", connu: true,
-    ambiance: "brume", style: "Classique", annee: 1785, bpm: 60, voix: "instru",
-    tags: ["classique", "piano", "orchestre", "ballade"],
-    energie: 1, etrange: 1, danse: 0 },
 
   { titre: "My Cherie Amour", artiste: "Stevie Wonder", album: "My Cherie Amour",
     lien: "https://music.youtube.com/watch?v=Fjufjv4rH0s", note: "",
@@ -507,12 +471,6 @@ const MORCEAUX = [
     tags: ["soul", "philly", "ballade", "cordes"],
     energie: 2, etrange: 2, danse: 3 },
 
-  { titre: "The Adults Are Talking", artiste: "The Strokes", album: "The New Abnormal",
-    lien: "https://music.youtube.com/watch?v=826mxiKjoP0", note: "",
-    ambiance: "electrique", style: "Rock indé new-yorkais", annee: 2020, bpm: 165, voix: "chant",
-    tags: ["rock", "indie", "guitares", "new york"],
-    energie: 6, etrange: 2, danse: 6 },
-
   { titre: "The Weekend (Radio Edit)", artiste: "Michael Gray", album: "The Weekend",
     lien: "https://music.youtube.com/watch?v=uDGJ9DyF25I", note: "Juste, j'adore ce son",
     ambiance: "piste", style: "House disco", annee: 2004, bpm: 127, voix: "chant",
@@ -561,12 +519,6 @@ const MORCEAUX = [
     tags: ["latin", "club", "electro", "reggaeton"],
     energie: 7, etrange: 6, danse: 8 },
 
-  { titre: "MINIBUS AVEC LES PETITS", artiste: "Igouh", album: "l'argent 2 la caf vol.2",
-    lien: "https://music.youtube.com/watch?v=4xeY7BinY9E", note: "",
-    ambiance: "bitume", style: "Rap français", annee: 2024, bpm: 140, voix: "rap",
-    tags: ["rap", "france", "trap", "nocturne"],
-    energie: 7, etrange: 6, danse: 6 },
-
   { titre: "STOPLIGHT", artiste: "SUMIN", album: "MINISERIES 2",
     lien: "https://music.youtube.com/watch?v=Ox3uJaLsXgI", note: "Je suis tellement en propagande",
     ambiance: "piste", style: "R&B électronique coréen", annee: 2024, bpm: 110, voix: "chant",
@@ -597,41 +549,17 @@ const MORCEAUX = [
     tags: ["metal", "guitares", "rapide", "expérimental"],
     energie: 10, etrange: 8, danse: 3 },
 
-  { titre: "Hooked (Remastered)", artiste: "D.R.I.", album: "Crossover",
-    lien: "https://music.youtube.com/watch?v=PXIuSHT4YoE", note: "",
-    ambiance: "electrique", style: "Crossover thrash", annee: 1987, bpm: 200, voix: "chant",
-    tags: ["punk", "metal", "guitares", "rapide"],
-    energie: 10, etrange: 5, danse: 3 },
-
-  { titre: "Private Valet", artiste: "Larry June", album: "Spaceships on the Blade",
-    lien: "https://music.youtube.com/watch?v=TIBbr_u9gBc", note: "",
-    ambiance: "bitume", style: "Rap West Coast cool", annee: 2022, bpm: 85, voix: "rap",
-    tags: ["rap", "samples soul", "solaire", "west coast"],
-    energie: 4, etrange: 3, danse: 5 },
-
   { titre: "All of Me", artiste: "Andrus, Blackwood & Co.", album: "Following You",
     lien: "https://music.youtube.com/watch?v=t2mSibwG6Hg", note: "",
     ambiance: "soleil", style: "Gospel soul", annee: 1978, bpm: 105, voix: "chant",
     tags: ["soul", "gospel", "funk", "jazz"],
     energie: 5, etrange: 5, danse: 6 },
 
-  { titre: "Glue Song (feat. Clairo)", artiste: "beabadoobee", album: "Glue Song (feat. Clairo)",
-    lien: "https://music.youtube.com/watch?v=9Yy4-LCOi34", note: "",
-    ambiance: "brume", style: "Folk-pop indé", annee: 2023, bpm: 80, voix: "chant",
-    tags: ["indie", "folk", "ballade", "guitares"],
-    energie: 2, etrange: 2, danse: 2 },
-
   { titre: "we fell in love in october", artiste: "girl in red", album: "we fell in love in october / forget her",
     lien: "https://music.youtube.com/watch?v=FJX0JPXD2nM", note: "Vu que je suis une Tumblr Girl apparemment",
     ambiance: "electrique", style: "Bedroom pop", annee: 2018, bpm: 105, voix: "chant",
     tags: ["indie", "pop", "guitares", "mélancolique"],
     energie: 2, etrange: 2, danse: 2 },
-
-  { titre: "BEST INTEREST", artiste: "Tyler, The Creator", album: "BEST INTEREST",
-    lien: "https://music.youtube.com/watch?v=37kWL6Qowq4", note: "",
-    ambiance: "soleil", style: "Rap néo-soul", annee: 2019, bpm: 90, voix: "rap",
-    tags: ["rap", "soul", "rnb", "solaire"],
-    energie: 4, etrange: 3, danse: 5 },
 
   { titre: "A Lot Has Changed (Rough Trade Session)", artiste: "Weyes Blood", album: "Rough Trade Session",
     lien: "https://music.youtube.com/watch?v=NmFqLz6tyLA", note: "Miam",
@@ -640,18 +568,6 @@ const MORCEAUX = [
     energie: 2, etrange: 4, danse: 1 },
 
   /* ─── arrivés depuis la table de tri, octobre 2026 ─── */
-  { titre: "Piano Concerto in G: II. Adagio assai", artiste: "Ravel, Krystian Zimerman", album: "",
-    lien: "https://music.youtube.com/watch?v=W1hyEjZros8", note: "",
-    ambiance: "brume", style: "Concerto impressionniste", annee: 1931, bpm: 60, voix: "instru",
-    tags: ["classique", "piano", "orchestre", "ballade"],
-    energie: 1, etrange: 2, danse: 0 },
-
-  { titre: "I Thought I Saw Your Face Today", artiste: "She & Him", album: "Volume One",
-    lien: "https://music.youtube.com/watch?v=HJstyRBLqBQ", note: "",
-    ambiance: "brume", style: "Pop rétro douce", annee: 2008, bpm: 80, voix: "chant",
-    tags: ["indie", "pop", "ballade", "rétro"],
-    energie: 3, etrange: 2, danse: 3 },
-
   { titre: "Bag of Bones", artiste: "Mitski", album: "Retired from Sad, New Career in Business",
     lien: "https://music.youtube.com/watch?v=o3iak3BjFzY", note: "Ce sera pas le seul Mitski (déso pas déso)",
     ambiance: "electrique", style: "Indie orchestral", annee: 2013, bpm: 100, voix: "chant",
@@ -742,12 +658,6 @@ const MORCEAUX = [
     tags: ["bresil", "samba", "jazz", "piano"],
     energie: 3, etrange: 2, danse: 5 },
 
-  { titre: "On My Block", artiste: "Scarface", album: "The Fix",
-    lien: "https://music.youtube.com/watch?v=3cVoaF64aco", note: "",
-    ambiance: "bitume", style: "Rap sudiste, samples soul", annee: 2002, bpm: 88, voix: "rap",
-    tags: ["rap", "sud", "samples soul", "nocturne"],
-    energie: 5, etrange: 3, danse: 5 },
-
   { titre: "Stay Fly", artiste: "Three 6 Mafia feat. Young Buck, 8Ball & MJG", album: "Most Known Unknowns",
     lien: "https://music.youtube.com/watch?v=U_jq38d3FFI", note: "Top 5 morceaux",
     ambiance: "bitume", style: "Rap sudiste, Memphis", annee: 2005, bpm: 82, voix: "rap",
@@ -785,7 +695,7 @@ const MORCEAUX = [
     energie: 5, etrange: 2, danse: 6 },
 
   { titre: "Azucar", artiste: "Earl Sweatshirt", album: "Some Rap Songs",
-    lien: "https://music.youtube.com/watch?v=-hA-81XOCgM", note: "La plus grande minute de rap contemporain", secours: { lien: "https://music.youtube.com/watch?v=188lJwrhmic", note: "La plus grande minute de rap contemporain" },
+    lien: "https://music.youtube.com/watch?v=-hA-81XOCgM", note: "Pitié, guettez la transition sample/morceau", secours: { lien: "https://music.youtube.com/watch?v=188lJwrhmic", note: "La plus grande minute de rap contemporain" },
     ambiance: "ailleurs", style: "Rap abstrait, samples", annee: 2018, bpm: 80, voix: "rap",
     tags: ["rap", "abstrait", "samples", "jazz"],
     energie: 4, etrange: 7, danse: 3 },
@@ -921,12 +831,6 @@ const MORCEAUX = [
     ambiance: "electrique", style: "J-rock, pop rock japonaise", bpm: 150, voix: "chant",
     tags: ["japon", "rock", "guitares", "pop"],
     energie: 6, etrange: 4, danse: 4 },
-
-  { titre: "Common Man", artiste: "David Ruffin", album: "",
-    lien: "https://music.youtube.com/watch?v=VN4RsPongvI", note: "Ça fait bcp de David Ruffin mais joli sample",
-    ambiance: "soleil", style: "Soul seventies", bpm: 90, voix: "chant",
-    tags: ["soul", "samples", "cordes"],
-    energie: 4, etrange: 3, danse: 4 },
 
   { titre: "How Can You Mend a Broken Heart", artiste: "Al Green", album: "Let's Stay Together",
     lien: "https://music.youtube.com/watch?v=SuQJZp2yWc0", note: "Répondez-lui pitié", connu: true,
@@ -1084,12 +988,6 @@ const MORCEAUX = [
     tags: ["rap", "underground"],
     energie: 7, etrange: 6, danse: 6 },
 
-  { titre: "Orchids and Roses", artiste: "The Symphonia Orchestra", album: "",
-    lien: "https://music.youtube.com/watch?v=By6epz3PseA", note: "M'accompagneriez-vous pour une dernière danse ?",
-    ambiance: "brume", style: "Easy listening, cordes", bpm: 80, voix: "instru",
-    tags: ["easy listening", "cordes", "slow", "vintage"],
-    energie: 2, etrange: 4, danse: 3 },
-
   { titre: "Clock Town (Day 1, Day 2, Day 3 & Final Hours)", artiste: "The Legend of Zelda: Majora's Mask", album: "",
     lien: "https://music.youtube.com/watch?v=K0kXVfqPrLs", note: "Ça va monter en mode « stress » au fil de l'écoute si jamais (j'adore)",
     ambiance: "epopee", style: "BO de jeu vidéo", annee: 2000, bpm: 125, voix: "instru",
@@ -1234,12 +1132,6 @@ const MORCEAUX = [
     tags: ["rnb", "nineties", "soirée", "uk"],
     energie: 6, etrange: 1, danse: 7 },
 
-  { titre: "B.M.F. (Blowin' Money Fast)", artiste: "Rick Ross feat. Styles P", album: "Teflon Don",
-    lien: "https://music.youtube.com/watch?v=bdTAlbL72W8", note: "Pourquoi se priver ?", pochette: 'maison',
-    ambiance: "bitume", style: "Rap de Miami", annee: 2010, bpm: 80, voix: "rap",
-    tags: ["rap", "miami", "trap", "lourd"],
-    energie: 8, etrange: 2, danse: 6 },
-
   { titre: "Inédit", artiste: "Booba", album: "",
     lien: "https://music.youtube.com/watch?v=_Vdt0ThfC_s", note: "Temps Mort est son meilleur album (ou celui sur lequel il est le + en maîtrise)",
     ambiance: "bitume", style: "Rap français", bpm: 90, voix: "rap",
@@ -1321,23 +1213,11 @@ const MORCEAUX = [
     tags: ["rap", "boom bap", "griselda", "buffalo"],
     energie: 6, etrange: 5, danse: 3 },
 
-  { titre: "Blasé", artiste: "Niro", album: "OX7",
-    lien: "https://music.youtube.com/watch?v=cuV18iAS_EE", note: "",
-    ambiance: "bitume", style: "Rap français sombre", annee: 2017, bpm: 76, voix: "rap",
-    tags: ["rap", "rap français", "sombre"],
-    energie: 5, etrange: 5, danse: 3 },
-
   { titre: "Sunny Days", artiste: "SahBabii feat. itzMrT3", album: "S.A.N.D.A.S.",
     lien: "https://music.youtube.com/watch?v=FWCaOMab4QU", note: "AirPods dans l'avion en disant au revoir à la France macronienne",
     ambiance: "soleil", style: "Trap mélodique d'Atlanta", annee: 2017, bpm: 136, voix: "rap",
     tags: ["rap", "trap", "mélodique", "atlanta"],
     energie: 4, etrange: 6, danse: 5 },
-
-  { titre: "Comme si", artiste: "SCH", album: "A7",
-    lien: "https://music.youtube.com/watch?v=SlBSwK_5xn8", note: "Comment te retrouver ?",
-    ambiance: "bitume", style: "Rap marseillais nocturne", annee: 2015, bpm: 72, voix: "rap",
-    tags: ["rap", "rap français", "marseille", "nuit"],
-    energie: 4, etrange: 3, danse: 4 },
 
   { titre: "Silkk da Shocka", artiste: "Isaiah Rashad feat. Syd", album: "The Sun's Tirade",
     lien: "https://music.youtube.com/watch?v=L2xLbDlNhFo", note: "", secours: { lien: "https://music.youtube.com/watch?v=x-kKDPTKuNs", note: "" },
@@ -1363,29 +1243,11 @@ const MORCEAUX = [
     tags: ["rap", "samples soul", "just blaze", "new york"],
     energie: 4, etrange: 3, danse: 4 },
 
-  { titre: "J'suis pas un player", artiste: "Alpha Wann", album: "",
-    lien: "https://music.youtube.com/watch?v=VUmghnF4nYg", note: "",
-    ambiance: "bitume", style: "Rap français technique, hors projet", bpm: 90, voix: "rap",
-    tags: ["rap", "rap français", "egotrip"],
-    energie: 6, etrange: 4, danse: 4 },
-
   { titre: "Les maux", artiste: "Tandem", album: "Ceux qui le savent m'écoutent",
     lien: "https://music.youtube.com/watch?v=sWlNspjdH_I", note: "", secours: { lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "" },
     ambiance: "bitume", style: "Rap du 93", annee: 2001, bpm: 90, voix: "rap",
     tags: ["rap", "rap français", "93", "hardcore"],
     energie: 6, etrange: 6, danse: 3 },
-
-  { titre: "Can You Keep Up", artiste: "Busta Rhymes feat. Twista", album: "",
-    lien: "https://music.youtube.com/watch?v=veflCk2rHfA", note: "",
-    ambiance: "bitume", style: "Rap à toute vitesse", bpm: 95, voix: "rap",
-    tags: ["rap", "flow rapide", "chicago", "new york"],
-    energie: 9, etrange: 4, danse: 5 },
-
-  { titre: "Best Day Ever", artiste: "Mac Miller", album: "Best Day Ever",
-    lien: "https://music.youtube.com/watch?v=AbV-Q6tz4B8", note: "RIP également", debut: 95,
-    ambiance: "soleil", style: "Rap insouciant de Pittsburgh", annee: 2011, bpm: 90, voix: "rap",
-    tags: ["rap", "samples", "insouciance"],
-    energie: 4, etrange: 3, danse: 5 },
 
   { titre: "Dur d'y croire", artiste: "Salif", album: "Tous ensemble, chacun pour soi",
     lien: "https://music.youtube.com/watch?v=uxCdfgDZx-I", note: "", secours: { lien: "https://music.youtube.com/watch?v=dIh0RVeuQ_o", note: "" },
@@ -1398,12 +1260,6 @@ const MORCEAUX = [
     ambiance: "bitume", style: "Rap hardcore de Villiers-le-Bel", annee: 1998, bpm: 92, voix: "rap",
     tags: ["rap", "rap français", "hardcore", "années 90"],
     energie: 7, etrange: 4, danse: 3 },
-
-  { titre: "Mockingbird", artiste: "Eminem", album: "Encore",
-    lien: "https://music.youtube.com/watch?v=9kznlAwE-8o", note: "", secours: { lien: "https://music.youtube.com/watch?v=S9bCLPwzSC0", note: "" },
-    ambiance: "brume", style: "Rap intime", annee: 2004, bpm: 84, voix: "rap",
-    tags: ["rap", "intime", "piano"],
-    energie: 3, etrange: 1, danse: 2 },
 
   { titre: "Surnakkurel 3", artiste: "Nakk", album: "Street Minimum",
     lien: "https://music.youtube.com/watch?v=UG3YB-fwhfE", note: "Le refrain peut sauver si jamais",
@@ -1422,12 +1278,6 @@ const MORCEAUX = [
     ambiance: "bitume", style: "Rap de Memphis", annee: 2000, bpm: 75, voix: "rap",
     tags: ["rap", "rap du sud", "memphis"],
     energie: 5, etrange: 4, danse: 6 },
-
-  { titre: "L'unité", artiste: "La Fouine feat. J-Mi Sissoko", album: "Bourré au son",
-    lien: "https://music.youtube.com/watch?v=B51xiSIIaco", note: "",
-    ambiance: "bitume", style: "Rap français", annee: 2005, bpm: 90, voix: "rap",
-    tags: ["rap", "rap français", "fraternité"],
-    energie: 6, etrange: 4, danse: 4 },
 
   { titre: "Quand j'serai grand", artiste: "Fabe", album: "Détournement de son",
     lien: "https://music.youtube.com/watch?v=z5hMSSiRppE", note: "Dédicace à ceux qui partent et ceux qui partent pas", secours: { lien: "https://music.youtube.com/watch?v=-VJsvx2UAR0", note: "Dédicace à ceux qui partent et ceux qui partent pas" },
@@ -1452,12 +1302,6 @@ const MORCEAUX = [
     ambiance: "soleil", style: "Rap du Sud, soul", annee: 1996, bpm: 66, voix: "rap",
     tags: ["rap", "rap du sud", "soul", "houston"],
     energie: 3, etrange: 5, danse: 4 },
-
-  { titre: "Chanson triste", artiste: "Nakk", album: "Street Minimum",
-    lien: "https://music.youtube.com/watch?v=Ve3UoaTj7YE", note: "", secours: { lien: "https://music.youtube.com/watch?v=O5qpCh3fAB0", note: "" },
-    ambiance: "brume", style: "Rap français mélancolique", annee: 2005, bpm: 80, voix: "rap",
-    tags: ["rap", "rap français", "mélancolie"],
-    energie: 3, etrange: 7, danse: 3 },
 
 
   // ajouts du 22 nov. (table de tri)
@@ -1575,6 +1419,44 @@ const MORCEAUX = [
     ambiance: "bitume", style: "Rap français", annee: 2008, bpm: 90, voix: "rap",
     tags: ["rap", "france", "pop-rap", "nostalgie"],
     energie: 5, etrange: 2, danse: 3 },
+
+  // ajouts du 24 nov. (table de tri)
+
+  { titre: "endlessly", artiste: "Chanpan",
+    lien: "https://music.youtube.com/watch?v=D_g4udDanNM",
+    ambiance: "soleil", style: "Dance pop jazzy", bpm: 110, voix: "chant",
+    tags: ["pop", "jazzy", "dance", "new york"],
+    energie: 5, etrange: 5, danse: 6 },
+
+  { titre: "Stormy", artiste: "The Third Wave",
+    lien: "https://music.youtube.com/watch?v=ToDZ_iFcCvA",
+    ambiance: "brume", style: "Soul psychédélique", bpm: 96, voix: "chant",
+    tags: ["soul", "rétro", "orage", "groove"],
+    energie: 4, etrange: 6, danse: 4 },
+
+  { titre: "(titre invisible)", artiste: "Emma Vansen",
+    lien: "https://music.youtube.com/watch?v=3MsW-OuXiIo", note: "Elles avancent doucement",
+    ambiance: "brume", style: "Pop lo-fi", bpm: 90, voix: "chant",
+    tags: ["lo-fi", "indie pop", "rêveur", "doux"],
+    energie: 2, etrange: 7, danse: 2 },
+
+  { titre: "Quand j'serais grand", artiste: "Fabe", album: "Détournement de son",
+    lien: "https://music.youtube.com/watch?v=-VJsvx2UAR0",
+    ambiance: "bitume", style: "Rap français", annee: 1998, bpm: 92, voix: "rap",
+    tags: ["rap", "france", "années 90", "nostalgie"],
+    energie: 5, etrange: 3, danse: 3 },
+
+  { titre: "Dear Summer", artiste: "Jay-Z",
+    lien: "https://music.youtube.com/watch?v=KnK0Ra2RWmU",
+    ambiance: "soleil", style: "Rap new-yorkais", annee: 2005, bpm: 90, voix: "rap",
+    tags: ["rap", "new york", "été", "samples"],
+    energie: 5, etrange: 3, danse: 4 },
+
+  { titre: "Jour 2 Tonnerre", artiste: "Ärsenik", album: "Quelques gouttes suffisent",
+    lien: "https://music.youtube.com/watch?v=qkHhJww1KY4",
+    ambiance: "bitume", style: "Rap français", annee: 1998, bpm: 90, voix: "rap",
+    tags: ["rap", "france", "années 90", "banlieue"],
+    energie: 5, etrange: 3, danse: 4 },
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
@@ -1614,4 +1496,30 @@ const RETIRES = [
   "https://music.youtube.com/watch?v=BrtHiMisC5o", // Prodigy, Genesis (remplacé par Mac 10 Handle)
   "https://music.youtube.com/watch?v=NR5ZOBh7O04", // Jacques Brel, La Valse à mille temps (écarté le 22 nov.)
   "https://music.youtube.com/watch?v=fc24JSufIlM", // Joke, Max B (doublon : Ateyaba, Max B est déjà sur le site)
+  "https://music.youtube.com/watch?v=hoVnIDmuwLw", // Mahler, Berliner Philharmoniker, Symphonie n° 6 : I. Allegro energico, ma non troppo (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=-10jYSvWYeI", // Sibelius, Berliner Philharmoniker, Symphonie n° 2 : IV. Finale (Allegro moderato) (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=-YjgOzSQNQ0", // Lena Raine, Resurrections (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=R8BmJxhrZdo", // Teesa, Moments (Voice Memo) (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=pNPw1PZboWI", // Alba Lamar, Swing and Jump (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=sgqtFZ9S5sA", // Mozart, London Mozart Players, Concerto pour piano n° 21 : II. Andante (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=826mxiKjoP0", // The Strokes, The Adults Are Talking (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=4xeY7BinY9E", // Igouh, MINIBUS AVEC LES PETITS (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=PXIuSHT4YoE", // D.R.I., Hooked (Remastered) (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=TIBbr_u9gBc", // Larry June, Private Valet (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=9Yy4-LCOi34", // beabadoobee, Glue Song (feat. Clairo) (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=37kWL6Qowq4", // Tyler, The Creator, BEST INTEREST (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=W1hyEjZros8", // Ravel, Krystian Zimerman, Piano Concerto in G: II. Adagio assai (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=HJstyRBLqBQ", // She & Him, I Thought I Saw Your Face Today (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=3cVoaF64aco", // Scarface, On My Block (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=VN4RsPongvI", // David Ruffin, Common Man (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=By6epz3PseA", // The Symphonia Orchestra, Orchids and Roses (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=bdTAlbL72W8", // Rick Ross feat. Styles P, B.M.F. (Blowin' Money Fast) (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=cuV18iAS_EE", // Niro, Blasé (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=SlBSwK_5xn8", // SCH, Comme si (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=VUmghnF4nYg", // Alpha Wann, J'suis pas un player (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=veflCk2rHfA", // Busta Rhymes feat. Twista, Can You Keep Up (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=AbV-Q6tz4B8", // Mac Miller, Best Day Ever (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=9kznlAwE-8o", // Eminem, Mockingbird (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=B51xiSIIaco", // La Fouine feat. J-Mi Sissoko, L'unité (retiré le 24 nov.)
+  "https://music.youtube.com/watch?v=Ve3UoaTj7YE", // Nakk, Chanson triste (retiré le 24 nov.)
 ];
