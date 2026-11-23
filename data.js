@@ -1220,7 +1220,7 @@ const MORCEAUX = [
     energie: 4, etrange: 6, danse: 5 },
 
   { titre: "Silkk da Shocka", artiste: "Isaiah Rashad feat. Syd", album: "The Sun's Tirade",
-    lien: "https://music.youtube.com/watch?v=L2xLbDlNhFo", note: "", secours: { lien: "https://music.youtube.com/watch?v=x-kKDPTKuNs", note: "" },
+    lien: "https://music.youtube.com/watch?v=L2xLbDlNhFo", note: "Xavi et Iniesta (j'y connais rien en foot)", secours: { lien: "https://music.youtube.com/watch?v=x-kKDPTKuNs", note: "Xavi et Iniesta (j'y connais rien en foot)" },
     ambiance: "brume", style: "Rap lo-fi, TDE", annee: 2016, bpm: 80, voix: "rap",
     tags: ["rap", "lo-fi", "soul", "tde"],
     energie: 3, etrange: 5, danse: 4 },
