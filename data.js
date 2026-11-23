@@ -1244,13 +1244,13 @@ const MORCEAUX = [
     energie: 4, etrange: 3, danse: 4 },
 
   { titre: "Les maux", artiste: "Tandem", album: "Ceux qui le savent m'écoutent",
-    lien: "https://music.youtube.com/watch?v=sWlNspjdH_I", note: "", secours: { lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "" },
+    lien: "https://music.youtube.com/watch?v=sWlNspjdH_I", note: "Comment t’écris ça a 22 ans ?", secours: { lien: "https://music.youtube.com/watch?v=gjUN9ntZaAI", note: "Comment t’écris ça a 22 ans ?" },
     ambiance: "bitume", style: "Rap du 93", annee: 2001, bpm: 90, voix: "rap",
     tags: ["rap", "rap français", "93", "hardcore"],
     energie: 6, etrange: 6, danse: 3 },
 
   { titre: "Dur d'y croire", artiste: "Salif", album: "Tous ensemble, chacun pour soi",
-    lien: "https://music.youtube.com/watch?v=uxCdfgDZx-I", note: "", secours: { lien: "https://music.youtube.com/watch?v=dIh0RVeuQ_o", note: "" },
+    lien: "https://music.youtube.com/watch?v=uxCdfgDZx-I", note: "Pour tous les bons à rien", secours: { lien: "https://music.youtube.com/watch?v=dIh0RVeuQ_o", note: "Pour tous les bons à rien" },
     ambiance: "bitume", style: "Rap de Boulogne, introspectif", annee: 2001, bpm: 90, voix: "rap",
     tags: ["rap", "rap français", "introspectif"],
     energie: 4, etrange: 6, danse: 3 },
@@ -1298,7 +1298,7 @@ const MORCEAUX = [
     energie: 7, etrange: 5, danse: 5 },
 
   { titre: "One Day", artiste: "UGK", album: "Ridin' Dirty",
-    lien: "https://music.youtube.com/watch?v=bu7L8vzuP74", note: "", secours: { lien: "https://music.youtube.com/watch?v=rCWH2MmlHQE", note: "" },
+    lien: "https://music.youtube.com/watch?v=bu7L8vzuP74", note: "Ma Fiat Panda devenait une Cadillac avec ça", secours: { lien: "https://music.youtube.com/watch?v=rCWH2MmlHQE", note: "Ma Fiat Panda devenait une Cadillac avec ça" },
     ambiance: "soleil", style: "Rap du Sud, soul", annee: 1996, bpm: 66, voix: "rap",
     tags: ["rap", "rap du sud", "soul", "houston"],
     energie: 3, etrange: 5, danse: 4 },
