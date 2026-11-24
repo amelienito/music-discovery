@@ -611,7 +611,7 @@ const MORCEAUX = [
     energie: 4, etrange: 6, danse: 5 },
 
   { titre: "Oh! Tengo Suerte", artiste: "Masayoshi Takanaka", album: "Seychelles",
-    lien: "https://music.youtube.com/watch?v=qqgmrDE4p40", note: "Les émotions",
+    lien: "https://music.youtube.com/watch?v=qqgmrDE4p40", note: "Les émotions", debut: 366,
     ambiance: "soleil", style: "Fusion japonaise", annee: 1976, bpm: 120, voix: "instru",
     tags: ["citypop", "japon", "guitares", "latin"],
     energie: 6, etrange: 5, danse: 7 },
