@@ -1201,7 +1201,7 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
 
 /* ─── une seule fois, après un peu d'écoute : l'astuce de « Ma sélection » (jamais par-dessus la vidéo) ─── */
 .aide {
-  position: fixed; z-index: 60; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom)); width: min(340px, calc(100vw - 32px));
+  position: fixed; z-index: 49; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom)); width: min(340px, calc(100vw - 32px));   /* (sous le voile des Réglages et de Ma sélection : l'astuce ne passe plus par-dessus une fenêtre ouverte) */
   display: grid; gap: 12px; padding: 18px 18px 16px; border-radius: 16px;
   background: var(--fond); color: var(--encre); box-shadow: 0 24px 50px -16px rgba(0,0,0,.45), 0 0 0 1px var(--trait);
   opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2);
@@ -1216,6 +1216,12 @@ body.panneau-ouvert .bac, body.panneau-ouvert .reglages { transform: none; }
   font-family: var(--etiquette); font-weight: 700; font-stretch: 88%; font-size: 12px; background: var(--aiguille); color: var(--sur-aiguille, #fff);
 }
 .aide .gros-bouton { justify-self: start; min-height: 38px; padding: 0 18px; font-size: 14px; }
+/* au téléphone, l'astuce prenait près de la moitié de l'écran : plus compacte */
+@media (max-width: 560px) {
+  .aide { right: 12px; left: 12px; width: auto; bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .aide-liste { gap: 6px; }
+  .aide-liste li { font-size: 13.5px; line-height: 1.36; }
+}
 .boucle-texte { font-size: 14.5px; line-height: 1.42; color: var(--encre-2); }
 .boucle .avis-actions { gap: 8px 16px; }
 .boucle .lien-bouton { font-size: 14px; }
