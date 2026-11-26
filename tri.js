@@ -26,7 +26,8 @@ T.coeurs = T.coeurs || {};      // coups de cœur
 T.ressentis = T.ressentis || {};// énergie / étrange / danse, quand tu les as réglés
 T.tard = T.tard || {};
 T.reecouter = T.reecouter || {}; // « à réécouter » : ta liste perso, en plus du oui ou du non          // « oui, mais commentaire plus tard »
-T.jours = T.jours || {};        // nombre de morceaux jugés par jour
+T.jours = T.jours || {};
+T.notesQuand = T.notesQuand || {}; // quand chaque commentaire a été touché : en cas de conflit entre appareils, le plus récent gagne        // nombre de morceaux jugés par jour
 T.objectif = T.objectif || 30;
 T.duree = T.duree || { ms: 0, n: 0 }; // temps moyen passé par morceau
 const L = () => T.listes[T.active];
@@ -94,20 +95,36 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add
 
 /* ─────────── lecteur ─────────── */
 let R = { actif: false }; // le mode révision (rempli plus bas)
+// deux lecteurs : pendant qu'on écoute un morceau, le suivant se charge en silence dans l'autre
+let reserve = null, prevu = null, reservePrete = false;
+let sansPrechargement = (() => { try { return localStorage.getItem('md-tri-sans-prechargement') === '1'; } catch (e) { return false; } })();
 let lecteur = null, pret = false, attenteCue = null, dernierCue = null, courant = null, saut = false, debutFiche = 0;
 window.onYouTubeIframeAPIReady = () => {
-  lecteur = new YT.Player('yt', {
+  lecteur = creerLecteur('yt');
+  if (!sansPrechargement) { reserve = creerLecteur('yt2'); try { reserve.getIframe().classList.add('reserve'); } catch (e) {} }
+};
+function creerLecteur(el) {
+  return new YT.Player(el, {
     width: '100%', height: '100%',
     playerVars: { playsinline: 1, rel: 0, modestbranding: 1, origin: location.origin.startsWith('http') ? location.origin : undefined },
     events: {
-      onReady: () => { pret = true; $('#bouton-charger').disabled = false; $('#bouton-charger').textContent = 'Charger'; },
+      onReady: e => {
+        if (e.target === reserve) { try { e.target.mute(); } catch (er) {} return; }
+        pret = true; $('#bouton-charger').disabled = false; $('#bouton-charger').textContent = 'Charger';
+      },
       onStateChange: e => {
+        // le lecteur de réserve : dès que le morceau suivant démarre (muet), on le met en pause, prêt à partir
+        if (e.target !== lecteur) {
+          if (e.data === YT.PlayerState.PLAYING && !reservePrete) { reservePrete = true; try { e.target.pauseVideo(); } catch (er) {} }
+          return;
+        }
         if (e.data === YT.PlayerState.CUED && attenteCue) { const f = attenteCue; attenteCue = null; f(); }
         if (e.data === YT.PlayerState.PLAYING) { lireInfos(); $('#t-lecture').textContent = 'Pause'; }
         if (e.data === YT.PlayerState.PAUSED) $('#t-lecture').textContent = 'Lecture';
         if (e.data === YT.PlayerState.ENDED) { $('#t-lecture').textContent = 'Relancer'; if (R.actif && $('#rv-auto').checked) revisionSuivant(); }
       },
-      onError: () => {
+      onError: e => {
+        if (e.target !== lecteur) { prevu = null; return; }
         if (!courant) return;
         const l = L();
         l.infos[courant] = Object.assign(l.infos[courant] || {}, { refus: true });
@@ -115,7 +132,34 @@ window.onYouTubeIframeAPIReady = () => {
       }
     }
   });
-};
+}
+function precharger(pour) {
+  if (sansPrechargement || !reserve || R.actif || courant !== pour || !L()) return;
+  const id = prochain(courant);
+  if (!id || id === prevu) return;
+  prevu = id; reservePrete = false;
+  try { reserve.mute(); reserve.loadVideoById({ videoId: id, startSeconds: debut() }); } catch (e) { prevu = null; }
+}
+function basculer(id) {
+  const ancien = lecteur;
+  lecteur = reserve; reserve = ancien;
+  try { lecteur.getIframe().classList.remove('reserve'); reserve.getIframe().classList.add('reserve'); } catch (e) {}
+  try { reserve.stopVideo(); reserve.mute(); } catch (e) {}
+  try { lecteur.unMute(); if (!reservePrete) lecteur.seekTo(debut(), true); lecteur.playVideo(); } catch (e) {}
+  // si l'appareil refuse de lancer le son dans le second lecteur (certains iPhone), on revient au fonctionnement d'avant, pour de bon
+  const v = lecteur;
+  setTimeout(() => {
+    if (lecteur !== v || courant !== id) return;
+    let ok = false;
+    try { ok = v.getPlayerState() === YT.PlayerState.PLAYING && !v.isMuted(); } catch (e) {}
+    if (ok) return;
+    sansPrechargement = true;
+    try { localStorage.setItem('md-tri-sans-prechargement', '1'); } catch (e) {}
+    lecteur = reserve; reserve = v;
+    try { lecteur.getIframe().classList.remove('reserve'); v.getIframe().classList.add('reserve'); v.stopVideo(); } catch (e) {}
+    lecteur.loadVideoById({ videoId: id, startSeconds: debut() });
+  }, 2500);
+}
 const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
 
 function analyser(data) {
@@ -320,6 +364,7 @@ async function demarrerPlusieurs(listes) {
   ouvrirTable();
 }
 async function demarrer() {
+  if (estCode($('#entree').value)) { if (await appliquerCode($('#entree').value)) $('#entree').value = T.derniere || ''; return; }
   const plusieurs = lireListes($('#entree').value);
   if (plusieurs.length > 1) return demarrerPlusieurs(plusieurs);
   const e = lireEntree($('#entree').value);
@@ -400,7 +445,7 @@ function ouvrirTable() {
 }
 
 /* ─────────── le tri ─────────── */
-function prochain() {
+function prochain(sauf) {
   const l = L();
   const vus = T.active === SITE ? {} : dejaTries();
   const restants = [];
@@ -411,9 +456,10 @@ function prochain() {
       if (traite(id)) { l.decisions[id] = 'deja'; continue; }
       if (vus[id]) { l.decisions[id] = 'vu'; continue; }
     }
-    restants.push(id);
+    if (id !== sauf) restants.push(id);
   }
   if (!restants.length) return null;
+  if (!sauf && prevu && restants.includes(prevu)) return prevu;
   // ordre aléatoire : pour ne pas juger un morceau selon ceux qui l'entourent dans la playlist
   return $('#opt-hasard').checked ? restants[Math.floor(Math.random() * restants.length)] : restants[0];
 }
@@ -432,9 +478,12 @@ async function suivant() {
 function ouvrirMorceau(id) {
   courant = id;
   debutFiche = Date.now();
-  lecteur.loadVideoById({ videoId: id, startSeconds: debut() });
+  if (id === prevu && reserve && !sansPrechargement && !R.actif) basculer(id);
+  else lecteur.loadVideoById({ videoId: id, startSeconds: debut() });
+  prevu = null;
   afficherFiche(true);
   majCompteurs();
+  setTimeout(() => precharger(id), 1200);
 }
 // aller voir un morceau précis (frise, revue, bilan) : on peut changer d'avis
 function aller(id) {
@@ -543,6 +592,7 @@ function majCoeur() {
 $('#note').addEventListener('input', () => {
   if (!courant) return;
   const v = $('#note').value;
+  T.notesQuand[courant] = Date.now();
   T.notes[courant] = v;                    // vide aussi : on garde « j'ai effacé » face au texte du site
   if (!v.trim() && !NOTE_SITE[courant]) delete T.notes[courant];
   if (v.trim()) delete T.tard[courant];
@@ -679,6 +729,7 @@ function terminer() {
   replierCharger(false);
   courant = null;
   try { lecteur.stopVideo(); } catch (e) {}
+  try { reserve && reserve.stopVideo(); } catch (e) {} prevu = null;
   $('#table').hidden = true;
   $('#bilan').hidden = true;
   $('#fin').hidden = false;
@@ -937,6 +988,7 @@ $('#revue').addEventListener('click', e => {
 $('#revue').addEventListener('input', e => {
   const t = e.target.closest('[data-note]'); if (!t) return;
   const id = t.closest('[data-id]').dataset.id;
+  T.notesQuand[id] = Date.now();
   T.notes[id] = t.value;
   if (!t.value.trim() && !NOTE_SITE[id]) delete T.notes[id];
   if (t.value.trim()) delete T.tard[id];
@@ -958,29 +1010,90 @@ $('#sauvegarder').addEventListener('click', () => {
 const ouvrirFichier = () => $('#fichier-sauvegarde').click();
 $('#restaurer-1').addEventListener('click', ouvrirFichier);
 $('#restaurer-2').addEventListener('click', ouvrirFichier);
+// fusionner l'état d'un autre appareil : on additionne, et en cas de conflit le choix réel l'emporte sur « déjà vu »,
+// le commentaire le plus récent sur le plus ancien
+function fusionnerEtat(J) {
+  if (!J || typeof J !== 'object' || !J.listes) throw new Error('format');
+  let nouveaux = 0;
+  for (const [k, lj] of Object.entries(J.listes)) {
+    if (k === MIX) continue; // Random se reconstruit tout seul
+    const ici = T.listes[k];
+    if (!ici) { T.listes[k] = lj; nouveaux += Object.keys(lj.decisions || {}).length; continue; }
+    if (lj.nom && !ici.nom) ici.nom = lj.nom;
+    (lj.ids || []).forEach(id => { if (!ici.ids.includes(id)) ici.ids.push(id); });
+    for (const [id, d] of Object.entries(lj.decisions || {})) {
+      const a = ici.decisions[id];
+      if (!a || (JUGE(d) && !JUGE(a))) { ici.decisions[id] = d; if (JUGE(d)) nouveaux++; }
+    }
+    for (const [id, inf] of Object.entries(lj.infos || {})) if (!ici.infos[id]) ici.infos[id] = inf;
+    if (lj.complet === false && ici.ids.length < (lj.ids || []).length) ici.complet = false;
+    ici.historique = (ici.historique || []).concat((lj.historique || []).filter(h => !ici.historique.some(x => (x.id || x) === (h.id || h))));
+  }
+  const quand = J.notesQuand || {};
+  for (const [id, n] of Object.entries(J.notes || {})) {
+    if (T.notes[id] === undefined || (quand[id] || 0) > (T.notesQuand[id] || 0)) {
+      if (T.notes[id] !== n) nouveaux++;
+      T.notes[id] = n; if (quand[id]) T.notesQuand[id] = quand[id];
+    }
+  }
+  for (const cle of ['coeurs', 'ressentis', 'tard', 'reecouter']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) { T[cle][id] = v; nouveaux++; }
+  for (const [j, n] of Object.entries(J.jours || {})) T.jours[j] = Math.max(T.jours[j] || 0, n);
+  T.active = T.active && T.listes[T.active] ? T.active : (J.active && T.listes[J.active] ? J.active : null);
+  if (T.active === MIX) construireMix();
+  sauver(); rendreListes(); majObjectif();
+  if (!$('#voile').hidden) rendreRevue();
+  return nouveaux;
+}
 $('#fichier-sauvegarde').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';
   if (!f) return;
   try {
-    const J = JSON.parse(await f.text());
-    if (!J || typeof J !== 'object' || !J.listes) throw new Error('format');
-    let nouveaux = 0;
-    // on fusionne : rien de ce qui est déjà ici n'est écrasé, sauf les listes absentes
-    for (const [k, lj] of Object.entries(J.listes)) {
-      const ici = T.listes[k];
-      if (!ici) { T.listes[k] = lj; nouveaux += Object.keys(lj.decisions || {}).length; continue; }
-      (lj.ids || []).forEach(id => { if (!ici.ids.includes(id)) ici.ids.push(id); });
-      for (const [id, d] of Object.entries(lj.decisions || {})) if (!ici.decisions[id]) { ici.decisions[id] = d; nouveaux++; }
-      for (const [id, inf] of Object.entries(lj.infos || {})) if (!ici.infos[id]) ici.infos[id] = inf;
-      ici.historique = (ici.historique || []).concat((lj.historique || []).filter(h => !ici.historique.some(x => (x.id || x) === (h.id || h))));
-    }
-    for (const cle of ['notes', 'coeurs', 'ressentis', 'tard', 'reecouter']) for (const [id, v] of Object.entries(J[cle] || {})) if (T[cle][id] === undefined) T[cle][id] = v;
-    for (const [j, n] of Object.entries(J.jours || {})) T.jours[j] = Math.max(T.jours[j] || 0, n);
-    T.active = T.active && T.listes[T.active] ? T.active : (J.active && T.listes[J.active] ? J.active : null);
-    sauver(); rendreListes(); majObjectif();
-    if (!$('#voile').hidden) rendreRevue();
-    toast(nouveaux ? `Sauvegarde restaurée : ${nouveaux} choix récupérés.` : 'Sauvegarde lue : rien de nouveau à ajouter.');
+    const n = fusionnerEtat(JSON.parse(await f.text()));
+    toast(n ? `Sauvegarde restaurée : ${n} choix ou commentaires récupérés.` : 'Sauvegarde lue : rien de nouveau à ajouter.');
   } catch (err) { toast('Ce fichier n\'est pas une sauvegarde de la table de tri.'); }
+});
+// le code de synchro : tout l'état, compressé, à copier sur un appareil et coller sur l'autre
+// (iPhone et Mac sur le même compte Apple : copié sur l'un, collé sur l'autre, sans rien envoyer)
+const PREFIXE = 'MDTRI1:';
+async function versCode() {
+  const brut = new Blob([JSON.stringify(T)]).stream().pipeThrough(new CompressionStream('gzip'));
+  const octets = new Uint8Array(await new Response(brut).arrayBuffer());
+  let b = ''; for (let i = 0; i < octets.length; i += 0x8000) b += String.fromCharCode.apply(null, octets.subarray(i, i + 0x8000));
+  return PREFIXE + btoa(b);
+}
+async function depuisCode(code) {
+  const b = atob(code.trim().slice(PREFIXE.length).replace(/\s+/g, ''));
+  const octets = Uint8Array.from(b, c => c.charCodeAt(0));
+  const flux = new Blob([octets]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return JSON.parse(await new Response(flux).text());
+}
+const estCode = t => String(t || '').trim().startsWith(PREFIXE);
+async function appliquerCode(code) {
+  try {
+    const n = fusionnerEtat(await depuisCode(code));
+    toast(n ? `Synchro faite : ${n} choix ou commentaires récupérés. Pense à recopier dans l'autre sens.` : 'Synchro faite : rien de nouveau, les deux appareils sont à jour.');
+    return true;
+  } catch (e) { toast('Ce code de synchro est incomplet ou abîmé. Recopie-le en entier.'); return false; }
+}
+$('#synchro-copier').addEventListener('click', async () => {
+  // Safari n'accepte la copie que pendant le toucher : on lui donne la promesse du texte tout de suite
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': versCode().then(t => new Blob([t], { type: 'text/plain' })) })]);
+    } else await navigator.clipboard.writeText(await versCode());
+    toast('Progression copiée. Sur l\'autre appareil : « Coller la progression ».');
+  } catch (e) {
+    const t = await versCode();
+    $('#entree').value = t; $('#entree').select();
+    toast('Copie automatique refusée : le code est dans le grand champ, copie-le à la main.');
+  }
+});
+$('#synchro-coller').addEventListener('click', async () => {
+  let t = '';
+  try { t = await navigator.clipboard.readText(); } catch (e) {}
+  if (estCode(t)) return appliquerCode(t);
+  $('#entree').value = ''; $('#entree').focus();
+  toast('Colle le code de synchro dans le grand champ, puis touche Charger.');
 });
 
 /* ─────────── commandes ─────────── */

@@ -350,6 +350,10 @@
     .options { padding-top: 6px; border-top: 1px solid var(--trait); font-size: 13px; }
     /* Random : la frise de 1 000 cases ne dit rien, on la range */
     .mode-mix .frise { display: none; }
+    .ecran iframe { position: absolute; inset: 0; }
+    .ecran iframe.reserve { opacity: 0; pointer-events: none; z-index: -1; }
+    .synchro { display: grid; gap: 10px; padding: 14px; border-radius: 14px; background: color-mix(in srgb, var(--klein) 8%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--klein) 30%, transparent); font-size: 14px; }
+    .synchro .bouton { min-height: 42px; }
     .mode-mix .frise-tete span:first-child { font-size: 0; }
     .mode-mix .frise-tete span:first-child::before { content: "⤨ Random : toutes tes playlists mélangées. Un choix ici compte aussi dans la playlist d'origine."; font-size: 13px; }
     .v { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
@@ -401,12 +405,19 @@
     <p class="memoire" id="memoire">Tes choix et tes commentaires sont enregistrés au fur et à mesure dans ce navigateur. Un morceau déjà trié, ou déjà sur le site, n'est jamais reproposé, même dans une autre playlist.</p>
     <p class="memoire" id="avis-ios" hidden>Sur iPhone, Safari comme Chrome cachent ton compte YouTube aux vidéos intégrées : même avec YouTube Premium, tu as les pubs. Pour trier sans pub : utilise un ordinateur avec Chrome connecté à YouTube. Ou, sur l'iPhone, connecte-toi sur youtube.com dans Safari et coupe « Empêcher le suivi intersites » (Réglages, Apps, Safari) le temps du tri.</p>
     <div class="listes" id="listes"></div>
-    <p class="memoire">Tu changes d'appareil ? <button class="lien" id="restaurer-1">Restaurer une sauvegarde</button></p>
+    <div class="synchro">
+      <p><b>Téléphone et ordi</b> : copie ta progression sur l'un, colle-la sur l'autre. Choix, révisions et commentaires s'additionnent ; pour un même commentaire, le plus récent gagne.</p>
+      <div class="ligne">
+        <button class="bouton bouton-clair" id="synchro-copier">Copier la progression</button>
+        <button class="bouton bouton-clair" id="synchro-coller">Coller la progression</button>
+      </div>
+      <p class="memoire">Sinon, par fichier : <button class="lien" id="restaurer-1">Restaurer une sauvegarde</button></p>
+    </div>
   </section>
 
   <section class="table" id="table" hidden>
     <div class="gauche">
-      <div class="ecran" id="ecran"><div id="yt"></div><div class="verdict-flash" id="flash"></div><div class="rebobine" id="rebobine" aria-hidden="true">⏪ PULL UP</div></div>
+      <div class="ecran" id="ecran"><div id="yt"></div><div id="yt2"></div><div class="verdict-flash" id="flash"></div><div class="rebobine" id="rebobine" aria-hidden="true">⏪ PULL UP</div></div>
     </div>
     <div class="frise-bloc" id="frise-bloc">
       <div class="frise-tete"><span>La playlist, morceau par morceau</span><span id="frise-legende"></span></div>
@@ -554,6 +565,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js?v=44"></script>
-<script src="tri.js?v=29"></script>
+<script src="tri.js?v=30"></script>
 </body>
 </html>
