@@ -93,7 +93,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add
 
 /* ─────────── lecteur ─────────── */
 let R = { actif: false }; // le mode révision (rempli plus bas)
-let lecteur = null, pret = false, attenteCue = null, courant = null, saut = false, debutFiche = 0;
+let lecteur = null, pret = false, attenteCue = null, dernierCue = null, courant = null, saut = false, debutFiche = 0;
 window.onYouTubeIframeAPIReady = () => {
   lecteur = new YT.Player('yt', {
     width: '100%', height: '100%',
@@ -203,13 +203,20 @@ function lireListes(texte) {
 function cuePlaylist(list, index) {
   return new Promise(res => {
     // si le lecteur est déjà « prêt », YouTube ne prévient pas toujours : on vérifie aussi nous-mêmes
+    // quand on enchaîne plusieurs playlists, le lecteur garde un moment la précédente en mémoire :
+    // on n'accepte qu'une liste différente de celle d'avant (sauf si on relit la même playlist)
+    let avant = '';
+    try { avant = (lecteur.getPlaylist() || []).join(','); } catch (e) {}
+    const meme = dernierCue === list;
+    const neuve = pl => pl && pl.length && (meme || pl.join(',') !== avant);
     let fini = false;
-    const finir = v => { if (fini) return; fini = true; clearTimeout(minuterie); clearInterval(sonde); attenteCue = null; res(v); };
-    const minuterie = setTimeout(() => finir(null), 10000);
+    const finir = v => { if (fini) return; fini = true; clearTimeout(minuterie); clearInterval(sonde); attenteCue = null; if (v && v.length) dernierCue = list; res(v); };
+    const minuterie = setTimeout(() => finir(null), 12000);
     const sonde = setInterval(() => {
-      try { const pl = lecteur.getPlaylist(); if (pl && pl.length && lecteur.getPlaylistIndex() === index) finir(pl); } catch (e) {}
+      try { const pl = lecteur.getPlaylist(); if (neuve(pl) && lecteur.getPlaylistIndex() === index) finir(pl); } catch (e) {}
     }, 400);
-    attenteCue = () => finir(lecteur.getPlaylist() || []);
+    const surCue = () => { let pl = null; try { pl = lecteur.getPlaylist(); } catch (e) {} if (neuve(pl)) finir(pl); else if (!fini) attenteCue = surCue; };
+    attenteCue = surCue;
     try { lecteur.stopVideo(); } catch (e) {}
     lecteur.cuePlaylist({ list, listType: 'playlist', index });
   });
