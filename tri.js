@@ -31,6 +31,8 @@ T.objectif = T.objectif || 30;
 T.duree = T.duree || { ms: 0, n: 0 }; // temps moyen passé par morceau
 const L = () => T.listes[T.active];
 const SITE = 'site';
+const MIX = 'mix'; // le mode Random : toutes les playlists mélangées
+const SOURCES = () => Object.entries(T.listes).filter(([k]) => k !== SITE && k !== MIX);
 const TAILLE_MANCHE = 10;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9぀-ヿ一-龯]+/g, '');
@@ -81,9 +83,8 @@ const traite = id => DEJA.has(id) || RETIRES_IDS.has(id);
 // tout ce qui a déjà reçu un oui ou un non, toutes playlists confondues
 function dejaTries() {
   const g = {};
-  for (const [k, l] of Object.entries(T.listes)) {
-    if (k === SITE) continue;
-    for (const [id, d] of Object.entries(l.decisions || {})) if (d === 'oui' || d === 'non') g[id] = d;
+  for (const [, l] of SOURCES()) {
+    for (const [id, d] of Object.entries(l.decisions || {})) if (d === 'oui' || d === 'non' || d === 'passe') g[id] = g[id] === 'oui' || g[id] === 'non' ? g[id] : d;
   }
   return g;
 }
@@ -357,7 +358,37 @@ async function demarrer() {
 // pendant le tri, le formulaire de chargement se replie : le morceau reste en haut de l'écran
 function replierCharger(oui) { $('#charger').hidden = oui; $('#ouvrir-charger').hidden = false; document.body.classList.toggle('en-tri', oui); }
 $('#ouvrir-charger').addEventListener('click', () => { const h = $('#charger').hidden; $('#charger').hidden = !h; if (h) { rendreListes(); $('#charger').scrollIntoView({ behavior: 'smooth' }); } });
+// Random : ce qui reste à trier dans toutes tes playlists, mélangé. Ce qui y est jugé l'est aussi dans ses playlists d'origine.
+function construireMix() {
+  const m = T.listes[MIX] = T.listes[MIX] || { nom: 'Random', list: null, ids: [], infos: {}, decisions: {}, historique: [], complet: true, cree: Date.now() };
+  const vus = dejaTries(), garde = new Set(m.ids.filter(id => m.decisions[id] && m.decisions[id] !== 'vu'));
+  const neufs = [];
+  for (const [, l] of SOURCES()) for (const id of l.ids) {
+    if (garde.has(id) || neufs.includes(id) || l.decisions[id] || vus[id] || traite(id)) continue;
+    neufs.push(id);
+    if (l.infos[id] && !m.infos[id]) m.infos[id] = l.infos[id];
+  }
+  for (let i = neufs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [neufs[i], neufs[j]] = [neufs[j], neufs[i]]; }
+  m.ids = [...m.ids.filter(id => garde.has(id)), ...neufs];
+  Object.keys(m.decisions).forEach(id => { if (!garde.has(id)) delete m.decisions[id]; });
+  m.complet = true;
+  return m;
+}
+// une décision prise dans Random (ou son annulation) vaut aussi dans chaque playlist qui contient le morceau
+function refleter(id, v, avant) {
+  const autres = {};
+  for (const [k, l] of SOURCES()) {
+    if (!l.ids.includes(id)) continue;
+    if (avant) { if (avant[k]) l.decisions[id] = avant[k]; else delete l.decisions[id]; continue; }
+    autres[k] = l.decisions[id] || null;
+    l.decisions[id] = v;
+    const inf = T.listes[MIX].infos[id];
+    if (inf && !l.infos[id]) l.infos[id] = inf;
+  }
+  return autres;
+}
 function ouvrirTable() {
+  if (T.active === MIX) construireMix();
   replierCharger(true);
   $('#table').hidden = false;
   $('#bilan').hidden = true;
@@ -374,7 +405,8 @@ function prochain() {
   const restants = [];
   for (const id of l.ids) {
     if (l.decisions[id]) continue;
-    if (T.active !== SITE) {
+    if (T.active === MIX) { if (traite(id) || vus[id]) continue; }
+    else if (T.active !== SITE) {
       if (traite(id)) { l.decisions[id] = 'deja'; continue; }
       if (vus[id]) { l.decisions[id] = 'vu'; continue; }
     }
@@ -600,7 +632,9 @@ function decider(v) {
   const prev = l.decisions[courant];
   l.decisions[courant] = v;
   if (v !== 'oui') delete T.tard[courant];
-  l.historique.push({ id: courant, prev });
+  const h = { id: courant, prev };
+  if (T.active === MIX) h.autres = refleter(courant, v);
+  l.historique.push(h);
   // le temps passé sur un morceau (au-delà de 3 minutes, on suppose une pause)
   if (!prev && JUGE(v)) {
     const ms = Date.now() - debutFiche;
@@ -632,6 +666,7 @@ function annuler() {
   const id = typeof h === 'string' ? h : h.id;
   const prev = typeof h === 'string' ? undefined : h.prev;
   if (prev) l.decisions[id] = prev; else delete l.decisions[id];
+  if (T.active === MIX && h.autres) refleter(id, null, h.autres);
   if (T.jours[jourCle()] > 0 && !prev) T.jours[jourCle()]--;
   sauver();
   $('#bilan').hidden = true; $('#fin').hidden = true; $('#table').hidden = false;
@@ -779,9 +814,17 @@ function rendreExport() {
   $('#revoir-passes').textContent = `Revoir les « pas sûr » (${passes})`;
 }
 function rendreListes() {
-  const cles = Object.keys(T.listes);
+  const cles = Object.keys(T.listes).filter(k => k !== MIX);
   let n = 0;
-  $('#listes').innerHTML = cles.length > 1 || (cles.length === 1 && $('#table').hidden)
+  const nSources = SOURCES().length;
+  let mix = '';
+  if (nSources >= 2) {
+    const m = T.listes[MIX];
+    const faits = m ? m.ids.filter(x => m.decisions[x]).length : 0;
+    const reste = m && T.active === MIX ? m.ids.filter(x => !m.decisions[x]).length : null;
+    mix = `<button class="liste-pastille pastille-mix" data-cle="${MIX}" aria-pressed="${T.active === MIX}"><span aria-hidden="true">⤨</span> Random${m ? ` (${faits}${reste !== null ? '/' + (faits + reste) : ''})` : ''}</button>`;
+  }
+  $('#listes').innerHTML = mix + (cles.length > 1 || (cles.length === 1 && $('#table').hidden)
     ? cles.map(k => {
         const l = T.listes[k];
         const faits = l.ids.filter(x => l.decisions[x]).length;
@@ -789,7 +832,7 @@ function rendreListes() {
         const nom = k === SITE ? 'Le site actuel' : esc(l.nom || `Playlist ${num}`);
         return `<button class="liste-pastille" data-cle="${esc(k)}" aria-pressed="${k === T.active}">${nom} (${faits}/${l.ids.length}${l.complet ? '' : '+'})</button>`;
       }).join('')
-    : '';
+    : '');
 }
 
 /* ─────────── la revue : tout ce qui est jugé, modifiable ─────────── */
@@ -945,7 +988,13 @@ $('#listes').addEventListener('click', e => {
   const b = e.target.closest('[data-cle]');
   if (!b) return;
   if (!pret) return toast('Le lecteur se prépare, une seconde.');
-  T.active = b.dataset.cle; sauver(); ouvrirTable();
+  T.active = b.dataset.cle;
+  if (T.active === MIX) {
+    const m = construireMix();
+    if (!m.ids.some(id => !m.decisions[id])) { sauver(); rendreListes(); return toast('Rien à mélanger : tout est déjà trié.'); }
+    toast(`Random : ${m.ids.filter(id => !m.decisions[id]).length} morceaux de ${SOURCES().length} playlists, mélangés.`);
+  }
+  sauver(); ouvrirTable();
 });
 // trier aussi les morceaux déjà sur le site : vert = il reste, rouge = il sort
 $('#trier-site').addEventListener('click', () => {
@@ -1152,8 +1201,7 @@ function poolRevision(source) {
     MORC.forEach(m => { const id = idDe(m.lien); if (id && !(sl && sl.decisions[id] === 'non')) ajoute(id, { titre: m.titre, artiste: m.artiste, site: true }); });
   }
   if (source !== 'site') {
-    Object.entries(T.listes).forEach(([k, l]) => {
-      if (k === SITE) return;
+    SOURCES().forEach(([, l]) => {
       l.ids.forEach(id => { if (l.decisions[id] === 'oui') ajoute(id, l.infos[id] || {}); });
     });
   }

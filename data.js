@@ -346,7 +346,7 @@ const MORCEAUX = [
     energie: 2, etrange: 2, danse: 3 },
 
   { titre: "premium package", artiste: "SOMA", album: "quêtes secondaires* vol.1",
-    lien: "https://music.youtube.com/watch?v=ycoaG_klmkY", note: "",
+    lien: "https://music.youtube.com/watch?v=ycoaG_klmkY", note: "Je suis facile à séduire",
     ambiance: "ailleurs", style: "Hyperpop", annee: 2023, bpm: 140, voix: "chant",
     tags: ["electro", "hyperpop", "expérimental", "pop"],
     energie: 7, etrange: 8, danse: 6 },
@@ -599,7 +599,7 @@ const MORCEAUX = [
     energie: 3, etrange: 3, danse: 5 },
 
   { titre: "Palm Wine", artiste: "Ezra Collective", album: "Dance, No One's Watching",
-    lien: "https://music.youtube.com/watch?v=w0gJXVxF6dM", note: "",
+    lien: "https://music.youtube.com/watch?v=w0gJXVxF6dM", note: "J'étais choqué qu'ils soient anglais",
     ambiance: "soleil", style: "Jazz londonien, afro", annee: 2024, bpm: 104, voix: "instru",
     tags: ["jazz", "afro", "cuivres", "solaire"],
     energie: 6, etrange: 4, danse: 7 },
@@ -1157,7 +1157,7 @@ const MORCEAUX = [
     energie: 6, etrange: 2, danse: 7 },
 
   { titre: "100 Bars & Gunnin'", artiste: "Ramirez", album: "",
-    lien: "https://music.youtube.com/watch?v=sI_ySt_bdi4", note: "Vu que c'est une radio, autant y aller",
+    lien: "https://music.youtube.com/watch?v=sI_ySt_bdi4", note: "Vu que c'est une radio, autant y aller sur les basses",
     ambiance: "bitume", style: "Rap, phonk de Memphis", bpm: 130, voix: "rap",
     tags: ["rap", "memphis", "phonk", "sombre"],
     energie: 8, etrange: 6, danse: 5 },
@@ -1457,6 +1457,38 @@ const MORCEAUX = [
     ambiance: "bitume", style: "Rap français", annee: 1998, bpm: 90, voix: "rap",
     tags: ["rap", "france", "années 90", "banlieue"],
     energie: 5, etrange: 3, danse: 4 },
+
+  // ajouts du 26 nov. (révision)
+
+  { titre: "Cayendo (Acoustic) [Instrumental]", artiste: "Frank Ocean",
+    lien: "https://music.youtube.com/watch?v=HpLK2ceZQH8", note: "Le moment où Walter White lance des cigarettes dans la piscine",
+    ambiance: "brume", style: "Guitare acoustique", bpm: 80, voix: "instru",
+    tags: ["acoustique", "guitare", "instrumental", "mélancolique"],
+    energie: 2, etrange: 3, danse: 1 },
+
+  { titre: "There Will Never Be Another You", artiste: "Lester Young",
+    lien: "https://music.youtube.com/watch?v=n2wr9FR-m70", note: "J'ai tâché mon t-shirt avec mon bourbon...",
+    ambiance: "brume", style: "Jazz cool", bpm: 120, voix: "instru",
+    tags: ["jazz", "saxophone", "swing", "nocturne"],
+    energie: 3, etrange: 2, danse: 3 },
+
+  { titre: "Those Who Inherit the Will of Fire", artiste: "Naruto Shippuden", album: "Naruto Shippuden OST III",
+    lien: "https://music.youtube.com/watch?v=wknP5Mxmuzw", note: "Pardon mais quel classique",
+    ambiance: "epopee", style: "BO d'anime", bpm: 100, voix: "instru",
+    tags: ["anime", "naruto", "japon", "bo", "épique"],
+    energie: 5, etrange: 3, danse: 1 },
+
+  { titre: "Solace", artiste: "Earl Sweatshirt",
+    lien: "https://music.youtube.com/watch?v=k2HFehg2BfY", note: "Si jamais il vous restait une once de bonne humeur, c'est cadeau",
+    ambiance: "brume", style: "Rap introspectif", annee: 2015, bpm: 70, voix: "rap",
+    tags: ["rap", "lo-fi", "introspectif", "sombre"],
+    energie: 2, etrange: 6, danse: 0 },
+
+  { titre: "Saria's Song (Ocarina of Time) [kalimba]", artiste: "Yoon Soup",
+    lien: "https://music.youtube.com/watch?v=ihrmCz1Mr2E", note: "Vous me dites si ça fait trop de Zelda",
+    ambiance: "soleil", style: "Reprise au kalimba", bpm: 110, voix: "instru",
+    tags: ["jeux vidéo", "zelda", "kalimba", "doux"],
+    energie: 2, etrange: 3, danse: 2 },
 ];
 
 /* Les morceaux retirés exprès (ancienne version, doublon…) : la table de tri
