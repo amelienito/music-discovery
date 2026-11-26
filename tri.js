@@ -389,6 +389,7 @@ function refleter(id, v, avant) {
 }
 function ouvrirTable() {
   if (T.active === MIX) construireMix();
+  document.body.classList.toggle('mode-mix', T.active === MIX);
   replierCharger(true);
   $('#table').hidden = false;
   $('#bilan').hidden = true;

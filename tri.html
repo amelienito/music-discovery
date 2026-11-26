@@ -289,6 +289,79 @@
       .carte.retour, .carte.envol { transition: none; }
     }
   </style>
+
+  <style id="habillage">
+    /* ── habillage : un vrai poste de tri, pas un tableau de bord ── */
+    [data-theme="sombre"] {
+      --fond: radial-gradient(90% 60% at 18% -10%, rgba(111,136,255,.13), transparent 60%), radial-gradient(70% 50% at 100% 0%, rgba(255,190,107,.07), transparent 60%), #111114;
+      --mur-2: #19191e; --carte: #1f1f25; --trait: rgba(236,235,230,.09);
+    }
+    body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    main { max-width: 1180px; }
+    .tete h1 { font-stretch: 75%; font-size: clamp(2.4rem, 6vw, 4.2rem); letter-spacing: -.035em; line-height: .9; }
+    .tete h1::before { content: "Music Discovery"; display: block; margin-bottom: 8px; font: 600 11px/1 "Instrument Sans", sans-serif; font-stretch: 100%; letter-spacing: .22em; text-transform: uppercase; color: var(--klein); }
+    .tete .sous { margin-top: 10px; font-size: 15px; }
+    /* les compteurs : un afficheur, pas des boutons */
+    .compteurs { gap: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--trait); background: color-mix(in srgb, var(--mur-2) 70%, transparent); }
+    .compteur { background: none; box-shadow: none; border-radius: 0; padding: 7px 12px; font-weight: 500; color: var(--encre-2); }
+    .compteur + .compteur { box-shadow: inset 1px 0 0 var(--trait); }
+    .compteur b { color: var(--encre); font-weight: 700; margin-left: 3px; }
+    .bouton-menu, .bascule-theme, .objectif { background: transparent; }
+    .bouton-menu:hover, .bascule-theme:hover { background: var(--mur-2); }
+    .charger { background: color-mix(in srgb, var(--mur-2) 85%, transparent); box-shadow: inset 0 0 0 1px var(--trait), var(--ombre); backdrop-filter: blur(6px); }
+    .liste-pastille { transition: transform .12s, background .12s; }
+    .liste-pastille:hover { transform: translateY(-1px); }
+    .pastille-mix { font-weight: 700; background: linear-gradient(100deg, color-mix(in srgb, var(--klein) 26%, var(--carte)), color-mix(in srgb, var(--doute) 22%, var(--carte))); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--klein) 45%, transparent); }
+    .pastille-mix[aria-pressed="true"] { background: linear-gradient(100deg, var(--klein), color-mix(in srgb, var(--klein) 55%, var(--doute))); }
+    /* la table */
+    @media (min-width: 900px) { .table { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px 28px; } }
+    .ecran { border-radius: 14px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.6), 0 0 0 1px var(--trait); }
+    .carte { padding: 18px 20px 16px; box-shadow: inset 0 0 0 1px var(--trait); background: linear-gradient(180deg, color-mix(in srgb, var(--carte) 100%, #fff 3%), var(--carte)); }
+    .carte h2 { font-stretch: 78%; font-size: clamp(1.8rem, 4vw, 2.7rem); letter-spacing: -.03em; line-height: .95; }
+    .artiste { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--encre-2); }
+    .chaine { font-size: 13px; }
+    .manche-segments i { height: 4px; }
+    /* le commentaire reste bien visible, mais sans néon */
+    .mot { box-shadow: inset 0 0 0 1.5px var(--mot-bord), 0 0 0 4px color-mix(in srgb, var(--mot-bord) 12%, transparent); }
+    .mot textarea { border-width: 1.5px; }
+    /* écoute : une seule barre, discrète */
+    .transport { gap: 0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--trait); width: fit-content; max-width: 100%; }
+    .transport button { background: transparent; box-shadow: none; border-radius: 0; min-height: 40px; color: var(--encre-2); }
+    .transport button + button { box-shadow: inset 1px 0 0 var(--trait); }
+    .transport button:hover { color: var(--encre); background: var(--mur-2); }
+    /* les verdicts d'abord, le pull up ensuite */
+    .fiche { display: flex; flex-direction: column; }
+    .decisions { order: 1; } .pullup { order: 2; } .options { order: 3; } .raccourcis:not(.revision-raccourcis) { order: 4; }
+    .v { position: relative; min-height: 104px; border-radius: 16px; font-stretch: 85%; font-size: 1.7rem; letter-spacing: -.02em; box-shadow: 0 5px 0 rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.18); transition: transform .08s, filter .12s; }
+    .v:hover { filter: brightness(1.07); }
+    .v small { font-stretch: 100%; letter-spacing: 0; }
+    .v-non { background: linear-gradient(180deg, #ec5a46, var(--non)); }
+    .v-oui { background: linear-gradient(180deg, #2fbd74, var(--oui)); }
+    .v-passe { background: linear-gradient(180deg, #ffd08b, var(--doute-fond)); font-size: 1.35rem; }
+    @media (hover: hover) {
+      .verdicts .v::after { position: absolute; top: 9px; right: 10px; min-width: 20px; padding: 1px 5px; border-radius: 5px; font: 600 11px/1.5 "Instrument Sans", sans-serif; background: rgba(0,0,0,.18); color: inherit; opacity: .8; }
+      .v-non::after { content: "←"; } .v-passe::after { content: "↓"; } .v-oui::after { content: "→"; }
+    }
+    .v-tard { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--oui) 70%, transparent); background: transparent; min-height: 48px; }
+    .pullup { min-height: 52px; font-size: 1.1rem; font-stretch: 85%; background: transparent; color: var(--klein); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--klein) 60%, transparent); grid-auto-flow: column; gap: 10px; }
+    .pullup small { opacity: .7; }
+    .pullup:hover { background: color-mix(in srgb, var(--klein) 12%, transparent); }
+    .options { padding-top: 6px; border-top: 1px solid var(--trait); font-size: 13px; }
+    /* Random : la frise de 1 000 cases ne dit rien, on la range */
+    .mode-mix .frise { display: none; }
+    .mode-mix .frise-tete span:first-child::before { content: "⤨ "; }
+    .frise { max-height: 150px; }
+    .frise i { border-radius: 2px; }
+    @media (max-width: 600px) {
+      .tete h1 { font-size: 2.6rem; }
+      .compteurs { width: 100%; justify-content: space-between; }
+      .compteur { padding: 7px 9px; font-size: 13px; }
+      .v { min-height: 88px; font-size: 1.45rem; }
+      .v-passe { font-size: 1.15rem; }
+      .transport { width: 100%; } .transport button { flex: 1; min-width: 0; padding: 0 6px; font-size: 13px; }
+    }
+  </style>
 </head>
 <body>
 <main>
@@ -475,6 +548,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js?v=44"></script>
-<script src="tri.js?v=28"></script>
+<script src="tri.js?v=29"></script>
 </body>
 </html>
