@@ -1035,6 +1035,9 @@ function ouvrirRevue() {
   ouvrirAvant = document.activeElement;
   revueMax = 60;
   $('#voile').hidden = false;
+  // la revue montre les choix de la liste ouverte : on le dit, sinon « Le site actuel » ne montre que ce que tu as gardé
+  const nomListe = !L() ? '' : T.active === SITE ? 'Le site actuel' : T.active === MIX ? 'Random' : (L().nom || 'cette playlist');
+  $('#revue-titre').textContent = nomListe ? `Revue · ${nomListe}` : 'Revue';
   rendreRevue();
   $('#fermer-revue').focus({ preventScroll: true });
 }
