@@ -401,7 +401,7 @@ async function demarrer() {
   ouvrirTable();
 }
 // pendant le tri, le formulaire de chargement se replie : le morceau reste en haut de l'écran
-function replierCharger(oui) { $('#charger').hidden = oui; $('#ouvrir-charger').hidden = false; document.body.classList.toggle('en-tri', oui); }
+function replierCharger(oui) { if (!oui && !courant) $('#progres').hidden = true; $('#charger').hidden = oui; $('#ouvrir-charger').hidden = false; document.body.classList.toggle('en-tri', oui); }
 $('#ouvrir-charger').addEventListener('click', () => { const h = $('#charger').hidden; $('#charger').hidden = !h; if (h) { rendreListes(); $('#charger').scrollIntoView({ behavior: 'smooth' }); } });
 // Random : ce qui reste à trier dans toutes tes playlists, mélangé. Ce qui y est jugé l'est aussi dans ses playlists d'origine.
 function construireMix() {
@@ -655,7 +655,50 @@ function majCompteurs() {
   $('#n-deja').textContent = v.filter(x => x === 'deja' || x === 'vu').length;
   $('#n-reste').textContent = l.ids.filter(x => !l.decisions[x]).length + (l.complet ? '' : '+');
   majObjectif();
+  majProgres();
   rendreExport();
+}
+
+/* ─────────── la progression : ce qui est fait, jamais d'estimation de durée ─────────── */
+const PALIER = 25;
+let palierVu = null;
+function majProgres() {
+  const l = L(), b = $('#progres');
+  if (!l || $('#table').hidden && $('#bilan').hidden) { b.hidden = true; return; }
+  b.hidden = false;
+  const faits = l.ids.filter(x => l.decisions[x]).length, total = l.ids.length || 1;
+  const pct = faits / total * 100;
+  $('#pg-pct').textContent = pct >= 10 || pct === 0 ? Math.floor(pct) : pct.toFixed(1).replace('.', ',');
+  $('#pg-barre').parentElement.style.setProperty('--p', pct + '%');
+  $('#pg-barre').style.width = pct + '%';
+  const nom = T.active === SITE ? 'Le site actuel' : T.active === MIX ? '⤨ Random, toutes tes playlists' : (l.nom || 'Ta playlist');
+  $('#pg-nom').textContent = nom;
+  const jour = T.jours[jourCle()] || 0;
+  const juges = Object.keys(dejaTries()).length + (T.listes[SITE] ? Object.values(T.listes[SITE].decisions).filter(JUGE).length : 0);
+  const palier = Math.floor(juges / PALIER) + 1, dans = juges % PALIER;
+  $('#pg-pied').innerHTML = `<b>${faits}</b> trié${faits > 1 ? 's' : ''} ici · <b>${jour}</b> aujourd'hui · <b>${juges}</b> en tout`;
+  $('#pg-palier').textContent = palier;
+  $('#pg-palier-pied').textContent = `encore ${PALIER - dans}`;
+  $('.pg-palier').style.setProperty('--pp', (dans / PALIER * 100) + '%');
+  // une bulle dans la barre tous les 5 %
+  $('#pg-bulles').innerHTML = Array.from({ length: 19 }, (_, i) => `<b style="left:${(i + 1) * 5}%"></b>`).join('');
+  if (palierVu !== null && palier > palierVu) feterPalier(palier);
+  palierVu = palier;
+}
+function feterPalier(n) {
+  const b = $('#progres');
+  b.classList.remove('fete'); void b.offsetWidth; b.classList.add('fete');
+  toast(`Palier ${n} ! Encore ${PALIER} et tu passes au suivant.`);
+  vibre([12, 40, 12]);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = $('.pg-palier').getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const couleurs = ['#c6f432', '#ff3d7f', '#ffc23c', '#6b3cff', '#3ee0b0', '#5ad1ff'];
+  for (let i = 0; i < 26; i++) {
+    const p = document.createElement('i'); p.className = 'petille';
+    const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 200;
+    p.style.cssText = `left:${cx}px;top:${cy}px;--c:${couleurs[i % couleurs.length]};--t:${8 + Math.random() * 16}px;--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d - 60}px`;
+    document.body.appendChild(p); setTimeout(() => p.remove(), 1100);
+  }
 }
 
 /* ─────────── la frise ─────────── */
@@ -755,6 +798,7 @@ function dureeTexte(ms) {
   return `${h} h${r ? String(r).padStart(2, '0') : ''}`;
 }
 function resteTexte() {
+  return ''; // les estimations de durée découragent : on montre ce qui est fait, pas ce qu'il reste
   const l = L(); if (!l || T.duree.n < 5) return '';
   const reste = l.ids.filter(x => !l.decisions[x]).length;
   if (!reste) return '';
