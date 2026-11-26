@@ -344,13 +344,16 @@
       .v-non::after { content: "←"; } .v-passe::after { content: "↓"; } .v-oui::after { content: "→"; }
     }
     .v-tard { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--oui) 70%, transparent); background: transparent; min-height: 48px; }
-    .pullup { min-height: 52px; font-size: 1.1rem; font-stretch: 85%; background: transparent; color: var(--klein); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--klein) 60%, transparent); grid-auto-flow: column; gap: 10px; }
+    .pullup { min-height: 52px; font-size: 1.1rem; font-stretch: 85%; background: transparent; color: var(--klein); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--klein) 60%, transparent); }
     .pullup small { opacity: .7; }
     .pullup:hover { background: color-mix(in srgb, var(--klein) 12%, transparent); }
     .options { padding-top: 6px; border-top: 1px solid var(--trait); font-size: 13px; }
     /* Random : la frise de 1 000 cases ne dit rien, on la range */
     .mode-mix .frise { display: none; }
-    .mode-mix .frise-tete span:first-child::before { content: "⤨ "; }
+    .mode-mix .frise-tete span:first-child { font-size: 0; }
+    .mode-mix .frise-tete span:first-child::before { content: "⤨ Random : toutes tes playlists mélangées. Un choix ici compte aussi dans la playlist d'origine."; font-size: 13px; }
+    .v { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+    .pullup { display: flex; align-items: baseline; justify-content: center; gap: 10px; }
     .frise { max-height: 150px; }
     .frise i { border-radius: 2px; }
     @media (max-width: 600px) {
