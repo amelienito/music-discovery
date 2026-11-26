@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Table de tri, Music Discovery</title>
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#d6ff3d">
+  <meta name="theme-color" content="#c9a8ff">
   <script>
     // thème choisi la dernière fois (sombre par défaut)
-    document.documentElement.dataset.theme = 'acide';
+    document.documentElement.dataset.theme = 'acide'; try { const c = JSON.parse(localStorage.getItem('md-tri-couleurs') || '{}'); document.documentElement.dataset.palette = c.palette || 'petillant'; } catch (e) {}
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -294,7 +294,7 @@
     /* ═══ AFFICHE : pas de cadres, pas de boîtes. De la couleur à plat, de la typo, et un verre qui se remplit ═══
        chaque morceau a sa couleur (--ton). Le niveau du liquide en bas de l'écran = ce que tu as trié dans la liste. */
     :root:root, :root:root[data-theme] {
-      --ton: #d6ff3d; --encre: #14101a; --encre-2: color-mix(in srgb, var(--encre) 62%, var(--ton));
+      --base: #c9a8ff; --ton: var(--base); --encre: #14101a; --encre-2: color-mix(in srgb, var(--encre) 62%, var(--ton));
       --fond: var(--ton); --mur: var(--ton); --mur-2: color-mix(in srgb, var(--ton) 82%, #fff); --carte: transparent; --champ: transparent;
       --klein: var(--encre); --sur-klein: var(--ton);
       --oui: var(--encre); --non: var(--encre); --doute: var(--encre); --doute-fond: transparent;
@@ -336,7 +336,7 @@
 
     /* ── en-tête : du texte, pas des boutons ── */
     .tete { align-items: baseline; gap: 10px 30px; }
-    .tete h1 { font: 800 clamp(3rem, 9vw, 8.5rem)/.8 var(--titre); font-stretch: 75%; letter-spacing: -.055em; text-transform: lowercase; background: none; border: 0; box-shadow: none; padding: 0; transform: none; }
+    .tete h1 { font: 800 clamp(3rem, 9vw, 8.5rem)/.8 var(--titre); font-stretch: 75%; letter-spacing: -.055em; text-transform: none; background: none; border: 0; box-shadow: none; padding: 0; transform: none; }
     .tete h1::before { content: none; }
     .tete .sous { margin-top: 14px; font: italic 1.35rem/1.25 var(--plume); max-width: 34ch; color: var(--encre); }
     body.en-tri .tete h1 { font-size: clamp(1.8rem, 3.2vw, 2.8rem); }
@@ -395,7 +395,7 @@
     .table { gap: 22px 40px; }
     @media (min-width: 900px) { .table { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
     .ecran { border: 0; border-radius: 4px; box-shadow: none; transform: none; background: var(--encre); }
-    .verdict-flash { font: 800 5rem var(--titre); font-stretch: 75%; text-transform: lowercase; }
+    .verdict-flash { font: 800 5rem var(--titre); font-stretch: 75%; text-transform: none; }
     .verdict-flash.oui, .verdict-flash.non { background: color-mix(in srgb, var(--ton) 88%, transparent); color: var(--encre); }
     .frise-tete { color: var(--encre); }
     .frise i { background: color-mix(in srgb, var(--encre) 14%, transparent); border-radius: 50%; box-shadow: none; }
@@ -425,7 +425,7 @@
 
     /* le commentaire : une ligne d'écriture, à la main */
     .mot { background: none; border: 0; box-shadow: none; border-radius: 0; padding: 0; gap: 8px; }
-    .mot label { font: 600 13px "Instrument Sans", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--encre); }
+    .mot label { font: 600 13px "Instrument Sans", sans-serif; letter-spacing: 0; text-transform: none; font-size: 14px; color: var(--encre); }
     .mot label::before { content: none; }
     .mot textarea { background: none; border: 0; border-bottom: 1.5px solid var(--encre); border-radius: 0; padding: 6px 0 8px; font: italic 1.75rem/1.2 var(--plume); color: var(--encre); min-height: 64px; }
     .mot textarea:focus { box-shadow: none; border-bottom-width: 3px; }
@@ -444,7 +444,7 @@
     body.en-tri:not(.revision) .verdicts { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; height: var(--barre); display: grid; grid-template-columns: 1fr .7fr 1fr; gap: 0;
       background: var(--encre); padding-bottom: env(safe-area-inset-bottom); }
     .v { position: relative; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; min-height: 0; border: 0; border-radius: 0; box-shadow: none; background: none !important;
-      color: var(--ton) !important; font: 800 clamp(2.4rem, 6vw, 5.4rem)/1 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: lowercase; transition: color .15s, letter-spacing .2s; }
+      color: var(--ton) !important; font: 800 clamp(2.4rem, 6vw, 5.4rem)/1 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: none; transition: color .15s, letter-spacing .2s; }
     .v small { font: italic 1.05rem var(--plume); text-transform: none; letter-spacing: 0; opacity: .75; align-self: flex-end; margin-bottom: 1.6em; }
     .v:hover { letter-spacing: -.02em; filter: none; }
     .v:active { transform: none; box-shadow: none; opacity: .6; }
@@ -457,7 +457,7 @@
     .v-tard:active { transform: none; box-shadow: none; }
     .v-tard small { color: var(--encre); font: 600 12px "Instrument Sans", sans-serif; }
     .pullup { display: flex; align-items: baseline; justify-content: flex-start; gap: 12px; width: auto; min-height: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; color: var(--encre);
-      font: 800 2rem/1 var(--titre); font-stretch: 75%; letter-spacing: -.04em; text-transform: lowercase; }
+      font: 800 2rem/1 var(--titre); font-stretch: 75%; letter-spacing: -.04em; text-transform: none; }
     .pullup::before { content: "⟲"; font-size: .8em; }
     .pullup small { font: italic 1.05rem var(--plume); opacity: .8; text-transform: none; letter-spacing: 0; }
     .pullup:hover { background: none; }
@@ -468,20 +468,20 @@
 
     /* écrans de fin, bilan, export, revue : la même affiche */
     .bilan, .export { background: none; border: 0; box-shadow: none; border-radius: 0; padding: 0; max-width: none; }
-    .bilan h2, .export h2 { font: 800 clamp(2.4rem, 6vw, 4.6rem)/.85 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: lowercase; }
+    .bilan h2, .export h2 { font: 800 clamp(2.4rem, 6vw, 4.6rem)/.85 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: none; }
     .bilan .sous, .export .sous { font: italic 1.3rem var(--plume); color: var(--encre); }
     .bilan ul { gap: 0; }
     .bilan li { background: none; border: 0; border-top: 1px solid var(--trait); border-radius: 0; padding: 10px 0; }
     .bilan li .pastille, .bilan li .pastille.oui, .bilan li .pastille.non, .bilan li .pastille.passe { border: 1.5px solid var(--encre); background: none; color: var(--encre); }
     .bilan li .pastille.oui { background: var(--encre); color: var(--ton); }
     .bilan li small, .bilan li q { color: var(--encre); }
-    .fin .gros { font: 800 clamp(3rem, 10vw, 8rem)/.82 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: lowercase; background: none; border: 0; box-shadow: none; transform: none; padding: 0; }
+    .fin .gros { font: 800 clamp(3rem, 10vw, 8rem)/.82 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: none; background: none; border: 0; box-shadow: none; transform: none; padding: 0; }
     .fin .sous { font: italic 1.4rem var(--plume); color: var(--encre); }
     .toast { background: var(--encre); color: var(--ton); border: 0; border-radius: 0; box-shadow: none; font: italic 1.15rem var(--plume); padding: 12px 20px; bottom: calc(var(--barre) + 16px); }
     body:not(.en-tri) .toast { bottom: 24px; }
     .voile { background: color-mix(in srgb, var(--encre) 40%, transparent); }
     .panneau { background: var(--ton); border: 0; box-shadow: none; }
-    .panneau h2 { font: 800 3rem/.85 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: lowercase; }
+    .panneau h2 { font: 800 3rem/.85 var(--titre); font-stretch: 75%; letter-spacing: -.05em; text-transform: none; }
     .stat, .revue li { background: none; border: 0; border-top: 1.5px solid var(--encre); border-radius: 0; box-shadow: none; padding: 10px 0; }
     .stat b { font: 800 2rem var(--titre); font-stretch: 75%; }
     .stat span { color: var(--encre); }
@@ -492,7 +492,7 @@
     .revue .r-nom span { color: var(--encre); opacity: .7; }
     .revue textarea { background: none; border: 0; border-bottom: 1.5px solid var(--encre); border-radius: 0; font: italic 1.2rem var(--plume); }
     .revision-barre { background: none; color: var(--encre); border: 0; border-top: 3px solid var(--encre); border-radius: 0; box-shadow: none; padding: 12px 0 0; }
-    .revision-tete b { color: var(--encre); font: 800 1.6rem var(--titre); font-stretch: 75%; text-transform: lowercase; }
+    .revision-tete b { color: var(--encre); font: 800 1.6rem var(--titre); font-stretch: 75%; text-transform: none; }
     #rv-position { color: var(--encre); }
     .revision-barre .lien { color: var(--encre); }
     .revision-barre .filtre { background: none; color: var(--encre); }
@@ -523,7 +523,21 @@
       body.revision .revision-nav { bottom: 10px; }
       body.ecrit.en-tri:not(.revision) .verdicts { position: static; height: 72px; }
     }
-  </style>
+  
+    /* ── les palettes (Réglages) ── */
+    :root:root[data-palette="doux"] { --ton: color-mix(in srgb, var(--base) 42%, #f4efe8); --encre: #2b2531; }
+    :root:root[data-palette="sombre"] { --ton: color-mix(in srgb, var(--base) 13%, #141118); --encre: color-mix(in srgb, var(--base) 38%, #f6f2ec); }
+    :root:root[data-palette="sombre"] .ecran { background: #000; }
+    .reglages { display: grid; gap: 16px; padding: 18px 0; border-top: 1.5px solid var(--encre); border-bottom: 1.5px solid var(--encre); }
+    .reglages h2 { font: 800 2rem/.9 var(--titre); font-stretch: 75%; letter-spacing: -.04em; }
+    .reglages-ligne { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: baseline; }
+    .reglages-ligne > span { font: italic 1.2rem var(--plume); min-width: 9ch; }
+    .choix-palette { background: none; border: 0; padding: 0 0 2px; font: 700 1.05rem "Instrument Sans", sans-serif; color: var(--encre); text-decoration: underline; text-underline-offset: 5px; text-decoration-color: var(--trait); display: inline-flex; gap: 8px; align-items: center; }
+    .choix-palette[aria-pressed="true"] { background: var(--encre); color: var(--ton); padding: 2px 8px; text-decoration: none; }
+    .choix-palette i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1.5px currentColor; }
+    .reglages label { display: inline-flex; gap: 8px; align-items: center; font-size: 15px; }
+    .reglages input { accent-color: var(--encre); width: 18px; height: 18px; }
+</style>
 </head>
 <body>
 <main>
@@ -543,9 +557,22 @@
       <button class="bouton-menu" id="ouvrir-charger" hidden>Playlists</button>
       <button class="bouton-menu" id="ouvrir-revision" title="Réécouter tes morceaux un par un, pour écrire ou retoucher tes commentaires">Révision</button>
       <button class="bouton-menu" id="ouvrir-revue">Revue</button>
+      <button class="bouton-menu" id="ouvrir-reglages" aria-expanded="false" aria-controls="reglages">Réglages</button>
       <button class="bascule-theme" id="theme"></button>
     </div>
   </div>
+
+  <section class="reglages" id="reglages" hidden aria-label="Réglages des couleurs">
+    <h2>Réglages</h2>
+    <div class="reglages-ligne"><span>Couleurs</span>
+      <button class="choix-palette" data-palette="petillant"><i style="background:#ff5c93"></i>Pétillant</button>
+      <button class="choix-palette" data-palette="doux"><i style="background:#e8c9d6"></i>Doux</button>
+      <button class="choix-palette" data-palette="sombre"><i style="background:#1d1820"></i>Sombre</button>
+    </div>
+    <div class="reglages-ligne"><span>Ambiance</span>
+      <label><input type="checkbox" id="par-morceau"> Une couleur différente pour chaque morceau</label>
+    </div>
+  </section>
 
   <section class="progres" id="progres" hidden aria-live="polite">
     <div class="pg-pct"><b id="pg-pct">0</b><span>%</span></div>
@@ -728,6 +755,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="data.js?v=44"></script>
-<script src="tri.js?v=32"></script>
+<script src="tri.js?v=33"></script>
 </body>
 </html>

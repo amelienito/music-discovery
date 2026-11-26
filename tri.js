@@ -475,14 +475,33 @@ async function suivant() {
   saut = false;
   ouvrirMorceau(id);
 }
-// chaque morceau a sa couleur, toujours la même pour lui
-const TONS = ['#d6ff3d', '#ff5c93', '#ff9a3d', '#5ff0c4', '#c9a8ff', '#7fd9ff', '#ffe14d', '#ff7a6b', '#a6ff8a', '#ffb8e0'];
+// chaque morceau a sa couleur, toujours la même pour lui (sans jaune) ; la palette et ce choix se règlent dans Réglages
+const TONS = ['#ff5c93', '#ff9a3d', '#5ff0c4', '#c9a8ff', '#7fd9ff', '#ff7a6b', '#a6ff8a', '#ffb8e0'];
+const BASE_FIXE = '#c9a8ff';
+const COULEURS = (() => { try { return Object.assign({ palette: 'petillant', parMorceau: true }, JSON.parse(localStorage.getItem('md-tri-couleurs') || '{}')); } catch (e) { return { palette: 'petillant', parMorceau: true }; } })();
+let baseMorceau = BASE_FIXE;
+function appliquerCouleurs() {
+  const r = document.documentElement;
+  r.dataset.palette = COULEURS.palette;
+  r.style.setProperty('--base', COULEURS.parMorceau ? baseMorceau : BASE_FIXE);
+  requestAnimationFrame(() => { const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', getComputedStyle(r).backgroundColor); });
+  document.querySelectorAll('.choix-palette').forEach(b => b.setAttribute('aria-pressed', b.dataset.palette === COULEURS.palette));
+  $('#par-morceau').checked = COULEURS.parMorceau;
+  try { localStorage.setItem('md-tri-couleurs', JSON.stringify(COULEURS)); } catch (e) {}
+}
 function teinter(id) {
   let n = 0; for (const c of String(id || '')) n = (n * 31 + c.charCodeAt(0)) >>> 0;
-  const t = TONS[n % TONS.length];
-  document.documentElement.style.setProperty('--ton', t);
-  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t);
+  baseMorceau = TONS[n % TONS.length];
+  appliquerCouleurs();
 }
+$('#ouvrir-reglages').addEventListener('click', () => {
+  const p = $('#reglages'); p.hidden = !p.hidden;
+  $('#ouvrir-reglages').setAttribute('aria-expanded', !p.hidden);
+  if (!p.hidden) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+document.querySelectorAll('.choix-palette').forEach(b => b.addEventListener('click', () => { COULEURS.palette = b.dataset.palette; appliquerCouleurs(); }));
+$('#par-morceau').addEventListener('change', e => { COULEURS.parMorceau = e.target.checked; appliquerCouleurs(); });
+appliquerCouleurs();
 function ouvrirMorceau(id) {
   courant = id;
   teinter(id);
