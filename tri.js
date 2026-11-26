@@ -475,8 +475,17 @@ async function suivant() {
   saut = false;
   ouvrirMorceau(id);
 }
+// chaque morceau a sa couleur, toujours la même pour lui
+const TONS = ['#d6ff3d', '#ff5c93', '#ff9a3d', '#5ff0c4', '#c9a8ff', '#7fd9ff', '#ffe14d', '#ff7a6b', '#a6ff8a', '#ffb8e0'];
+function teinter(id) {
+  let n = 0; for (const c of String(id || '')) n = (n * 31 + c.charCodeAt(0)) >>> 0;
+  const t = TONS[n % TONS.length];
+  document.documentElement.style.setProperty('--ton', t);
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t);
+}
 function ouvrirMorceau(id) {
   courant = id;
+  teinter(id);
   debutFiche = Date.now();
   if (id === prevu && reserve && !sansPrechargement && !R.actif) basculer(id);
   else lecteur.loadVideoById({ videoId: id, startSeconds: debut() });
@@ -671,6 +680,8 @@ function majProgres() {
   $('#pg-pct').textContent = pct >= 10 || pct === 0 ? Math.floor(pct) : pct.toFixed(1).replace('.', ',');
   $('#pg-barre').parentElement.style.setProperty('--p', pct + '%');
   $('#pg-barre').style.width = pct + '%';
+  const liq = $('#liquide'), niv = Math.min(100, pct);
+  if (liq.style.getPropertyValue('--niveau') !== String(niv)) { liq.style.setProperty('--niveau', niv); liq.classList.remove('monte'); void liq.offsetWidth; liq.classList.add('monte'); }
   const nom = T.active === SITE ? 'Le site actuel' : T.active === MIX ? '⤨ Random, toutes tes playlists' : (l.nom || 'Ta playlist');
   $('#pg-nom').textContent = nom;
   const jour = T.jours[jourCle()] || 0;
@@ -678,7 +689,7 @@ function majProgres() {
   const palier = Math.floor(juges / PALIER) + 1, dans = juges % PALIER;
   $('#pg-pied').innerHTML = `<b>${faits}</b> trié${faits > 1 ? 's' : ''} ici · <b>${jour}</b> aujourd'hui · <b>${juges}</b> en tout`;
   $('#pg-palier').textContent = palier;
-  $('#pg-palier-pied').textContent = `encore ${PALIER - dans}`;
+  $('#pg-palier-pied').textContent = `encore ${PALIER - dans} pour le suivant`;
   $('.pg-palier').style.setProperty('--pp', (dans / PALIER * 100) + '%');
   // une bulle dans la barre tous les 5 %
   $('#pg-bulles').innerHTML = Array.from({ length: 19 }, (_, i) => `<b style="left:${(i + 1) * 5}%"></b>`).join('');
@@ -692,11 +703,11 @@ function feterPalier(n) {
   vibre([12, 40, 12]);
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const r = $('.pg-palier').getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-  const couleurs = ['#c6f432', '#ff3d7f', '#ffc23c', '#6b3cff', '#3ee0b0', '#5ad1ff'];
+  const couleurs = TONS;
   for (let i = 0; i < 26; i++) {
     const p = document.createElement('i'); p.className = 'petille';
     const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 200;
-    p.style.cssText = `left:${cx}px;top:${cy}px;--c:${couleurs[i % couleurs.length]};--t:${8 + Math.random() * 16}px;--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d - 60}px`;
+    p.style.cssText = `left:${cx}px;top:${cy}px;background:${couleurs[i % couleurs.length]};--t:${8 + Math.random() * 16}px;--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d - 60}px`;
     document.body.appendChild(p); setTimeout(() => p.remove(), 1100);
   }
 }
