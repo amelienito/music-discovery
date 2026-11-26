@@ -253,6 +253,11 @@ async function suiteParMiroir(l) {
   }
   return 0;
 }
+// certaines playlists (publiques pourtant) ne passent pas par le lecteur intégré de YouTube : on les lit par le miroir
+async function secoursMiroir(l) {
+  for (let k = 0; k < 40 && !l.complet; k++) { if (!(await suiteParMiroir(l))) break; }
+  return l.ids.length;
+}
 // en ordre aléatoire, on charge toute la playlist en fond : le hasard porte sur l'ensemble, pas sur les 200 premiers
 let chargementFond = false;
 async function chargerTout() {
@@ -294,13 +299,14 @@ async function demarrerPlusieurs(listes) {
     else if (e.nom && !T.listes[e.cle].nom) T.listes[e.cle].nom = e.nom;
     const l = T.listes[e.cle];
     const ids = await cuePlaylist(e.list, 0);
-    if (!ids || !ids.length) {
+    if (ids && ids.length) {
+      fusionner(l, ids);
+      if (ids.length >= 199) l.complet = false; else l.complet = true;
+    } else if (!(await secoursMiroir(l))) {
       if (!existait) delete T.listes[e.cle];
       rate.push(e.nom || e.list);
       continue;
     }
-    fusionner(l, ids);
-    if (ids.length >= 199) l.complet = false; else l.complet = true;
     ok++;
     if (!T.active || !T.listes[T.active] || T.active === SITE) T.active = e.cle;
     sauver();
@@ -327,7 +333,8 @@ async function demarrer() {
   $('#bouton-charger').textContent = 'Chargement…';
   if (e.list) {
     // on relit toujours la playlist : si tu y as ajouté des morceaux, ils arrivent à la suite
-    const ids = await cuePlaylist(e.list, 0);
+    let ids = await cuePlaylist(e.list, 0);
+    if ((!ids || !ids.length) && !existait && await secoursMiroir(l)) ids = l.ids.slice();
     if (!ids || !ids.length) {
       $('#bouton-charger').textContent = 'Charger';
       if (!existait) {
