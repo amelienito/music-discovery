@@ -359,8 +359,10 @@
     .frise i { border-radius: 2px; }
     @media (max-width: 600px) {
       .tete h1 { font-size: 2.6rem; }
-      .compteurs { width: 100%; justify-content: space-between; }
-      .compteur { padding: 7px 9px; font-size: 13px; }
+      .compteurs { flex: none; }
+      .compteur { padding: 7px 9px; font-size: 13px; white-space: nowrap; }
+      .v-tard { background: color-mix(in srgb, var(--mur) 92%, transparent); backdrop-filter: blur(8px); }
+      .transport button:last-child { flex: 2.2; }
       .v { min-height: 88px; font-size: 1.45rem; }
       .v-passe { font-size: 1.15rem; }
       .transport { width: 100%; } .transport button { flex: 1; min-width: 0; padding: 0 6px; font-size: 13px; }
