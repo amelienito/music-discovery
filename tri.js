@@ -14,11 +14,32 @@ const $ = s => document.querySelector(s);
 const CLE = 'md-tri-v1';
 const charger = () => { try { return JSON.parse(localStorage.getItem(CLE)) || {}; } catch (e) { return {}; } };
 let alerteMemoire = false;
+// filet de sécurité : une copie de secours, jamais écrasée par une progression vide,
+// et un onglet resté ouvert ailleurs n'a plus le droit d'écraser ce qu'un autre onglet vient d'enregistrer
+const SECOURS = 'md-tri-secours';
+let muet = false;
 const sauver = () => {
-  try { localStorage.setItem(CLE, JSON.stringify(T)); }
+  if (muet) return;
+  try {
+    const txt = JSON.stringify(T);
+    localStorage.setItem(CLE, txt);
+    if (Object.keys(T.listes || {}).length) localStorage.setItem(SECOURS, txt);
+  }
   catch (e) { if (!alerteMemoire) { alerteMemoire = true; toast('Mémoire du navigateur pleine : télécharge une sauvegarde.'); } }
 };
+addEventListener('storage', e => {
+  if (e.key !== CLE || muet) return;
+  muet = true;
+  setTimeout(() => toast('La table de tri est ouverte dans un autre onglet : recharge cette page avant de continuer ici.'), 300);
+});
 const T = charger();
+let restaureAuto = false;
+if (!T.listes || !Object.keys(T.listes).length) {
+  try {
+    const sec = JSON.parse(localStorage.getItem(SECOURS) || 'null');
+    if (sec && sec.listes && Object.keys(sec.listes).length) { Object.assign(T, sec); restaureAuto = true; }
+  } catch (e) {}
+}
 T.listes = T.listes || {};
 T.active = T.active || null;
 T.notes = T.notes || {};        // commentaire par morceau (identifiant YouTube)
@@ -1528,6 +1549,7 @@ $('#rv-copier').addEventListener('click', async () => {
 });
 
 // reprise : ce qui est déjà en mémoire
+if (restaureAuto) { sauver(); setTimeout(() => toast('Ta progression avait disparu : elle a été reprise depuis la copie de secours.'), 400); }
 rendreListes();
 majObjectif();
 const nTries = Object.keys(dejaTries()).length;
