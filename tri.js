@@ -511,6 +511,8 @@ function ouvrirMorceau(id) {
   prevu = null;
   afficherFiche(true);
   majCompteurs();
+  // on remonte en haut de la table pour le morceau suivant (titre et lecteur visibles d'un coup)
+  if (!document.body.classList.contains('ecrit')) { const t = $('#table').getBoundingClientRect().top + scrollY - 12; if (scrollY > t + 40) scrollTo({ top: t, behavior: 'smooth' }); }
   setTimeout(() => precharger(id), 1200);
 }
 // aller voir un morceau précis (frise, revue, bilan) : on peut changer d'avis
