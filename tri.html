@@ -561,6 +561,26 @@
       body.en-tri .tete h1 { font-size: 1.4rem; }
       body.en-tri .pg-nom { display: none; }
     }
+
+    /* ── iPhone : rien de coupé, pas de grand rectangle ── */
+    html { overflow-x: clip; }
+    main, main > * { min-width: 0; max-width: 100%; }
+    @media (max-width: 899px) {
+      .tete-droite { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; gap: 6px 14px; }
+      .compteurs { flex-wrap: wrap; gap: 4px 14px; }
+      .frise-tete span { min-width: 0; }
+      /* la bande non / pas sûr / oui : les mots en haut, au-dessus de la barre de Safari */
+      body.en-tri:not(.revision) .verdicts { height: calc(var(--barre) + env(safe-area-inset-bottom)); align-items: stretch; }
+      .v { align-items: flex-start; padding-top: 16px; }
+      .v-passe { box-shadow: none !important; border-left: 1px solid color-mix(in srgb, var(--ton) 30%, transparent); border-right: 1px solid color-mix(in srgb, var(--ton) 30%, transparent); }
+      .v::after { display: none; }
+      /* le verre devient un fin trait de progression posé sur le lecteur */
+      body.en-tri:not(.revision):not(.ecrit) .liquide { height: 6px; right: auto; width: max(6px, calc(var(--niveau, 0) * 1%)); background: var(--encre); z-index: 7;
+        bottom: calc(var(--barre) + env(safe-area-inset-bottom) + min(56.25vw, 30vh)); }
+      body.en-tri:not(.revision):not(.ecrit) .liquide::before, body.en-tri:not(.revision):not(.ecrit) .liquide::after { content: none; }
+      body.en-tri:not(.revision):not(.ecrit) .gauche { bottom: calc(var(--barre) + env(safe-area-inset-bottom)); }
+      body.en-tri:not(.revision):not(.ecrit) main { padding-bottom: calc(var(--barre) + env(safe-area-inset-bottom) + min(56.25vw, 30vh) + 28px); }
+    }
 </style>
 </head>
 <body>
