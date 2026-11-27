@@ -18,20 +18,33 @@ let alerteMemoire = false;
 // et un onglet resté ouvert ailleurs n'a plus le droit d'écraser ce qu'un autre onglet vient d'enregistrer
 const SECOURS = 'md-tri-secours';
 let muet = false;
+// chaque enregistrement porte un numéro : un onglet qui n'a pas vu le dernier numéro est un vieil onglet,
+// il n'écrit plus rien (c'est ce qui effaçait des playlists : un onglet resté ouvert réenregistrait son ancienne version)
+const REV = 'md-tri-rev';
+const revStockee = () => { try { return +localStorage.getItem(REV) || 0; } catch (e) { return 0; } };
+let revConnue = revStockee();
 const sauver = () => {
   if (muet) return;
+  if (revStockee() > revConnue) {
+    muet = true;
+    toast('Cette page est en retard sur un autre onglet : elle se recharge.');
+    setTimeout(() => location.reload(), 1200);
+    return;
+  }
   try {
     const txt = JSON.stringify(T);
+    if (txt === localStorage.getItem(CLE)) return; // rien n'a changé : on n'écrit pas (et on ne réveille pas les autres onglets)
+    revConnue = revStockee() + 1;
+    localStorage.setItem(REV, revConnue);
     localStorage.setItem(CLE, txt);
     if (Object.keys(T.listes || {}).length) localStorage.setItem(SECOURS, txt);
   }
   catch (e) { if (!alerteMemoire) { alerteMemoire = true; toast('Mémoire du navigateur pleine : télécharge une sauvegarde.'); } }
 };
-addEventListener('storage', e => {
-  if (e.key !== CLE || muet) return;
-  muet = true;
-  setTimeout(() => toast('La table de tri est ouverte dans un autre onglet : recharge cette page avant de continuer ici.'), 300);
-});
+// un onglet qu'on retrouve après l'avoir quitté se remet à jour tout seul s'il est en retard
+const rattraper = () => { if (!muet && revStockee() > revConnue) { muet = true; location.reload(); } };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') rattraper(); });
+addEventListener('pageshow', e => { if (e.persisted) rattraper(); });
 const T = charger();
 let restaureAuto = false;
 if (!T.listes || !Object.keys(T.listes).length) {
